@@ -358,3 +358,6 @@ TSWLatexianTemp*
 *.spl
 
 ludwig/
+papers/
+data/
+starter-files/
