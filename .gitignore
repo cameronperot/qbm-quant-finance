@@ -356,3 +356,5 @@ TSWLatexianTemp*
 
 # generated if using elsarticle.cls
 *.spl
+
+ludwig/
