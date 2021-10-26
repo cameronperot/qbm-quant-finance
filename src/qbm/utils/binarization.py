@@ -93,6 +93,17 @@ def convert_bin_str_to_list(bin_str):
     return np.array([int(x) for x in bin_str])
 
 
+def convert_bin_list_to_str(bin_list):
+    """
+    Converts a list of integers to a binary string.
+
+    :param bin_list: List of integers, e.g. [0, 1, 1, 0, 0, 1, 0, 1]
+
+    :returns: Binary string, e.g. "01100101".
+    """
+    return "".join([str(x) for x in bin_list])
+
+
 def convert_binarized_df_to_input_array(df):
     """
     Converts a dataframe of binary strings to an (N, d) array of integers.
@@ -108,3 +119,20 @@ def convert_binarized_df_to_input_array(df):
         ],
         axis=1,
     )
+
+
+def split_bin_str(bin_str, split_points):
+    """
+    Splits a binary string into a list of binary strings at the split points. E.g. to split
+    a length 64 string into four equal length 16 strings, one would pass split points of
+    [0, 16, 32, 48].
+
+    :param bin_str: Binary string.
+    :param split_points: List of points at which to split the string.
+
+    :returns: List of split strings.
+    """
+    return [
+        bin_str[start:stop]
+        for start, stop in zip(split_points, split_points[1:] + [None])
+    ]

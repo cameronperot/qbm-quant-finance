@@ -4,6 +4,32 @@ from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
+import pandas_market_calendars as mcal
+
+
+def _get_holidays(start_date, end_date, exchanges=["NYSE", "LSE"]):
+    """
+    Returns a set of holidays for the provided exchanges. List of exchanges available here:
+    https://pandas-market-calendars.readthedocs.io/en/latest/usage.html.
+
+    :param start_date: Datetime of when to start the window.
+    :param end_date: Datetime of when to end the window.
+
+    :returns: A set of holidays for the provided exchanges.
+    """
+    holidays = set()
+    for exchange in exchanges:
+        calendar = mcal.get_calendar(exchange)
+        exchange_holidays = set(
+            [
+                holiday
+                for holiday in calendar.holidays().holidays
+                if holiday >= start_date.date() and holiday <= end_date.date()
+            ]
+        )
+        holidays = holidays.union(exchange_holidays)
+
+    return holidays
 
 
 def load_raw_data(
@@ -57,16 +83,19 @@ def load_raw_data(
         df["return"] = (df["close"] - df["open"]) / df["open"]
         df["log_return"] = np.log(df["close"] / df["open"])
 
-        # drop days w/ volume <= 0 (removes weekends/holidays) and before/after start/end dates
+        # drop days w/ volume <= 0, weekends, and holidays
+        holidays = _get_holidays(start_date, end_date)
         df = df.loc[
             (df["volume"] >= min_volume)
             & (df.index >= start_date)
             & (df.index <= end_date)
-            & (df.index.day_of_week <= 4)
+            & (df.index.day_of_week < 5)
+            & (~df.index.isin(holidays))
         ]
         assert (df["volume"] >= min_volume).all()
         assert (df.index >= start_date).all()
         assert (df.index <= end_date).all()
+        assert (~df.index.isin(holidays)).all()
 
         # add to dict of dfs
         dfs[dataset] = df
