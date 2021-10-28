@@ -77,6 +77,8 @@ def plot_qq(ax, data, samples, title, params, **kwargs):
     ax.set_ylim(params["ylims"])
     ax.set_xticks(params["xticks"])
     ax.set_yticks(params["yticks"])
+    ax.set_xlabel("Data")
+    ax.set_ylabel("Generated")
     ax.grid(alpha=0.7)
 
     return ax
