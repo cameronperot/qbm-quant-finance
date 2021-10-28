@@ -69,7 +69,7 @@ def unbinarize_df(df_binarized, df, n_bits, ϵ_min=0, ϵ_max=0):
 
     :returns: An unbinarized version of df_binarized.
     """
-    df_unbinarized = df.copy()
+    df_unbinarized = df_binarized.copy()
     for column in df.columns:
         df_unbinarized[column] = unbinarize(
             df_binarized[column],
@@ -100,7 +100,7 @@ def convert_bin_list_to_str(bin_list):
 
     :returns: Binary string, e.g. "01100101".
     """
-    return "".join([str(x) for x in bin_list])
+    return "".join([str(int(x)) for x in bin_list])
 
 
 def convert_binarized_df_to_input_array(df):
