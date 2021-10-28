@@ -1,4 +1,4 @@
-from .utils import compute_stats_over_dfs
+from .autocorrelation import compute_autocorrelation_time
 from .binarization import (
     binarize,
     unbinarize,
@@ -10,8 +10,10 @@ from .binarization import (
     split_bin_str,
 )
 from .data_loading import load_raw_data, merge_dfs
+from .misc import compute_stats_over_dfs, save_artifact, load_artifact
 
 __all__ = [
+    "compute_autocorrelation_time",
     "binarize",
     "unbinarize",
     "binarize_df",
@@ -23,4 +25,6 @@ __all__ = [
     "load_raw_data",
     "merge_dfs",
     "compute_stats_over_dfs",
+    "save_artifact",
+    "load_artifact",
 ]
