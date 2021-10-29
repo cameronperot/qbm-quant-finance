@@ -1,5 +1,6 @@
 import os
 import pickle
+import numpy as np
 import pandas as pd
 
 from pathlib import Path
@@ -64,6 +65,20 @@ def load_artifact(file_name):
     artifacts_dir = _get_path_from_env("QBM_ARTIFACTS_DIR")
     with open(artifacts_dir / f"{file_name}.pkl", "rb") as f:
         return pickle.load(f)
+
+
+@np.vectorize
+def lr_exp_decay(epoch, decay_epoch, period):
+    """
+    Exponential decay function for use in learning rate scheduling.
+
+    :param epoch: Current epoch.
+    :param decay_epoch: Epoch at which to begin the decay.
+    :param period: Decay period.
+
+    :returns: The learning rate scaling factor.
+    """
+    return 2 ** (min((decay_epoch - epoch), 0) / period)
 
 
 def _get_path_from_env(env_var):

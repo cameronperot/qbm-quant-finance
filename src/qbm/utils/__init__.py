@@ -10,7 +10,13 @@ from .binarization import (
     split_bin_str,
 )
 from .data_loading import load_raw_data, merge_dfs
-from .misc import compute_df_stats, compute_stats_over_dfs, save_artifact, load_artifact
+from .misc import (
+    compute_df_stats,
+    compute_stats_over_dfs,
+    save_artifact,
+    load_artifact,
+    lr_exp_decay,
+)
 
 __all__ = [
     "compute_autocorrelation_time",
