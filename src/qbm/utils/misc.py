@@ -5,6 +5,25 @@ import pandas as pd
 from pathlib import Path
 
 
+def compute_df_stats(df):
+    """
+    Compute the min, max, mean, median, and standard deviation of the columns in the dataframe.
+
+    :param df: Dataframe.
+
+    :returns: Dataframe of the statistics.
+    """
+    return pd.DataFrame(
+        {
+            "min": df.min(),
+            "max": df.max(),
+            "mean": df.mean(),
+            "median": df.median(),
+            "std": df.std(),
+        }
+    ).T
+
+
 def compute_stats_over_dfs(dfs):
     """
     Computes the means, medians, and standard deviations column/row-wise over the input
