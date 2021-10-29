@@ -7,6 +7,7 @@ dependencies:
   - black
   - flake8
   - ipython
+  - ipython-autotime
   - ipykernel
   - jupyterlab
   - matplotlib=3.4.3
