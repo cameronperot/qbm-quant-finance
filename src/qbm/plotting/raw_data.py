@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def plot_histogram_grid(df, datasets, params, **kwargs):
+def plot_histogram_grid(df, currency_pairs, params, **kwargs):
     """
     Plots a grid of historgrams for the desired feature.
 
@@ -12,9 +12,9 @@ def plot_histogram_grid(df, datasets, params, **kwargs):
     :returns: Matplotlib figure and axes.
     """
     fig, axs = plt.subplots(2, 2, figsize=(10, 6), tight_layout=True, dpi=300)
-    for dataset, ax in zip(datasets, axs.flatten()):
-        ax.hist(df[dataset], **kwargs)
-        ax.set_title(dataset)
+    for pair, ax in zip(currency_pairs, axs.flatten()):
+        ax.hist(df[pair], **kwargs)
+        ax.set_title(pair)
         ax.set_xlim(params["xlims"])
         ax.set_ylim(params["ylims"])
         ax.set_xticks(params["xticks"])
