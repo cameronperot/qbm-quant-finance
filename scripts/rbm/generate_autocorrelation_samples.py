@@ -1,7 +1,7 @@
 import json
-import os
 
-from pathlib import Path
+from datetime import timedelta
+from time import time
 
 from qbm.utils import get_project_dir, get_rng, load_artifact, unbinarize_df
 from qbm.sampling import generate_samples_df
@@ -29,7 +29,10 @@ model_params = load_artifact(artifacts_dir / "params.pkl")
 v = rng.choice([0, 1], model_params["input_shape"][1])
 
 # generate and save the samples
+start_time = time()
 for i in range(n_sample_dfs):
+    iter_start_time = time()
+
     # generate the samples
     autocorrelation_samples, v = generate_samples_df(
         model=model,
@@ -48,4 +51,12 @@ for i in range(n_sample_dfs):
     autocorrelation_samples.index += i * n_samples_per_df
 
     # save the samples to csv
-    autocorrelation_samples.to_pickle(save_dir / f"{i+1:02}.pkl")
+    autocorrelation_samples.to_pickle(save_dir / f"{i+1:03}.pkl")
+
+    print(
+        f"Completed iteration {i+1} of {n_sample_dfs} in {timedelta(seconds=time() - iter_start_time)}"
+    )
+
+print(
+    f"Completed {n_sample_dfs} iterations in {timedelta(seconds=time() - start_time)}"
+)
