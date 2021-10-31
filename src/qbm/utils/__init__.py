@@ -1,4 +1,3 @@
-from .autocorrelation import compute_autocorrelation_time
 from .binarization import (
     binarize,
     unbinarize,
@@ -19,7 +18,6 @@ from .misc import (
 )
 
 __all__ = [
-    "compute_autocorrelation_time",
     "binarize",
     "unbinarize",
     "binarize_df",
