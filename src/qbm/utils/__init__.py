@@ -12,6 +12,7 @@ from .data_loading import load_raw_data, merge_dfs
 from .misc import (
     compute_df_stats,
     compute_stats_over_dfs,
+    get_project_dir,
     get_rng,
     load_artifact,
     lr_exp_decay,
@@ -34,6 +35,7 @@ __all__ = [
     # misc.
     "compute_df_stats",
     "compute_stats_over_dfs",
+    "get_project_dir",
     "get_rng",
     "load_artifact",
     "lr_exp_decay",

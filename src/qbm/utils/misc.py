@@ -94,17 +94,15 @@ def get_rng(seed):
     return RandomState(MT19937(SeedSequence(seed)))
 
 
-def _get_path_from_env(env_var):
+def get_project_dir():
     """
-    Gets the path from the environment and checks if it is valid.
-
-    :param dir_path: String of the env var, e.g. "QBM_ARTIFACTS_DIR" or "QBM_DATA_DIR".
+    Gets the project directory path from the environment and checks if it is valid.
 
     :returns: Path.
     """
-    dir_path = os.getenv(env_var)
+    dir_path = os.getenv("QBM_PROJECT_DIR")
     if dir_path is None:
-        raise Exception(f"{env_var} env var not set")
+        raise Exception("QBM_PROJECT_DIR env var not set")
 
     dir_path = Path(dir_path)
     if dir_path.exists():
