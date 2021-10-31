@@ -42,28 +42,29 @@ def compute_stats_over_dfs(dfs):
     return {"means": means, "medians": medians, "stds": stds}
 
 
-def save_artifact(artifact, file_name):
+def save_artifact(artifact, file_path):
     """
-    Saves an artifact to the artifacts directory specified by the QBM_ARTIFACTS_DIR env var.
+    Saves a pickled artifact.
 
     :param artifact: Python object to save.
-    :param file_name: Name of the file to save (will be suffixed with .pkl).
+    :param file_path: Name of the file to save.
     """
-    artifacts_dir = _get_path_from_env("QBM_ARTIFACTS_DIR")
-    with open(artifacts_dir / f"{file_name}.pkl", "wb") as f:
+    if not file_path.parent.exists():
+        file_path.parent.mkdir(parents=True)
+
+    with open(file_path, "wb") as f:
         pickle.dump(artifact, f)
 
 
-def load_artifact(file_name):
+def load_artifact(file_path):
     """
-    Loads an artifact from the artifacts directory specified by the QBM_ARTIFACTS_DIR env var.
+    Loads a pickled artifact.
 
-    :param file_name: Name of the file to load (will be suffixed with .pkl).
+    :param file_path: Name of the file to load.
 
     :returns: Loaded python object.
     """
-    artifacts_dir = _get_path_from_env("QBM_ARTIFACTS_DIR")
-    with open(artifacts_dir / f"{file_name}.pkl", "rb") as f:
+    with open(file_path, "rb") as f:
         return pickle.load(f)
 
 
