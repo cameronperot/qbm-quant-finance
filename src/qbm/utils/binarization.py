@@ -2,14 +2,14 @@ import numpy as np
 
 
 @np.vectorize
-def binarize(x, x_min, x_max, n_bits):
+def binarize(x, n_bits, x_min, x_max):
     """
     Convert the value x into a n-bit binary string.
 
     :param x: Value which to convert.
-    :param x_min: Minimum value of the corresponding series.
-    :param x_min: Maximum value of the corresponding series.
-    :param n_bits: Number of bits in the binary string.
+    :param column: Name of the feature to convert w.r.t.
+    :param params: Dict containing the number of bits, and entries corresponding to the column
+        min and max values (including the ϵ factor).
 
     :returns: A binary string representation of x.
     """
@@ -21,62 +21,52 @@ def binarize(x, x_min, x_max, n_bits):
 
 
 @np.vectorize
-def unbinarize(x_binarized, x_min, x_max, n_bits):
+def unbinarize(x, n_bits, x_min, x_max):
     """
-    Convert the value x_bin into a float from a n-bit binary string.
+    Convert the value x into a float from a n-bit binary string.
 
-    :param x_binarized: Value which to convert.
-    :param x_min: Minimum value of the corresponding series.
-    :param x_min: Maximum value of the corresponding series.
-    :param n_bits: Number of bits in the binary string.
+    :param x: Value which to convert.
+    :param params: Dict containing the number of bits, and entries corresponding to the column
+        min and max values (including the ϵ factor).
 
     :returns: A float representation of x.
     """
     scaling_factor = (2 ** n_bits - 1) / (x_max - x_min)
 
-    assert len(x_binarized) == n_bits
-    return int(x_binarized, 2) / scaling_factor + x_min
+    assert len(x) == n_bits
+    return int(x, 2) / scaling_factor + x_min
 
 
-def binarize_df(df, n_bits, ϵ_min=0, ϵ_max=0):
+def binarize_df(df, params):
     """
     Convert all columns of a dataframe to binary representation.
 
     :param df: Dataframe which to convert.
-    :param n_bits: Number of bits in the binary string.
-    :param ϵ_min: ϵ tolerance on the minimum end.
-    :param ϵ_max: ϵ tolerance on the maximum end.
+    :param params: Dict containing the number of bits, and entries corresponding to the column
+        min and max values (including the ϵ factor).
 
     :returns: A binarized version of df.
     """
     df_binarized = df.copy()
     for column in df.columns:
-        df_binarized[column] = binarize(
-            df[column], df[column].min() - ϵ_min, df[column].max() + ϵ_max, n_bits
-        )
+        df_binarized[column] = binarize(df[column], **params[column])
 
     return df_binarized
 
 
-def unbinarize_df(df_binarized, df, n_bits, ϵ_min=0, ϵ_max=0):
+def unbinarize_df(df, params):
     """
     Convert all columns of a dataframe to floats from binary representation.
 
-    :param df_binarized: Dataframe which to convert.
-    :param n_bits: Number of bits in the binary string.
-    :param ϵ_min: ϵ tolerance on the minimum end.
-    :param ϵ_max: ϵ tolerance on the maximum end.
+    :param df: Dataframe which to convert.
+    :param params: Dict containing the number of bits, and entries corresponding to the column
+        min and max values (including the ϵ factor).
 
     :returns: An unbinarized version of df_binarized.
     """
-    df_unbinarized = df_binarized.copy()
+    df_unbinarized = df.copy()
     for column in df.columns:
-        df_unbinarized[column] = unbinarize(
-            df_binarized[column],
-            df[column].min() - ϵ_min,
-            df[column].max() + ϵ_max,
-            n_bits,
-        )
+        df_unbinarized[column] = unbinarize(df[column], **params[column])
 
     return df_unbinarized
 
@@ -89,7 +79,7 @@ def convert_bin_str_to_list(bin_str):
 
     :returns: List of integers, e.g. [0, 1, 1, 0, 0, 1, 0, 1]
     """
-    return np.array([int(x) for x in bin_str])
+    return np.fromiter((int(x) for x in bin_str), np.int8)
 
 
 def convert_bin_list_to_str(bin_list):
@@ -100,7 +90,7 @@ def convert_bin_list_to_str(bin_list):
 
     :returns: Binary string, e.g. "01100101".
     """
-    return "".join([str(int(x)) for x in bin_list])
+    return "".join(str(x) for x in bin_list)
 
 
 def convert_binarized_df_to_input_array(df):
