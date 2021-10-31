@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from pathlib import Path
+from numpy.random import MT19937, RandomState, SeedSequence
 
 
 def compute_df_stats(df):
@@ -80,6 +81,17 @@ def lr_exp_decay(epoch, decay_epoch, period):
     :returns: The learning rate scaling factor.
     """
     return 2 ** (min((decay_epoch - epoch), 0) / period)
+
+
+def get_rng(seed):
+    """
+    Creates a random number generator with the specified seed value.
+
+    :param seed: Seed value for the rng.
+
+    :returns: Numpy RandomState object.
+    """
+    return RandomState(MT19937(SeedSequence(seed)))
 
 
 def _get_path_from_env(env_var):
