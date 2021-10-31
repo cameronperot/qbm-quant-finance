@@ -15,10 +15,10 @@ touch $ENV_DIR/etc/conda/deactivate.d/env_vars.sh
 
 # set activation of environment variables
 cat <<EOT > $ENV_DIR/etc/conda/activate.d/env_vars.sh
-export QBM_ARTIFACTS_DIR=$HOME/thesis/artifacts
+export QBM_PROJECT_DIR=\$HOME/thesis
 EOT
 
 # set deactivation of environment variables
 cat <<EOT > $ENV_DIR/etc/conda/deactivate.d/env_vars.sh
-unset QBM_ARTIFACTS_DIR
+unset QBM_PROJECT_DIR
 EOT
