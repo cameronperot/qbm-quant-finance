@@ -1,5 +1,10 @@
 from .raw_data import plot_histogram_grid, plot_violin
-from .metrics import plot_correlation_coefficients, plot_qq, plot_qq_grid
+from .metrics import (
+    plot_correlation_coefficients,
+    plot_qq,
+    plot_qq_grid,
+    plot_volatilities,
+)
 
 import mplfinance as mpf
 
@@ -14,4 +19,5 @@ __all__ = [
     "plot_correlation_coefficients",
     "plot_qq",
     "plot_qq_grid",
+    "plot_volatilities",
 ]
