@@ -1,5 +1,6 @@
 import json
 
+from copy import deepcopy
 from datetime import timedelta
 from joblib import Parallel, delayed
 from time import time
@@ -40,9 +41,14 @@ def generate_samples_df_wrapper(i):
     """
     iter_start_time = time()
 
+    # copy the model and give it a new rng, otherwise it will always use the same random
+    # number chain, which ends up as an attractor
+    model_i = deepcopy(model)
+    model_i.random_state = get_rng(i)
+
     # generate the samples
     samples, _ = generate_samples_df(
-        model=model,
+        model=model_i,
         v=V[i],
         n_samples=model_params["input_shape"][0],
         n_steps=n_steps,
