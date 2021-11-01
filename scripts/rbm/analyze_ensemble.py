@@ -29,7 +29,7 @@ log_returns = pd.read_csv(
 )
 
 # load the ensemble data
-dfs = [
+sample_ensemble = [
     pd.read_pickle(data_dir / file_name)
     for file_name in data_dir.iterdir()
     if str(file_name).endswith(".pkl")
@@ -43,8 +43,8 @@ qq_plot_params = {
     "xticks": np.linspace(-0.04, 0.04, 9),
     "yticks": np.linspace(-0.04, 0.04, 9),
 }
-for i, df in enumerate(dfs):
-    fig, axs = plot_qq_grid(log_returns, df, qq_plot_params)
+for i, samples in enumerate(sample_ensemble):
+    fig, axs = plot_qq_grid(log_returns, samples, qq_plot_params)
     plt.savefig(plot_dir / f"qq_{i+1:03}.png")
     plt.close(fig)
 
@@ -62,7 +62,10 @@ correlation_coefficients_data = compute_correlation_coefficients(
     log_returns, combinations
 )
 correlation_coefficients_sample = compute_stats_over_dfs(
-    [compute_correlation_coefficients(df, combinations) for df in dfs]
+    [
+        compute_correlation_coefficients(samples, combinations)
+        for samples in sample_ensemble
+    ]
 )
 for k, v in correlation_coefficients_sample.items():
     correlation_coefficients_sample[k] = v.reindex_like(correlation_coefficients_data)
@@ -74,7 +77,6 @@ print(correlation_coefficients_sample["means"])
 print("\nSample (std)")
 print(correlation_coefficients_sample["stds"])
 
-# plot the correlation coefficients
 fig, axs = plot_correlation_coefficients(
     correlation_coefficients_data, correlation_coefficients_sample
 )
@@ -84,7 +86,7 @@ plt.close(fig)
 # compute the volatilities
 volatilities_data = compute_annualized_volatility(log_returns)
 volatilities_sample = compute_stats_over_dfs(
-    [compute_annualized_volatility(df) for df in dfs]
+    [compute_annualized_volatility(samples) for samples in sample_ensemble]
 )
 volatilities = pd.DataFrame(
     {
