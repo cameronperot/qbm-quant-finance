@@ -1,13 +1,14 @@
 {
     "model_name": "BernoulliRBM_20211031_130749",
     "ensemble": {
-        "size": 100,
-        "n_steps": 10000,
-        "n_jobs": 6,
-        "seed": 42
+        "size": "100",
+        "n_steps": "10_000",
+        "n_jobs": "6",
+        "seed": "42"
     },
     "autocorrelation": {
-        "n_samples_per_df": 10000000,
-        "n_sample_dfs": 25
+        "n_samples_per_df": "10_000_000",
+        "n_sample_dfs": "10",
+        "n_lags": "2_000"
     }
 }
