@@ -47,10 +47,19 @@ def generate_samples_df(
         (n_samples, len(columns)), f"U{binarization_params[columns[0]]['n_bits']}"
     )
 
-    for i in range(n_samples):
+    if v.ndim == 1:
+        for i in range(n_samples):
+            v = generate_sample(model, v, n_steps)
+            samples[i] = np.stack(
+                ["".join(x) for x in np.array_split(v.astype("str"), split_points)]
+            )
+
+    elif v.ndim == 2:
+        assert v.shape[0] == n_samples
         v = generate_sample(model, v, n_steps)
-        samples[i] = np.stack(
-            ["".join(x) for x in np.array_split(v.astype("str"), split_points)]
-        )
+        for i in range(n_samples):
+            samples[i] = np.stack(
+                ["".join(x) for x in np.array_split(v[i].astype("str"), split_points)]
+            )
 
     return pd.DataFrame(samples, columns=columns), v
