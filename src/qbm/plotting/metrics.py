@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 
 
-def plot_correlation_coefficients(data, sample):
+def plot_correlation_coefficients(data, samples):
     """
-    Plots the data correlation coefficients against those of the sample.
+    Plots the data correlation coefficients against those of the samples.
 
     :param data: Correlation coefficients of the data.
-    :param sample: Correlation coefficients of the sample, this is
+    :param samples: Correlation coefficients of the samples, this is
         a dict of dataframes, containing keys ["means", "stds"] (e.g. output of
         compute_stats_over_dfs).
 
@@ -17,9 +17,9 @@ def plot_correlation_coefficients(data, sample):
         ax.set_title(row)
         ax.errorbar(
             range(3),
-            sample["means"].loc[row],
+            samples["means"].loc[row],
             label="Sample Ensemble",
-            yerr=sample["stds"].loc[row],
+            yerr=samples["stds"].loc[row],
             fmt="o",
             markersize=4,
             linewidth=1.8,
@@ -48,13 +48,13 @@ def plot_correlation_coefficients(data, sample):
     return fig, axs
 
 
-def plot_qq(ax, data, sample, title, params, **kwargs):
+def plot_qq(ax, data, samples, title, params, **kwargs):
     """
-    Plots a QQ plot of the data against the sample on the provided ax.
+    Plots a QQ plot of the data against the samples on the provided ax.
 
     :param ax: Matplotlib axis.
     :param data: Array of data points.
-    :param sample: Array of sample.
+    :param samples: Array of samples.
     :param title: Title of the plot.
     :param params: Additional parameter dictionary for ax configuration, required keys are
         ["xlims", "ylims", "xticks", "yticks"].
@@ -68,25 +68,25 @@ def plot_qq(ax, data, sample, title, params, **kwargs):
         color="tab:red",
         alpha=0.7,
     )
-    ax.scatter(sorted(data), sorted(sample), **kwargs)
+    ax.scatter(sorted(data), sorted(samples), **kwargs)
     ax.set_title(title)
     ax.set_xlim(params["xlims"])
     ax.set_ylim(params["ylims"])
     ax.set_xticks(params["xticks"])
     ax.set_yticks(params["yticks"])
     ax.set_xlabel("Data")
-    ax.set_ylabel("Sample")
+    ax.set_ylabel("Samples")
     ax.grid(alpha=0.7)
 
     return ax
 
 
-def plot_qq_grid(data, sample, params):
+def plot_qq_grid(data, samples, params):
     """
     Plots a 2x2 grid of QQ plots.
 
     :param data: Data must be a dataframe of shape (N, 4).
-    :param sample: sample must be a dataframe with matching column names to the data.
+    :param samples: samples must be a dataframe with matching column names to the data.
     :param params: Additional parameter dictionary for ax configuration, required keys are
         ["xlims", "ylims", "xticks", "yticks"].
 
@@ -94,17 +94,18 @@ def plot_qq_grid(data, sample, params):
     """
     fig, axs = plt.subplots(2, 2, figsize=(10, 10), dpi=300, tight_layout=True)
     for column, ax in zip(data.columns, axs.flatten()):
-        plot_qq(ax, data[column], sample[column], column, params)
+        plot_qq(ax, data[column], samples[column], column, params)
+    plt.tight_layout()
 
     return fig, axs
 
 
-def plot_volatilities(data, sample, params):
+def plot_volatilities(data, samples, params):
     """
-    Plots the data annualized volatility against those of the sample.
+    Plots the data annualized volatility against those of the samples.
 
     :param data: Annualized volatility of the data.
-    :param sample: Annualized volatility of the sample, this is
+    :param samples: Annualized volatility of the samples, this is
         a dict of series, containing keys ["means", "stds"] (e.g. output of
         compute_stats_over_dfs).
 
@@ -114,9 +115,9 @@ def plot_volatilities(data, sample, params):
     ax.set_title("Annualized Volatility")
     ax.errorbar(
         range(4),
-        sample["means"],
+        samples["means"],
         label="Sample Ensemble",
-        yerr=sample["stds"],
+        yerr=samples["stds"],
         fmt="o",
         markersize=6,
         linewidth=2,
