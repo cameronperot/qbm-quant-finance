@@ -1,5 +1,7 @@
 from .raw_data import plot_histogram_grid, plot_violin
 from .metrics import (
+    plot_autocorrelation,
+    plot_autocorrelation_grid,
     plot_correlation_coefficients,
     plot_qq,
     plot_qq_grid,
@@ -16,6 +18,8 @@ __all__ = [
     "plot_histogram_grid",
     "plot_violin",
     # metrics
+    "plot_autocorrelation",
+    "plot_autocorrelation_grid",
     "plot_correlation_coefficients",
     "plot_qq",
     "plot_qq_grid",

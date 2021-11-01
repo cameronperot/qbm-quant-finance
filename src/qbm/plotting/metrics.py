@@ -1,6 +1,44 @@
 import matplotlib.pyplot as plt
 
 
+def plot_autocorrelation(ax, lags, acf, title):
+    """
+    Plots the autocorrelation (acf) as a function of the lag on ax.
+
+    :param ax: Matplotlib axis.
+    :param lags: Lags over which the acf is computed.
+    :param acf: Autocorrelation function.
+
+    :returns: Matplotlib axis.
+    """
+    ax.plot(lags, acf)
+    ax.set_title(title)
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlim(1, 10 ** 4)
+    ax.set_ylim(10 ** -4, 1)
+    ax.set_xlabel("Lag")
+    ax.set_ylabel("Autocorrelation")
+    ax.grid(alpha=0.7)
+
+    return ax
+
+
+def plot_autocorrelation_grid(samples):
+    """
+    Plots the autocorrelation function (acf) for all currencies in the samples dataframe.
+
+    :param sample: Dataframe of samples.
+    :param
+    """
+    fig, axs = plt.subplots(2, 2, figsize=(10, 6), dpi=300)
+    for column, ax in zip(samples.columns, axs.flatten()):
+        plot_autocorrelation(ax, range(len(samples[column])), samples[column], column)
+    plt.tight_layout()
+
+    return fig, axs
+
+
 def plot_correlation_coefficients(data, samples):
     """
     Plots the data correlation coefficients against those of the samples.
