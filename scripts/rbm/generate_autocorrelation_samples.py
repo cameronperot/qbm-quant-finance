@@ -11,7 +11,7 @@ project_dir = get_project_dir()
 
 with open(project_dir / "scripts/rbm/config.json") as f:
     config = json.load(f)
-model_name = config["model_name"]
+model_name = config["load_model_name"]
 n_samples_per_df = int(config["autocorrelation"]["n_samples_per_df"])
 n_sample_dfs = int(config["autocorrelation"]["n_sample_dfs"])
 

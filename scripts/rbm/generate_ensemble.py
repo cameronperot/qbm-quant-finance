@@ -13,7 +13,7 @@ project_dir = get_project_dir()
 
 with open(project_dir / "scripts/rbm/config.json") as f:
     config = json.load(f)
-model_name = config["model_name"]
+model_name = config["load_model_name"]
 ensemble_size = int(config["ensemble"]["size"])
 n_steps = int(config["ensemble"]["n_steps"])
 n_jobs = int(config["ensemble"]["n_jobs"])
