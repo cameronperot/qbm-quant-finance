@@ -34,6 +34,7 @@ def plot_autocorrelation_grid(samples):
     fig, axs = plt.subplots(2, 2, figsize=(10, 6), dpi=300)
     for column, ax in zip(samples.columns, axs.flatten()):
         plot_autocorrelation(ax, range(len(samples[column])), samples[column], column)
+
     plt.tight_layout()
 
     return fig, axs
@@ -133,6 +134,7 @@ def plot_qq_grid(data, samples, params):
     fig, axs = plt.subplots(2, 2, figsize=(10, 10), dpi=300, tight_layout=True)
     for column, ax in zip(data.columns, axs.flatten()):
         plot_qq(ax, data[column], samples[column], column, params)
+
     plt.tight_layout()
 
     return fig, axs

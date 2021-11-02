@@ -21,6 +21,8 @@ def plot_histogram_grid(df, currency_pairs, params, **kwargs):
         ax.set_yticks(params["yticks"])
         ax.grid(alpha=0.7)
 
+    plt.tight_layout()
+
     return fig, axs
 
 
@@ -52,5 +54,7 @@ def plot_violin(df, params, **kwargs):
     ax.set_ylim(params["ylims"])
     ax.set_yticks(params["yticks"])
     ax.grid(alpha=0.7)
+
+    plt.tight_layout()
 
     return fig, ax
