@@ -54,6 +54,20 @@ def binarize_df(df, params):
     return df_binarized
 
 
+def binarize_volatility(volatility):
+    """
+    Binarizes the volatilities. Value is 1 if the rolling volatility is greater than
+    the historical median, and 0 otherwise.
+    """
+    volatility_binarized = volatility.copy()
+    for column in volatility.columns:
+        volatility_binarized[column] = (
+            volatility[column] > volatility[column].median()
+        ).astype("int8")
+
+    return volatility_binarized
+
+
 def unbinarize_df(df, params):
     """
     Convert all columns of a dataframe to floats from binary representation.

@@ -1,6 +1,7 @@
 from .binarization import (
     binarize,
     binarize_df,
+    binarize_volatility,
     convert_bin_list_to_str,
     convert_bin_str_to_list,
     convert_binarized_df_to_input_array,
@@ -23,6 +24,7 @@ __all__ = [
     # binarization
     "binarize",
     "binarize_df",
+    "binarize_volatility",
     "convert_bin_list_to_str",
     "convert_bin_str_to_list",
     "convert_binarized_df_to_input_array",
