@@ -11,8 +11,7 @@ from qbm.sampling import generate_samples_df
 # configuration
 project_dir = get_project_dir()
 
-with open(project_dir / "scripts/rbm/config.json") as f:
-    config = json.load(f)
+config = load_artifact(project_dir / "scripts/rbm/config.json")
 model_name = config["load_model_name"]
 ensemble_size = int(config["ensemble"]["size"])
 n_steps = int(config["ensemble"]["n_steps"])
@@ -27,7 +26,7 @@ if not save_dir.exists():
 # load the model and params
 rng = get_rng(seed)
 model = load_artifact(artifacts_dir / "model.pkl")
-model_params = load_artifact(artifacts_dir / "params.pkl")
+model_params = load_artifact(artifacts_dir / "params.json")
 
 # generate initial values for the visible layer
 V = rng.choice([0, 1], (ensemble_size, model_params["input_shape"][1]))

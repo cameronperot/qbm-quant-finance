@@ -5,14 +5,13 @@ import pandas as pd
 
 from qbm.metrics import compute_annualized_volatility, compute_correlation_coefficients
 from qbm.plotting import plot_correlation_coefficients, plot_qq_grid, plot_volatilities
-from qbm.utils import get_project_dir, compute_stats_over_dfs
+from qbm.utils import get_project_dir, compute_stats_over_dfs, load_artifact
 
 # configuration
 project_dir = get_project_dir()
 
-with open(project_dir / "scripts/rbm/config.json") as f:
-    config = json.load(f)
-model_name = config["model_name"]
+config = load_artifact(project_dir / "scripts/rbm/config.json")
+model_name = config["load_model_name"]
 
 artifacts_dir = project_dir / f"artifacts/{model_name}"
 data_dir = artifacts_dir / "ensemble_samples"

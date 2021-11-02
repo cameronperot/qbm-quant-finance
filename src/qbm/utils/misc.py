@@ -1,3 +1,4 @@
+import json
 import os
 import pickle
 import numpy as np
@@ -53,8 +54,12 @@ def save_artifact(artifact, file_path):
     if not file_path.parent.exists():
         file_path.parent.mkdir(parents=True)
 
-    with open(file_path, "wb") as f:
-        pickle.dump(artifact, f)
+    if file_path.suffix == ".json":
+        with open(file_path, "w") as f:
+            json.dump(artifact, f, indent=4)
+    elif file_path.suffix == ".pkl":
+        with open(file_path, "wb") as f:
+            pickle.dump(artifact, f)
 
 
 def load_artifact(file_path):
@@ -65,8 +70,12 @@ def load_artifact(file_path):
 
     :returns: Loaded python object.
     """
-    with open(file_path, "rb") as f:
-        return pickle.load(f)
+    if file_path.suffix == ".json":
+        with open(file_path, "r") as f:
+            return json.load(f)
+    elif file_path.suffix == ".pkl":
+        with open(file_path, "rb") as f:
+            return pickle.load(f)
 
 
 @np.vectorize

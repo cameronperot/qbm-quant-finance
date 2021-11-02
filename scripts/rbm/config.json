@@ -1,5 +1,5 @@
 {
-    "load_model_name": "BernoulliRBM_20211102_101549",
+    "load_model_name": "BernoulliRBM_20211102_105601",
     "model_params": {
         "seed": 42,
         "n_bits": 16,

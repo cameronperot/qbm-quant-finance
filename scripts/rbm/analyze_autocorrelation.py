@@ -6,14 +6,13 @@ import pandas as pd
 import statsmodels.api as sm  # use statsmodels' acf because it's faster and smoother than emcee's
 
 from qbm.plotting import plot_autocorrelation_grid
-from qbm.utils import get_project_dir
+from qbm.utils import get_project_dir, load_artifact
 
 # configuration
 project_dir = get_project_dir()
 
-with open(project_dir / "scripts/rbm/config.json") as f:
-    config = json.load(f)
-model_name = config["model_name"]
+config = load_artifact(project_dir / "scripts/rbm/config.json")
+model_name = config["load_model_name"]
 n_lags = int(config["autocorrelation"]["n_lags"])
 
 artifacts_dir = project_dir / f"artifacts/{model_name}"
