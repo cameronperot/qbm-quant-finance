@@ -8,7 +8,7 @@ from .binarization import (
     unbinarize,
     unbinarize_df,
 )
-from .data_loading import load_raw_data, merge_dfs
+from .data_loading import load_raw_data, load_train_data, merge_dfs
 from .misc import (
     compute_df_stats,
     compute_stats_over_dfs,
@@ -31,6 +31,7 @@ __all__ = [
     "unbinarize_df",
     # data_loading
     "load_raw_data",
+    "load_train_data",
     "merge_dfs",
     # misc.
     "compute_df_stats",

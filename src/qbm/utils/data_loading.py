@@ -158,6 +158,21 @@ def load_raw_data(
         return df, log_returns
 
 
+def load_train_data(data_dir):
+    """
+    Loads the training data (log returns) in float form.
+
+    :param data_dir: Path to the data directory.
+
+    :returns: Log returns dataframe.
+    """
+    return pd.read_csv(
+        data_dir / "train/log_returns.csv",
+        parse_dates=["date"],
+        index_col="date",
+    )
+
+
 def merge_dfs(dfs, currency_pairs):
     """
     Merges the dataframes into one, prefixing the columns with the keys of dfs.
