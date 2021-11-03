@@ -79,4 +79,4 @@ model.fit(X_train)
 # save artifacts
 save_artifact(model_params, artifacts_dir / "params.json")
 save_artifact(model, artifacts_dir / "model.pkl")
-log_returns.to_csv(artifacts_dir / "log_returns.csv")
+log_returns.loc[training_data["index"]].to_csv(artifacts_dir / "log_returns.csv")
