@@ -19,7 +19,7 @@ n_jobs = int(config["ensemble"]["n_jobs"])
 seed = int(config["ensemble"]["seed"])
 
 artifacts_dir = project_dir / f"artifacts/{model_name}"
-save_dir = artifacts_dir / "ensemble_samples"
+save_dir = artifacts_dir / "samples_ensemble"
 if not save_dir.exists():
     save_dir.mkdir()
 
@@ -29,7 +29,7 @@ model = load_artifact(artifacts_dir / "model.pkl")
 model_params = load_artifact(artifacts_dir / "params.json")
 
 # generate initial values for the visible layer
-V = rng.choice([0, 1], (ensemble_size, model_params["input_shape"][1]))
+V = rng.choice([0, 1], (ensemble_size, model_params["X_train_shape"][1]))
 
 
 def generate_samples_df_wrapper(i):
@@ -49,11 +49,9 @@ def generate_samples_df_wrapper(i):
     samples, _ = generate_samples_df(
         model=model_i,
         v=V[i],
-        n_samples=model_params["input_shape"][0],
+        n_samples=model_params["X_train_shape"][0],
         n_steps=n_steps,
-        columns=model_params["columns"],
-        binarization_params=model_params["binarization_params"],
-        split_points=model_params["split_points"],
+        model_params=model_params,
     )
     samples = unbinarize_df(samples, model_params["binarization_params"])
 

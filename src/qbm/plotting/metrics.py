@@ -8,6 +8,7 @@ def plot_autocorrelation(ax, lags, acf, title):
     :param ax: Matplotlib axis.
     :param lags: Lags over which the acf is computed.
     :param acf: Autocorrelation function.
+    :param title: Title of the plot.
 
     :returns: Matplotlib axis.
     """
@@ -28,8 +29,9 @@ def plot_autocorrelation_grid(samples):
     """
     Plots the autocorrelation function (acf) for all currencies in the samples dataframe.
 
-    :param sample: Dataframe of samples.
-    :param
+    :param samples: Dataframe of samples.
+
+    :returns: Matplotlib figure and axes.
     """
     fig, axs = plt.subplots(2, 2, figsize=(10, 6), dpi=300)
     for column, ax in zip(samples.columns, axs.flatten()):
@@ -124,8 +126,8 @@ def plot_qq_grid(data, samples, params):
     """
     Plots a 2x2 grid of QQ plots.
 
-    :param data: Data must be a dataframe of shape (N, 4).
-    :param samples: samples must be a dataframe with matching column names to the data.
+    :param data: A dataframe of shape (n_samples, 4).
+    :param samples: A dataframe with matching column names to the data and the same shape.
     :param params: Additional parameter dictionary for ax configuration, required keys are
         ["xlims", "ylims", "xticks", "yticks"].
 
@@ -142,19 +144,20 @@ def plot_qq_grid(data, samples, params):
 
 def plot_volatilities(data, samples, params):
     """
-    Plots the data annualized volatility against those of the samples.
+    Plots the data annualized volatility against those of the samples on an error bar plot.
 
     :param data: Annualized volatility of the data.
-    :param samples: Annualized volatility of the samples, this is
-        a dict of series, containing keys ["means", "stds"] (e.g. output of
-        compute_stats_over_dfs).
+    :param samples: Annualized volatility of the samples, this is a dict of series,
+        containing keys ["means", "stds"] (e.g. output of compute_stats_over_dfs).
+    :param params: Additional parameter dictionary for ax configuration, required keys are
+        ["xlims", "ylims", "yticks"].
 
     :returns: Matplotlib figure and axes.
     """
     fig, ax = plt.subplots(figsize=(9, 6), dpi=300)
     ax.set_title("Annualized Volatility")
     ax.errorbar(
-        range(4),
+        range(len(data)),
         samples["means"],
         label="Sample Ensemble",
         yerr=samples["stds"],
@@ -165,7 +168,7 @@ def plot_volatilities(data, samples, params):
         zorder=1,
     )
     ax.scatter(
-        range(4),
+        range(len(data)),
         data,
         label="Data",
         marker="x",
@@ -175,7 +178,7 @@ def plot_volatilities(data, samples, params):
     )
     ax.set_xlim(params["xlims"])
     ax.set_ylim(params["ylims"])
-    ax.set_xticks(ticks=range(4))
+    ax.set_xticks(ticks=range(len(data)))
     ax.set_yticks(params["yticks"])
     ax.set_xticklabels(labels=data.index)
     ax.grid(alpha=0.7)

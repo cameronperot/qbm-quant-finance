@@ -15,7 +15,7 @@ n_samples_per_df = int(config["autocorrelation"]["n_samples_per_df"])
 n_sample_dfs = int(config["autocorrelation"]["n_sample_dfs"])
 
 artifacts_dir = project_dir / f"artifacts/{model_name}"
-save_dir = artifacts_dir / "autocorrelation_samples"
+save_dir = artifacts_dir / "samples_autocorrelation"
 if not save_dir.exists():
     save_dir.mkdir()
 
@@ -25,7 +25,7 @@ model = load_artifact(artifacts_dir / "model.pkl")
 model_params = load_artifact(artifacts_dir / "params.json")
 
 # generate initial values for the visible layer
-v = rng.choice([0, 1], model_params["input_shape"][1])
+v = rng.choice([0, 1], model_params["X_train_shape"][1])
 
 # generate and save the samples
 start_time = time()
@@ -38,9 +38,7 @@ for i in range(n_sample_dfs):
         v=v,
         n_samples=n_samples_per_df,
         n_steps=1,
-        columns=model_params["columns"],
-        binarization_params=model_params["binarization_params"],
-        split_points=model_params["split_points"],
+        model_params=model_params,
     )
     autocorrelation_samples = unbinarize_df(
         autocorrelation_samples, model_params["binarization_params"]

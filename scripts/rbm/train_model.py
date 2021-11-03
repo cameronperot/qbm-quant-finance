@@ -1,16 +1,18 @@
 import numpy as np
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from sklearn.neural_network import BernoulliRBM
 
+from qbm.metrics import compute_rolling_volatility
 from qbm.utils import (
     binarize_df,
-    convert_binarized_df_to_input_array,
+    binarize_volatility,
     get_project_dir,
     get_rng,
     load_artifact,
-    load_train_data,
+    load_log_returns,
     lr_exp_decay,
+    prepare_training_data,
     save_artifact,
 )
 
@@ -27,7 +29,7 @@ data_dir = project_dir / "data"
 rng = get_rng(model_params["seed"])
 
 # data loading
-log_returns = load_train_data(data_dir)
+log_returns = load_log_returns(data_dir / "train/log_returns.csv")
 
 # binarization
 binarization_params = {}
@@ -40,15 +42,21 @@ for column in log_returns.columns:
 log_returns_binarized = binarize_df(log_returns, binarization_params)
 model_params["binarization_params"] = binarization_params
 
-# create the training set
-X_train = convert_binarized_df_to_input_array(log_returns_binarized)
-for i in range(X_train.shape[0]):
-    assert "".join([x for x in log_returns_binarized.iloc[i]]) == "".join(
-        [str(x) for x in X_train[i]]
+# volatility indicators
+if model_params["volatility_indicators"]:
+    volatility_binarized = binarize_volatility(
+        compute_rolling_volatility(log_returns, timedelta(days=90))
     )
+else:
+    volatility_binarized = None
+
+# create the training set
+training_data = prepare_training_data(log_returns_binarized, volatility_binarized)
+X_train = training_data["X_train"]
 rng.shuffle(X_train)
-model_params["input_shape"] = X_train.shape
-model_params["columns"] = log_returns.columns.to_list()
+model_params["X_train_shape"] = X_train.shape
+model_params["columns"] = training_data["columns"]
+model_params["split_indices"] = training_data["split_indices"]
 
 # train model
 print(f"Model Name: {model_params['name']}")

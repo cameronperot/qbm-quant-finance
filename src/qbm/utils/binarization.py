@@ -2,14 +2,14 @@ import numpy as np
 
 
 @np.vectorize
-def binarize(x, n_bits, x_min, x_max):
+def binarize(x, n_bits, x_min, x_max, **kwargs):
     """
     Convert the value x into a n-bit binary string.
 
     :param x: Value which to convert.
-    :param column: Name of the feature to convert w.r.t.
-    :param params: Dict containing the number of bits, and entries corresponding to the column
-        min and max values (including the ϵ factor).
+    :param n_bits: Length of the binary string.
+    :param x_min: Minimum value for scaling.
+    :param x_max: Maximum value for scaling.
 
     :returns: A binary string representation of x.
     """
@@ -20,69 +20,54 @@ def binarize(x, n_bits, x_min, x_max):
     return bin(x)[2:].zfill(n_bits)
 
 
-@np.vectorize
-def unbinarize(x, n_bits, x_min, x_max):
-    """
-    Convert the value x into a float from a n-bit binary string.
-
-    :param x: Value which to convert.
-    :param params: Dict containing the number of bits, and entries corresponding to the column
-        min and max values (including the ϵ factor).
-
-    :returns: A float representation of x.
-    """
-    scaling_factor = (2 ** n_bits - 1) / (x_max - x_min)
-
-    assert len(x) == n_bits
-    return int(x, 2) / scaling_factor + x_min
-
-
-def binarize_df(df, params):
+def binarize_df(df, binarization_params):
     """
     Convert all columns of a dataframe to binary representation.
 
     :param df: Dataframe which to convert.
-    :param params: Dict containing the number of bits, and entries corresponding to the column
-        min and max values (including the ϵ factor).
+    :param binarization_params: Dict containing the number of bits, and entries corresponding
+        to the column min and max values (including the ϵ factor).
 
     :returns: A binarized version of df.
     """
     df_binarized = df.copy()
     for column in df.columns:
-        df_binarized[column] = binarize(df[column], **params[column])
+        df_binarized[column] = binarize(df[column], **binarization_params[column])
 
     return df_binarized
 
 
 def binarize_volatility(volatility):
     """
-    Binarizes the volatilities. Value is 1 if the rolling volatility is greater than
-    the historical median, and 0 otherwise.
+    Binarizes the volatilities. Value is 1 if the rolling volatility is greater than the
+        historical median, and 0 otherwise.
+
+    :param volatility: Dataframe of rolling volatilities.
+
+    :returns: Dataframe of binarized rolling volatilities.
     """
     volatility_binarized = volatility.copy()
     for column in volatility.columns:
         volatility_binarized[column] = (
             volatility[column] > volatility[column].median()
-        ).astype("int8")
+        ).astype(np.int8)
+
+    # append "_binary" to the column names
+    column_map = {column: f"{column}_binary" for column in volatility.columns}
+    volatility_binarized.rename(columns=column_map, inplace=True)
 
     return volatility_binarized
 
 
-def unbinarize_df(df, params):
+def convert_bin_list_to_str(bin_list):
     """
-    Convert all columns of a dataframe to floats from binary representation.
+    Converts a list of integers to a binary string.
 
-    :param df: Dataframe which to convert.
-    :param params: Dict containing the number of bits, and entries corresponding to the column
-        min and max values (including the ϵ factor).
+    :param bin_list: List of binary numbers, e.g. [0, 1, 1, 0, 0, 1, 0, 1]
 
-    :returns: An unbinarized version of df_binarized.
+    :returns: Binary string, e.g. "01100101".
     """
-    df_unbinarized = df.copy()
-    for column in df.columns:
-        df_unbinarized[column] = unbinarize(df[column], **params[column])
-
-    return df_unbinarized
+    return "".join(str(x) for x in bin_list)
 
 
 def convert_bin_str_to_list(bin_str):
@@ -96,46 +81,41 @@ def convert_bin_str_to_list(bin_str):
     return np.fromiter((int(x) for x in bin_str), np.int8)
 
 
-def convert_bin_list_to_str(bin_list):
+@np.vectorize
+def unbinarize(x, n_bits, x_min, x_max, **kwargs):
     """
-    Converts a list of integers to a binary string.
+    Convert the value x into a float from a n-bit binary string.
 
-    :param bin_list: List of integers, e.g. [0, 1, 1, 0, 0, 1, 0, 1]
+    :param x: Value which to convert.
+    :param n_bits: Length of the binary string.
+    :param x_min: Minimum value for scaling.
+    :param x_max: Maximum value for scaling.
 
-    :returns: Binary string, e.g. "01100101".
+    :returns: A float representation of x.
     """
-    return "".join(str(x) for x in bin_list)
+    scaling_factor = (2 ** n_bits - 1) / (x_max - x_min)
+
+    assert len(x) == n_bits
+    return int(x, 2) / scaling_factor + x_min
 
 
-def convert_binarized_df_to_input_array(df):
+def unbinarize_df(df, binarization_params):
     """
-    Converts a dataframe of binary strings to an (N, d) array of integers.
+    Convert all columns of a dataframe to floats from binary representation.
 
-    :param df: Dataframe of binary strings.
+    :param df: Dataframe which to convert.
+    :param binarization_params: Dict containing the number of bits, and entries corresponding
+        to the column min and max values (including the ϵ factor).
 
-    :returns: Numpy array of integers.
+    :returns: An unbinarized version of df_binarized.
     """
-    return np.concatenate(
-        [
-            np.stack(df.applymap(convert_bin_str_to_list)[column])
-            for column in df.columns
-        ],
-        axis=1,
-    )
+    df_unbinarized = df.copy()
+    for column in df.columns:
+        if column.endswith("_binary"):
+            df_unbinarized[column] = df[column].astype(np.int8)
+        else:
+            df_unbinarized[column] = unbinarize(
+                df[column], **binarization_params[column]
+            )
 
-
-def split_bin_str(bin_str, split_points):
-    """
-    Splits a binary string into a list of binary strings at the split points. E.g. to split
-    a length 64 string into four equal length 16 strings, one would pass split points of
-    [0, 16, 32, 48].
-
-    :param bin_str: Binary string.
-    :param split_points: List of points at which to split the string.
-
-    :returns: List of split strings.
-    """
-    return [
-        bin_str[start:stop]
-        for start, stop in zip(split_points, split_points[1:] + [None])
-    ]
+    return df_unbinarized

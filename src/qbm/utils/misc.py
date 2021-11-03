@@ -16,15 +16,16 @@ def compute_df_stats(df):
 
     :returns: Dataframe of the statistics.
     """
-    return pd.DataFrame(
+    return pd.DataFrame.from_dict(
         {
             "min": df.min(),
             "max": df.max(),
             "mean": df.mean(),
             "median": df.median(),
             "std": df.std(),
-        }
-    ).T
+        },
+        orient="index",
+    )
 
 
 def compute_stats_over_dfs(dfs):
@@ -42,54 +43,6 @@ def compute_stats_over_dfs(dfs):
     stds = df.groupby(df.index).std()
 
     return {"means": means, "medians": medians, "stds": stds}
-
-
-def save_artifact(artifact, file_path):
-    """
-    Saves a pickled artifact.
-
-    :param artifact: Python object to save.
-    :param file_path: Name of the file to save.
-    """
-    if not file_path.parent.exists():
-        file_path.parent.mkdir(parents=True)
-
-    if file_path.suffix == ".json":
-        with open(file_path, "w") as f:
-            json.dump(artifact, f, indent=4)
-    elif file_path.suffix == ".pkl":
-        with open(file_path, "wb") as f:
-            pickle.dump(artifact, f)
-
-
-def load_artifact(file_path):
-    """
-    Loads a pickled artifact.
-
-    :param file_path: Name of the file to load.
-
-    :returns: Loaded python object.
-    """
-    if file_path.suffix == ".json":
-        with open(file_path, "r") as f:
-            return json.load(f)
-    elif file_path.suffix == ".pkl":
-        with open(file_path, "rb") as f:
-            return pickle.load(f)
-
-
-@np.vectorize
-def lr_exp_decay(epoch, decay_epoch, period):
-    """
-    Exponential decay function for use in learning rate scheduling.
-
-    :param epoch: Current epoch.
-    :param decay_epoch: Epoch at which to begin the decay.
-    :param period: Decay period.
-
-    :returns: The learning rate scaling factor.
-    """
-    return 2 ** (min((decay_epoch - epoch), 0) / period)
 
 
 def get_rng(seed):
@@ -118,3 +71,51 @@ def get_project_dir():
         return dir_path
     else:
         raise Exception(f"Path '{dir_path}' does not exist")
+
+
+def load_artifact(file_path):
+    """
+    Loads a pickle or json artifact (depending on the file extension).
+
+    :param file_path: Path of the file to load.
+
+    :returns: Loaded python object.
+    """
+    if file_path.suffix == ".json":
+        with open(file_path, "r") as f:
+            return json.load(f)
+    elif file_path.suffix == ".pkl":
+        with open(file_path, "rb") as f:
+            return pickle.load(f)
+
+
+@np.vectorize
+def lr_exp_decay(epoch, decay_epoch, period):
+    """
+    Exponential decay function for use in learning rate scheduling.
+
+    :param epoch: Current epoch.
+    :param decay_epoch: Epoch at which to begin the decay.
+    :param period: Decay period.
+
+    :returns: The learning rate scaling factor.
+    """
+    return 2 ** (min((decay_epoch - epoch), 0) / period)
+
+
+def save_artifact(artifact, file_path):
+    """
+    Saves a pickle or json artifact (depending on the file extension).
+
+    :param artifact: Python object to save.
+    :param file_path: Path of the file to save.
+    """
+    if not file_path.parent.exists():
+        file_path.parent.mkdir(parents=True)
+
+    if file_path.suffix == ".json":
+        with open(file_path, "w") as f:
+            json.dump(artifact, f, indent=4)
+    elif file_path.suffix == ".pkl":
+        with open(file_path, "wb") as f:
+            pickle.dump(artifact, f)

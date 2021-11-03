@@ -7,6 +7,21 @@ import pandas as pd
 import pandas_market_calendars as mcal
 
 
+def load_log_returns(file_path):
+    """
+    Loads the training data (log returns) in float form.
+
+    :param file_path: Path to the log_returns.csv file.
+
+    :returns: Log returns dataframe.
+    """
+    return pd.read_csv(
+        file_path,
+        parse_dates=["date"],
+        index_col="date",
+    )
+
+
 def load_raw_data(
     data_dir,
     data_source,
@@ -158,26 +173,13 @@ def load_raw_data(
         return df, log_returns
 
 
-def load_train_data(data_dir):
-    """
-    Loads the training data (log returns) in float form.
-
-    :param data_dir: Path to the data directory.
-
-    :returns: Log returns dataframe.
-    """
-    return pd.read_csv(
-        data_dir / "train/log_returns.csv",
-        parse_dates=["date"],
-        index_col="date",
-    )
-
-
 def merge_dfs(dfs, currency_pairs):
     """
     Merges the dataframes into one, prefixing the columns with the keys of dfs.
 
     :param dfs: Dictionary with strings as keys and dataframes as values.
+    :param currency_pairs: List of currency pairs in dataset, e.g.
+        ["EURUSD", "GBPUSD", "USDCAD", "USDJPY"]
 
     :returns: Merged dataframe.
     """
@@ -206,6 +208,7 @@ def _get_holidays(start_date, end_date, exchanges=["NYSE", "LSE"]):
 
     :param start_date: Datetime of when to start the window.
     :param end_date: Datetime of when to end the window.
+    :param exchanges: List of exchanges to use holidays of.
 
     :returns: A set of holidays for the provided exchanges.
     """
