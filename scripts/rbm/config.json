@@ -1,5 +1,5 @@
 {
-    "load_model_name": "BernoulliRBM_20211103_184646",
+    "load_model_name": "BernoulliRBM_20211104_202501",
     "model_params": {
         "seed": 42,
         "n_bits": 16,
@@ -10,7 +10,7 @@
         "lr_decay_period": 1000,
         "early_stopping_criteria": -35,
         "batch_size": 10,
-        "volatility_indicators": true
+        "volatility_indicators": false
     },
     "ensemble": {
         "size": 100,

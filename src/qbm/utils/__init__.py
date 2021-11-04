@@ -4,6 +4,7 @@ from .binarization import (
     binarize_volatility,
     convert_bin_list_to_str,
     convert_bin_str_to_list,
+    get_binarization_params,
     unbinarize,
     unbinarize_df,
 )
@@ -26,7 +27,7 @@ __all__ = [
     "binarize_volatility",
     "convert_bin_list_to_str",
     "convert_bin_str_to_list",
-    "split_bin_str",
+    "get_binarization_params",
     "unbinarize",
     "unbinarize_df",
     # data_loading

@@ -5,8 +5,14 @@ from datetime import timedelta
 from joblib import Parallel, delayed
 from time import time
 
-from qbm.utils import get_project_dir, get_rng, load_artifact, unbinarize_df
-from qbm.sampling import generate_samples_df
+from qbm.utils import (
+    get_project_dir,
+    get_rng,
+    load_artifact,
+    save_artifact,
+    unbinarize_df,
+)
+from qbm.sampling import generate_rbm_samples_df
 
 # configuration
 project_dir = get_project_dir()
@@ -32,7 +38,7 @@ model_params = load_artifact(artifacts_dir / "params.json")
 V = rng.choice([0, 1], (ensemble_size, model_params["X_train_shape"][1]))
 
 
-def generate_samples_df_wrapper(i):
+def generate_rbm_samples_df_wrapper(i):
     """
     Wrapper function to generate samples in parallel.
 
@@ -46,7 +52,7 @@ def generate_samples_df_wrapper(i):
     model_i.random_state = get_rng(i)
 
     # generate the samples
-    samples, _ = generate_samples_df(
+    samples, _ = generate_rbm_samples_df(
         model=model_i,
         v=V[i],
         n_samples=model_params["X_train_shape"][0],
@@ -66,9 +72,10 @@ def generate_samples_df_wrapper(i):
 # run the jobs in parallel
 start_time = time()
 Parallel(n_jobs=n_jobs)(
-    delayed(generate_samples_df_wrapper)(i) for i in range(ensemble_size)
+    delayed(generate_rbm_samples_df_wrapper)(i) for i in range(ensemble_size)
 )
 
-print(
-    f"Completed {ensemble_size} iterations in {timedelta(seconds=time() - start_time)}"
-)
+print(f"Completed {ensemble_size} iterations in {timedelta(seconds=time() - start_time)}")
+
+# save config
+save_artifact(config, save_dir / "config.json")

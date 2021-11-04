@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def generate_sample(model, v, n_steps):
+def generate_rbm_sample(model, v, n_steps):
     """
     Generate a sample after a number of passes from the provided RBM model from the initial
     state v.
@@ -20,12 +20,8 @@ def generate_sample(model, v, n_steps):
     return v.astype(np.int8)
 
 
-def generate_samples_df(
-    model,
-    v,
-    n_samples,
-    n_steps,
-    model_params,
+def generate_rbm_samples_df(
+    model, v, n_samples, n_steps, model_params,
 ):
     """
     Generate a dataframe of samples.
@@ -49,7 +45,7 @@ def generate_samples_df(
     # generate samples sequentially from a single initial visible layer
     if v.ndim == 1:
         for i in range(n_samples):
-            v = generate_sample(model, v, n_steps)
+            v = generate_rbm_sample(model, v, n_steps)
             samples[i] = np.stack(
                 ["".join(x) for x in np.array_split(v.astype("str"), split_indices)]
             )
@@ -57,7 +53,7 @@ def generate_samples_df(
     # generate samples in parallel from multiple initial visible layers
     elif v.ndim == 2:
         assert v.shape[0] == n_samples
-        v = generate_sample(model, v, n_steps)
+        v = generate_rbm_sample(model, v, n_steps)
         for i in range(n_samples):
             samples[i] = np.stack(
                 ["".join(x) for x in np.array_split(v[i].astype("str"), split_indices)]

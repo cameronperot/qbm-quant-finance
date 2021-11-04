@@ -45,17 +45,6 @@ def compute_stats_over_dfs(dfs):
     return {"means": means, "medians": medians, "stds": stds}
 
 
-def get_rng(seed):
-    """
-    Creates a random number generator with the specified seed value.
-
-    :param seed: Seed value for the rng.
-
-    :returns: Numpy RandomState object.
-    """
-    return RandomState(MT19937(SeedSequence(seed)))
-
-
 def get_project_dir():
     """
     Gets the project directory path from the environment and checks if it is valid.
@@ -73,6 +62,17 @@ def get_project_dir():
         raise Exception(f"Path '{dir_path}' does not exist")
 
 
+def get_rng(seed):
+    """
+    Creates a random number generator with the specified seed value.
+
+    :param seed: Seed value for the rng.
+
+    :returns: Numpy RandomState object.
+    """
+    return RandomState(MT19937(SeedSequence(seed)))
+
+
 def load_artifact(file_path):
     """
     Loads a pickle or json artifact (depending on the file extension).
@@ -81,6 +81,9 @@ def load_artifact(file_path):
 
     :returns: Loaded python object.
     """
+    if not file_path.exists() or file_path.suffix not in (".json", ".pkl"):
+        raise Exception(f"File {file_path} does not exist")
+
     if file_path.suffix == ".json":
         with open(file_path, "r") as f:
             return json.load(f)
@@ -112,6 +115,9 @@ def save_artifact(artifact, file_path):
     """
     if not file_path.parent.exists():
         file_path.parent.mkdir(parents=True)
+
+    if file_path.suffix not in (".json", ".pkl"):
+        raise Exception("Invalid file extension")
 
     if file_path.suffix == ".json":
         with open(file_path, "w") as f:

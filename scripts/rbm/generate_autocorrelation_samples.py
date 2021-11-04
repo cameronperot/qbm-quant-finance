@@ -3,8 +3,14 @@ import json
 from datetime import timedelta
 from time import time
 
-from qbm.utils import get_project_dir, get_rng, load_artifact, unbinarize_df
-from qbm.sampling import generate_samples_df
+from qbm.utils import (
+    get_project_dir,
+    get_rng,
+    load_artifact,
+    save_artifact,
+    unbinarize_df,
+)
+from qbm.sampling import generate_rbm_samples_df
 
 # configuration
 project_dir = get_project_dir()
@@ -33,12 +39,8 @@ for i in range(n_sample_dfs):
     iter_start_time = time()
 
     # generate the samples
-    autocorrelation_samples, v = generate_samples_df(
-        model=model,
-        v=v,
-        n_samples=n_samples_per_df,
-        n_steps=1,
-        model_params=model_params,
+    autocorrelation_samples, v = generate_rbm_samples_df(
+        model=model, v=v, n_samples=n_samples_per_df, n_steps=1, model_params=model_params,
     )
     autocorrelation_samples = unbinarize_df(
         autocorrelation_samples, model_params["binarization_params"]
@@ -54,6 +56,7 @@ for i in range(n_sample_dfs):
         f"Completed iteration {i+1} of {n_sample_dfs} in {timedelta(seconds=time() - iter_start_time)}"
     )
 
-print(
-    f"Completed {n_sample_dfs} iterations in {timedelta(seconds=time() - start_time)}"
-)
+print(f"Completed {n_sample_dfs} iterations in {timedelta(seconds=time() - start_time)}")
+
+# save config
+save_artifact(config, save_dir / "config.json")

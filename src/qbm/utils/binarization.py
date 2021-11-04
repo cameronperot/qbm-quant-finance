@@ -81,6 +81,32 @@ def convert_bin_str_to_list(bin_str):
     return np.fromiter((int(x) for x in bin_str), np.int8)
 
 
+def get_binarization_params(df, n_bits, ϵ={}):
+    """
+    Get the n_bits-bit binarization parameters of the provided dataframe, with the (optionally)
+    provided ϵ offset values.
+
+    :param df: Dataframe of numerical values.
+    :param n_bits: Number of bits to binarize to.
+    :param ϵ: Optional dictionary of min/max offset values.
+
+    :returns: Dictionary of binarization parameters, with keys being the columns of df and
+        the values being dicts with keys ["n_bits", "x_min", "x_max"].
+    """
+    binarization_params = {}
+    for column in df.columns:
+        binarization_params[column] = {
+            "n_bits": n_bits,
+            "x_min": df[column].min(),
+            "x_max": df[column].max(),
+        }
+        if column in ϵ:
+            binarization_params[column]["x_min"] -= ϵ[column]["min"]
+            binarization_params[column]["x_max"] += ϵ[column]["max"]
+
+    return binarization_params
+
+
 @np.vectorize
 def unbinarize(x, n_bits, x_min, x_max, **kwargs):
     """

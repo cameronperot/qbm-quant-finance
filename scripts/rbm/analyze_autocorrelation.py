@@ -38,6 +38,8 @@ print("--------------------------------")
 print("Integrated Autocorrelation Times")
 print("--------------------------------")
 for column in samples.columns:
+    if column.endswith("_binary"):
+        continue
     acfs[column] = sm.tsa.stattools.acf(samples[column], nlags=n_lags, fft=True)
     integrated_times[column] = emcee.autocorr.integrated_time(samples[column])[0]
     print(f"{column}\t{integrated_times[column]:.2f}")

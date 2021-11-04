@@ -15,13 +15,11 @@ def prepare_training_data(log_returns_binarized, additional_binary_variables=Non
     """
     if additional_binary_variables is not None:
         # ensure the indices line up
-        log_returns_binarized = log_returns_binarized.loc[
-            additional_binary_variables.index
-        ]
+        log_returns_binarized = log_returns_binarized.loc[additional_binary_variables.index]
         assert (additional_binary_variables.index == log_returns_binarized.index).all()
 
-        # ensure proper dtype for additional binary variables
-        assert (additional_binary_variables.dtypes == np.int8).all()
+        # ensure proper values for additional binary variables
+        assert set(additional_binary_variables.to_numpy().flatten()) == {0, 1}
 
     # set variable with column name ordering
     columns = log_returns_binarized.columns.to_list()
@@ -35,9 +33,7 @@ def prepare_training_data(log_returns_binarized, additional_binary_variables=Non
     for i, column in enumerate(columns):
         x = np.stack(log_returns_binarized[column])
         X_train.append(x)
-        split_indices.append(
-            x.shape[1] if i == 0 else split_indices[i - 1] + x.shape[1]
-        )
+        split_indices.append(x.shape[1] if i == 0 else split_indices[i - 1] + x.shape[1])
 
     # concatenate the columns into a single array
     X_train = np.concatenate(X_train, axis=1)
@@ -52,7 +48,7 @@ def prepare_training_data(log_returns_binarized, additional_binary_variables=Non
             split_indices.append(split_indices[-1] + 1)
 
     return {
-        "X_train": X_train,
+        "X_train": X_train.astype(np.int8),
         "columns": columns,
         "split_indices": split_indices[:-1],
         "index": log_returns_binarized.index,
