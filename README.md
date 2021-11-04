@@ -6,7 +6,7 @@ To install the conda enviroment run
 ```
 conda env create -f environment.yml
 ```
-or alternatively run the `conda-create-env.sh` script (make sure to properly set the env vars in the script).
+or alternatively, run the `conda-create-env.sh` script (make sure to properly set the env vars in the script).
 
 Additionally, a [fork of scikit-learn](https://github.com/cameronperot/scikit-learn) is required.
 To install it run
@@ -21,7 +21,7 @@ cd quantum-boltzmann-machines
 pip install .
 ```
 
-To install extra dev dependencies one can run
+To install extra dev dependencies run
 ```
 conda env update --file environment-dev.yml
 ```

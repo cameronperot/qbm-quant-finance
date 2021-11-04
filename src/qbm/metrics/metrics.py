@@ -25,7 +25,7 @@ def compute_correlation_coefficients(df, combinations, sample_number=None):
         appended to the dataframe corresponding to the sample number.
 
     :returns: Dataframe where rows are the combinations and columns are the correlation
-    coefficients.
+        coefficients.
     """
     correlation_coefficients = {}
     for (X, Y) in combinations:

@@ -18,3 +18,18 @@ test:
   artifacts:
     reports:
       cobertura: coverage.xml
+pages:
+  stage: deploy
+  script:
+    - pip install .
+    - pip install Sphinx sphinx_rtd_theme m2r2 anybadge
+    - sphinx-apidoc -f -o docs/source src/qbm
+    - sphinx-build -d docs/_build/doctrees docs/source docs/_build/html
+    - mv docs/_build/html public
+    - anybadge --value=master --file=docs.svg --label=docs --color=#0f80c0
+  artifacts:
+    paths:
+      - public
+      - docs.svg
+  only:
+    - main
