@@ -4,12 +4,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.9
-  - black
-  - flake8
-  - ipython
-  - ipython-autotime
-  - ipykernel
-  - jupyterlab
+  - cython=0.29.24
   - matplotlib=3.4.3
   - mplfinance=0.12.7a17
   - numba=0.54.1
@@ -21,7 +16,4 @@ dependencies:
   - pip:
     - dwave-ocean-sdk==4.2.0
     - emcee==3.1.1
-    - jupyterlab_code_formatter
-    - jupyterlab_vim
     - pandas-market-calendars==3.2
-    - "git+https://github.com/cameronperot/scikit-learn.git#egg=scikit-learn"
