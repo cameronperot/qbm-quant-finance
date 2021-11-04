@@ -1,0 +1,9 @@
+[run]
+source =
+    qbm
+
+[report]
+omit =
+    src/qbm/plotting/*
+exclude_lines =
+    if __name__ == .__main__.:
