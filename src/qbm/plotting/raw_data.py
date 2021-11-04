@@ -41,11 +41,7 @@ def plot_violin(df, params, **kwargs):
     ax.boxplot(
         df,
         showmeans=True,
-        meanprops={
-            "marker": "o",
-            "markerfacecolor": "none",
-            "markeredgecolor": "b",
-        },
+        meanprops={"marker": "o", "markerfacecolor": "none", "markeredgecolor": "b",},
         medianprops={"color": "g"},
         flierprops={"marker": "x", "markeredgecolor": "tab:red"},
     )

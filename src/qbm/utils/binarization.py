@@ -140,8 +140,6 @@ def unbinarize_df(df, binarization_params):
         if column.endswith("_binary"):
             df_unbinarized[column] = df[column].astype(np.int8)
         else:
-            df_unbinarized[column] = unbinarize(
-                df[column], **binarization_params[column]
-            )
+            df_unbinarized[column] = unbinarize(df[column], **binarization_params[column])
 
     return df_unbinarized

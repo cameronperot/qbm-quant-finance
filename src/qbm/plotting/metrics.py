@@ -104,10 +104,7 @@ def plot_qq(ax, data, samples, title, params, **kwargs):
     """
     ax.set_aspect("equal")
     ax.plot(
-        params["xlims"],
-        params["ylims"],
-        color="tab:red",
-        alpha=0.7,
+        params["xlims"], params["ylims"], color="tab:red", alpha=0.7,
     )
     ax.scatter(sorted(data), sorted(samples), **kwargs)
     ax.set_title(title)
@@ -168,13 +165,7 @@ def plot_volatilities(data, samples, params):
         zorder=1,
     )
     ax.scatter(
-        range(len(data)),
-        data,
-        label="Data",
-        marker="x",
-        c="tab:red",
-        s=100,
-        zorder=2,
+        range(len(data)), data, label="Data", marker="x", c="tab:red", s=100, zorder=2,
     )
     ax.set_xlim(params["xlims"])
     ax.set_ylim(params["ylims"])
