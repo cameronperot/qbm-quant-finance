@@ -15,11 +15,7 @@ def load_log_returns(file_path):
 
     :returns: Log returns dataframe.
     """
-    return pd.read_csv(
-        file_path,
-        parse_dates=["date"],
-        index_col="date",
-    )
+    return pd.read_csv(file_path, parse_dates=["date"], index_col="date",)
 
 
 def load_raw_data(
@@ -72,9 +68,7 @@ def load_raw_data(
 
             # convert column names to lower case w/o spaces
             columns = df.columns.to_list()
-            column_map = {
-                column: column.lower().replace(" ", "_") for column in columns
-            }
+            column_map = {column: column.lower().replace(" ", "_") for column in columns}
             df.rename(columns=column_map, inplace=True)
             df.index.rename("date", inplace=True)
 
@@ -166,9 +160,7 @@ def load_raw_data(
         # compute the log returns
         log_returns = df.iloc[:-1].copy()
         for pair in currency_pairs:
-            log_returns[pair] = np.log(
-                df[pair][1:].to_numpy() / df[pair][:-1].to_numpy()
-            )
+            log_returns[pair] = np.log(df[pair][1:].to_numpy() / df[pair][:-1].to_numpy())
 
         return df, log_returns
 
