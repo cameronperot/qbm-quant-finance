@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+from matplotlib.dates import DateFormatter
+from datetime import timedelta
 
 
 def plot_autocorrelation(ax, lags, acf, title):
@@ -77,9 +79,9 @@ def plot_correlation_coefficients(data, samples):
             zorder=2,
             alpha=0.7,
         )
-        ax.set_xlim((-0.75, 2.75))
         ax.set_xticks(ticks=range(3))
         ax.set_xticklabels(labels=data.columns)
+        ax.set_xlim((-0.75, 2.75))
         ax.grid(alpha=0.7)
         if i == 0:
             ax.legend()
@@ -108,10 +110,10 @@ def plot_qq(ax, data, samples, title, params, **kwargs):
     )
     ax.scatter(sorted(data), sorted(samples), **kwargs)
     ax.set_title(title)
-    ax.set_xlim(params["xlims"])
-    ax.set_ylim(params["ylims"])
     ax.set_xticks(params["xticks"])
     ax.set_yticks(params["yticks"])
+    ax.set_xlim(params["xlims"])
+    ax.set_ylim(params["ylims"])
     ax.set_xlabel("Data")
     ax.set_ylabel("Samples")
     ax.grid(alpha=0.7)
@@ -139,7 +141,7 @@ def plot_qq_grid(data, samples, params):
     return fig, axs
 
 
-def plot_volatilities(data, samples, params):
+def plot_volatility_comparison(data, samples, params):
     """
     Plots the data annualized volatility against those of the samples on an error bar plot.
 
@@ -167,14 +169,71 @@ def plot_volatilities(data, samples, params):
     ax.scatter(
         range(len(data)), data, label="Data", marker="x", c="tab:red", s=100, zorder=2,
     )
-    ax.set_xlim(params["xlims"])
-    ax.set_ylim(params["ylims"])
     ax.set_xticks(ticks=range(len(data)))
     ax.set_yticks(params["yticks"])
     ax.set_xticklabels(labels=data.index)
+    ax.set_xlim(params["xlims"])
+    ax.set_ylim(params["ylims"])
     ax.grid(alpha=0.7)
     ax.legend()
 
     plt.tight_layout()
 
     return fig, ax
+
+
+def plot_volatility(ax, dates, volatility, title, params):
+    """
+    Plots the historical volatility against the date, as well as a horizontal line indicating
+    the median value over the entire historical period.
+
+    :param ax: Matplotlib axis.
+    :param dates: Array of dates to plot against.
+    :param volatility: Array of volatility values to plot against the dates.
+    :param title: Title of the plot.
+    :param params: Additional parameter dictionary for ax configuration, required keys are
+        ["xlims", "ylims", "xticks", "yscale", "label"].
+
+    :returns: Matplotlib axis.
+    """
+    ax.plot(dates, volatility, label=params["label"], zorder=0)
+    ax.hlines(
+        volatility.median(),
+        dates.min() - timedelta(weeks=100),
+        dates.max() + timedelta(weeks=100),
+        label="Median",
+        linewidth=2,
+        color="tab:red",
+        zorder=1,
+    )
+    ax.set_title(title)
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Volatility")
+    ax.set_xticks(params["xticks"])
+    ax.set_yscale(params["yscale"])
+    ax.set_xlim(params["xlims"])
+    ax.set_ylim(params["ylims"])
+    ax.xaxis.grid(alpha=0.7)
+    ax.yaxis.grid(False)
+    ax.xaxis.set_major_formatter(DateFormatter("%Y"))
+
+
+def plot_volatility_grid(volatility, params):
+    """
+    Plots a 2x2 grid of the historical volatilities in the provided dataframe.
+
+    :param volatility: Dataframe of historical volatilities.
+    :param params: Additional parameter dictionary for ax configuration, required keys are
+        ["xlims", "ylims", "xticks", "yscale", "label"].
+
+    :returns: Matplotlib figure and axes.
+    """
+    fig, axs = plt.subplots(2, 2, figsize=(10, 6), dpi=300)
+    for column, ax in zip(volatility.columns, axs.flatten()):
+        plot_volatility(
+            ax, volatility.index, volatility[column], column.split("_")[0], params
+        )
+    axs[0, 1].legend()
+    plt.tight_layout()
+
+    return fig, axs

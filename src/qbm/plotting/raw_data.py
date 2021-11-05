@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 def plot_histogram_grid(df, params, **kwargs):
     """
     Plots a grid of historgrams for the desired feature.
-
     :param df: Dataframe.
     :param params: Additional parameter dictionary for ax configuration, required keys are
         ["xlims", "ylims", "xticks", "yticks"].
@@ -14,11 +13,11 @@ def plot_histogram_grid(df, params, **kwargs):
     fig, axs = plt.subplots(2, 2, figsize=(10, 6), tight_layout=True, dpi=300)
     for column, ax in zip(df.columns, axs.flatten()):
         ax.hist(df[column], **kwargs)
-        ax.set_title(pair)
-        ax.set_xlim(params["xlims"])
-        ax.set_ylim(params["ylims"])
+        ax.set_title(column)
         ax.set_xticks(params["xticks"])
         ax.set_yticks(params["yticks"])
+        ax.set_xlim(params["xlims"])
+        ax.set_ylim(params["ylims"])
         ax.grid(alpha=0.7)
 
     plt.tight_layout()
@@ -47,8 +46,8 @@ def plot_violin(df, params, **kwargs):
     )
     ax.set_xticks(range(1, len(df.columns) + 1))
     ax.set_xticklabels(df.columns)
-    ax.set_ylim(params["ylims"])
     ax.set_yticks(params["yticks"])
+    ax.set_ylim(params["ylims"])
     ax.grid(alpha=0.7)
 
     plt.tight_layout()

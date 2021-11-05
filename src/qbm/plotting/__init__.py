@@ -5,7 +5,9 @@ from .metrics import (
     plot_correlation_coefficients,
     plot_qq,
     plot_qq_grid,
-    plot_volatilities,
+    plot_volatility_comparison,
+    plot_volatility,
+    plot_volatility_grid,
 )
 
 import mplfinance as mpf
@@ -23,5 +25,7 @@ __all__ = [
     "plot_correlation_coefficients",
     "plot_qq",
     "plot_qq_grid",
-    "plot_volatilities",
+    "plot_volatility_comparison",
+    "plot_volatility",
+    "plot_volatility_grid",
 ]
