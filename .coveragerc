@@ -4,6 +4,6 @@ source =
 
 [report]
 omit =
-    src/qbm/plotting/*
+    */qbm/plotting/*
 exclude_lines =
     if __name__ == .__main__.:
