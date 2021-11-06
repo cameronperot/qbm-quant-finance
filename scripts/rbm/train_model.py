@@ -7,6 +7,7 @@ from qbm.metrics import compute_rolling_volatility
 from qbm.utils import (
     binarize_df,
     binarize_volatility,
+    get_binarization_params,
     get_project_dir,
     get_rng,
     load_artifact,
@@ -32,23 +33,16 @@ rng = get_rng(model_params["seed"])
 log_returns = load_log_returns(data_dir / "train/log_returns.csv")
 
 # binarization
-binarization_params = {}
-for column in log_returns.columns:
-    binarization_params[column] = {
-        "n_bits": config["model_params"]["n_bits"],
-        "x_min": log_returns[column].min(),
-        "x_max": log_returns[column].max(),
-    }
+binarization_params = get_binarization_params(log_returns, n_bits=16)
 log_returns_binarized = binarize_df(log_returns, binarization_params)
 model_params["binarization_params"] = binarization_params
 
 # volatility indicators
+volatility_binarized = None
 if model_params["volatility_indicators"]:
     volatility_binarized = binarize_volatility(
         compute_rolling_volatility(log_returns, timedelta(days=90))
     )
-else:
-    volatility_binarized = None
 
 # create the training set
 training_data = prepare_training_data(log_returns_binarized, volatility_binarized)

@@ -4,7 +4,11 @@ import numpy as np
 import pandas as pd
 
 from qbm.metrics import compute_annualized_volatility, compute_correlation_coefficients
-from qbm.plotting import plot_correlation_coefficients, plot_qq_grid, plot_volatilities
+from qbm.plotting import (
+    plot_correlation_coefficients,
+    plot_qq_grid,
+    plot_volatility_comparison,
+)
 from qbm.utils import (
     get_project_dir,
     compute_stats_over_dfs,
@@ -49,9 +53,7 @@ combinations = (
     ("GBPUSD", "USDCAD"),
     ("USDJPY", "USDCAD"),
 )
-correlation_coefficients_data = compute_correlation_coefficients(
-    log_returns, combinations
-)
+correlation_coefficients_data = compute_correlation_coefficients(log_returns, combinations)
 correlation_coefficients_sample = compute_stats_over_dfs(
     [
         compute_correlation_coefficients(samples, combinations)
@@ -92,19 +94,13 @@ print("--------------------------------\n\n")
 
 # compute the tails
 tails_data = pd.DataFrame(
-    {
-        "quantile_01": log_returns.quantile(0.01),
-        "quantile_99": log_returns.quantile(0.99),
-    }
+    {"quantile_01": log_returns.quantile(0.01), "quantile_99": log_returns.quantile(0.99),}
 )
 quantiles_sample = []
 for samples in samples_ensemble:
     quantiles_sample.append(
         pd.DataFrame(
-            {
-                "quantile_01": samples.quantile(0.01),
-                "quantile_99": samples.quantile(0.99),
-            }
+            {"quantile_01": samples.quantile(0.01), "quantile_99": samples.quantile(0.99),}
         )
     )
 tails_sample = compute_stats_over_dfs(quantiles_sample)
@@ -145,7 +141,7 @@ volatility_plot_params = {
     "ylims": (0.08, 0.11),
     "yticks": np.linspace(0.08, 0.11, 7),
 }
-fig, ax = plot_volatilities(
+fig, ax = plot_volatility_comparison(
     volatilities_data, volatilities_sample, volatility_plot_params
 )
 plt.savefig(plot_dir / "volatilities.png")
