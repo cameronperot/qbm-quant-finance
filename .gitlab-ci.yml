@@ -1,25 +1,31 @@
-image: python:3.9-bullseye
-build:
-  stage: build
+test:
+  stage: test
+  image: python:3.9-bullseye
+  only:
+    changes:
+      - "src/**/*"
+      - "tests/**/*"
   script:
     - pip install .
+    - pip install pytest pytest-cov
     - python -c "import qbm"
     - python -c "import qbm.metrics"
     - python -c "import qbm.plotting"
     - python -c "import qbm.sampling"
     - python -c "import qbm.utils"
-test:
-  stage: test
-  script:
-    - pip install .
-    - pip install pytest pytest-cov
     - pytest --cov-report=term-missing --cov=qbm --cov-config=.coveragerc
     - coverage xml
   artifacts:
+    expire_in: 1 week
     reports:
       cobertura: coverage.xml
 pages:
   stage: deploy
+  image: python:3.9-bullseye
+  only:
+    changes:
+      - "src/**/*"
+      - "docs/**/*"
   script:
     - pip install .
     - pip install Sphinx sphinx_rtd_theme m2r2 anybadge
@@ -27,9 +33,24 @@ pages:
     - sphinx-build -d docs/_build/doctrees docs/source docs/_build/html
     - mv docs/_build/html public
     - anybadge --value=master --file=docs.svg --label=docs --color=#0f80c0
+    - anybadge --value=master --file=report.svg --label=report --color=#008080
   artifacts:
+    expire_in: 1 week
     paths:
       - public
       - docs.svg
+      - report.svg
+report:
+  stage: deploy
+  image: texlive/texlive:latest
   only:
-    - main
+    changes:
+      - "latex/**/*"
+      - "results/**/*"
+  script:
+    - cd latex/report
+    - latexmk -pdf main.tex
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - latex/report/main.pdf
