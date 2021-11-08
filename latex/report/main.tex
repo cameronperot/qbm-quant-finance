@@ -1,0 +1,130 @@
+\documentclass[12pt,twoside]{report}
+\usepackage[a4paper,width=140mm,top=25mm,bottom=25mm,bindingoffset=6mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+\usepackage[style=numeric-comp, sorting=none]{biblatex}
+\addbibresource{../references.bib}
+\usepackage{graphicx}
+\graphicspath{ {../images/}{../../results/plots/} }
+\usepackage{notoccite}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage[T1]{fontenc}
+%\usepackage{sourcecodepro}
+\lstset{basicstyle=\small\ttfamily}
+\usepackage{braket}
+\usepackage{multirow}
+\usepackage{bbm}
+\usepackage{mathtools}
+
+%----------------------------------------------------------------------------------------
+% Title Page
+%----------------------------------------------------------------------------------------
+\pagenumbering{gobble}
+\title{
+    {Quantum Boltzmann Machines Applied to Quantitative Finance}\\
+    \vspace{0.5cm}
+    {\large RWTH Aachen University}\\
+    {\large Forschungszentrum J\"ulich}
+}
+\author{
+    {Cameron Perot}\\
+    {First Advisor: Prof. Dr. Kristel Michielsen}\\
+    {Second Advisor: TBD}
+}
+\date{April 2022}
+
+
+\begin{document}
+\maketitle
+\pagenumbering{roman}
+
+%----------------------------------------------------------------------------------------
+% Declaration of Authorship
+%----------------------------------------------------------------------------------------
+\clearpage\shipout\null
+\begin{center}
+\bf{Declaration of Authorship}
+\end{center}
+
+I hereby declare that I have created this work completely on my own and used no other sources or tools than the ones listed, and that I have marked any citations accordingly.
+
+Hiermit versichere ich, dass ich die vorliegende Arbeit selbst\"andig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt sowie Zitate kenntlich gemacht habe. \\
+
+\vspace{1.2cm}
+\noindent \rule{5cm}{0.15mm} \hfill \rule{5cm}{0.15mm}\\
+\noindent Ort, Datum \hfill Cameron Perot
+
+%----------------------------------------------------------------------------------------
+% Abstract
+%----------------------------------------------------------------------------------------
+\clearpage\shipout\null
+\chapter*{Abstract}
+
+%----------------------------------------------------------------------------------------
+% Table of Contents
+%----------------------------------------------------------------------------------------
+\tableofcontents
+
+%----------------------------------------------------------------------------------------
+% Introduction
+%----------------------------------------------------------------------------------------
+\chapter{Introduction}
+\label{ch:introduction}
+\pagenumbering{arabic}
+\input{chapters/introduction.tex}
+
+%----------------------------------------------------------------------------------------
+% Data Analysis
+%----------------------------------------------------------------------------------------
+\chapter{Data Analysis \& Preprocessing}
+\label{ch:data_analysis}
+\input{chapters/data_analysis.tex}
+
+%----------------------------------------------------------------------------------------
+% RBM
+%----------------------------------------------------------------------------------------
+\chapter{Restricted Boltzmann Machine}
+\label{ch:rbm}
+\input{chapters/rbm.tex}
+
+%----------------------------------------------------------------------------------------
+% RBM
+%----------------------------------------------------------------------------------------
+\chapter{Quantum Boltzmann Machine}
+\label{ch:qbm}
+\input{chapters/qbm.tex}
+
+%----------------------------------------------------------------------------------------
+% Conclusion
+%----------------------------------------------------------------------------------------
+\chapter{Conclusion}
+\label{ch:conclusion}
+\input{chapters/conclusion.tex}
+
+%----------------------------------------------------------------------------------------
+% Appendix
+%----------------------------------------------------------------------------------------
+\appendix
+\chapter{Appendix}
+\label{ch:appendix}
+\input{chapters/appendix.tex}
+
+%----------------------------------------------------------------------------------------
+% References
+%----------------------------------------------------------------------------------------
+%\printbibliography
+
+\end{document}
