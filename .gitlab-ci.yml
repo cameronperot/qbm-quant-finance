@@ -1,10 +1,6 @@
 test:
   stage: test
   image: python:3.9-bullseye
-  only:
-    changes:
-      - "src/**/*"
-      - "tests/**/*"
   script:
     - pip install .
     - pip install pytest pytest-cov
@@ -22,10 +18,6 @@ test:
 pages:
   stage: deploy
   image: python:3.9-bullseye
-  only:
-    changes:
-      - "src/**/*"
-      - "docs/**/*"
   script:
     - pip install .
     - pip install Sphinx sphinx_rtd_theme m2r2 anybadge
@@ -43,10 +35,6 @@ pages:
 report:
   stage: deploy
   image: texlive/texlive:latest
-  only:
-    changes:
-      - "latex/**/*"
-      - "results/**/*"
   script:
     - cd latex/report
     - latexmk -pdf main.tex
