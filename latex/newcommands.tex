@@ -1,0 +1,143 @@
+% Misc. commands
+\newcommand{\CNOT}[2]{\text{C}_{#1}\text{NOT}_{#2}}
+\newcommand{\SWAP}{\text{SWAP}}
+\newcommand{\CZ}{\text{CZ}}
+\newcommand{\tr}{\text{tr}}
+\newcommand{\frt}{\frac{1}{\sqrt{2}}}
+\newcommand{\vv}{\mathbf{v}}
+\newcommand{\hv}{\mathbf{h}}
+\newcommand{\basistwo}{\{\ket{00}, \ket{01}, \ket{10}, \ket{11}\}}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+
+% Identity operator (on K^2)
+\newcommand{\idtwo}{
+    \begin{bmatrix}
+        1 & 0 \\
+        0 & 1
+    \end{bmatrix}
+}
+
+% Hadamard operator
+\newcommand{\Hgate}{
+    \frac{1}{\sqrt{2}} \begin{bmatrix}
+        1 & 1 \\
+        1 & -1
+    \end{bmatrix}
+}
+
+% T gate
+\newcommand{\Tgate}{
+    \begin{bmatrix}
+        1 & 0 \\
+        0 & e^{i \pi / 4}
+    \end{bmatrix}
+}
+
+% T gate dag
+\newcommand{\Tgatedag}{
+    \begin{bmatrix}
+        1 & 0 \\
+        0 & e^{-i \pi / 4}
+    \end{bmatrix}
+}
+
+% R_X
+\newcommand{\RX}[1]{
+    \begin{bmatrix}
+        \cos\frac{#1}{2} & -i\sin\frac{#1}{2} \\
+        -i\sin\frac{#1}{2} & \cos\frac{#1}{2}
+    \end{bmatrix}
+}
+
+% R_Y
+\newcommand{\RY}[1]{
+    \begin{bmatrix}
+        \cos\frac{#1}{2} & -\sin\frac{#1}{2} \\
+        \sin\frac{#1}{2} & \cos\frac{#1}{2}
+    \end{bmatrix}
+}
+
+% R_Z
+\newcommand{\RZ}[1]{
+    \begin{bmatrix}
+        e^{-i{#1}/2} & 0 \\
+        0 & e^{i{#1}/2}
+    \end{bmatrix}
+}
+
+% Pauli X operator
+\newcommand{\X}{
+    \begin{bmatrix}
+        0 & 1 \\
+        1 & 0
+    \end{bmatrix}
+}
+
+% Pauli Y operator
+\newcommand{\Y}{
+    \begin{bmatrix}
+        0 & -i \\
+        i & 0
+    \end{bmatrix}
+}
+
+% Pauli Z operator
+\newcommand{\Z}{
+    \begin{bmatrix}
+        1 & 0 \\
+        0 & -1
+    \end{bmatrix}
+}
+
+% The |0⟩ state in vector form
+\newcommand{\zerostate}{
+    \begin{bmatrix}
+        1 \\
+        0
+    \end{bmatrix}
+}
+
+% The |1⟩ state in vector form
+\newcommand{\onestate}{
+    \begin{bmatrix}
+        0 \\
+        1
+    \end{bmatrix}
+}
+
+% The |-⟩ state in vector form
+\newcommand{\minusstatey}{
+    \frac{1}{\sqrt{2}}
+    \begin{bmatrix}
+        1 \\
+        -i
+    \end{bmatrix}
+}
+
+% The |+⟩ state in vector form
+\newcommand{\plusstatey}{
+    \frac{1}{\sqrt{2}}
+    \begin{bmatrix}
+        1 \\
+        i
+    \end{bmatrix}
+}
+
+% The |-'⟩ state in vector form
+\newcommand{\minusstate}{
+    \frac{1}{\sqrt{2}}
+    \begin{bmatrix}
+        1 \\
+        -1
+    \end{bmatrix}
+}
+
+% The |+'⟩ state in vector form
+\newcommand{\plusstate}{
+    \frac{1}{\sqrt{2}}
+    \begin{bmatrix}
+        1 \\
+        1
+    \end{bmatrix}
+}
