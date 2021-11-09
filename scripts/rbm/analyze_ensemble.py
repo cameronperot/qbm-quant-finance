@@ -20,9 +20,9 @@ from qbm.utils import (
 project_dir = get_project_dir()
 
 config = load_artifact(project_dir / "scripts/rbm/config.json")
-model_name = config["load_model_name"]
+model_id = config["model"]["id"]
 
-artifacts_dir = project_dir / f"artifacts/{model_name}"
+artifacts_dir = project_dir / f"artifacts/{model_id}"
 data_dir = artifacts_dir / "samples_ensemble"
 plot_dir = artifacts_dir / "plots"
 if not plot_dir.exists():

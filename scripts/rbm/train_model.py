@@ -21,10 +21,11 @@ from qbm.utils import (
 project_dir = get_project_dir()
 
 config = load_artifact(project_dir / "scripts/rbm/config.json")
-model_params = config["model_params"]
-model_params["name"] = f"BernoulliRBM_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+model_params = config["model"].copy()
+model_params["id"] = f"BernoulliRBM_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+config["model"]["id"] = model_params["id"]
 
-artifacts_dir = project_dir / f"artifacts/{model_params['name']}"
+artifacts_dir = project_dir / f"artifacts/{model_params['id']}"
 data_dir = project_dir / "data"
 
 rng = get_rng(model_params["seed"])
@@ -53,7 +54,7 @@ model_params["columns"] = training_data["columns"]
 model_params["split_indices"] = training_data["split_indices"]
 
 # train model
-print(f"Model Name: {model_params['name']}")
+print(f"Model Name: {model_params['id']}")
 model = BernoulliRBM(
     n_components=model_params["n_components"],
     learning_rate=model_params["learning_rate"],
@@ -71,6 +72,7 @@ model = BernoulliRBM(
 model.fit(X_train)
 
 # save artifacts
-save_artifact(model_params, artifacts_dir / "params.json")
+save_artifact(config, project_dir / "scripts/rbm/config.json")
+save_artifact(model_params, artifacts_dir / "model_params.json")
 save_artifact(model, artifacts_dir / "model.pkl")
 log_returns.loc[training_data["index"]].to_csv(artifacts_dir / "log_returns.csv")

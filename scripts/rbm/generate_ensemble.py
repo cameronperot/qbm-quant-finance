@@ -18,13 +18,13 @@ from qbm.sampling import generate_rbm_samples_df
 project_dir = get_project_dir()
 
 config = load_artifact(project_dir / "scripts/rbm/config.json")
-model_name = config["load_model_name"]
+model_id = config["model"]["id"]
 ensemble_size = int(config["ensemble"]["size"])
 n_steps = int(config["ensemble"]["n_steps"])
 n_jobs = int(config["ensemble"]["n_jobs"])
 seed = int(config["ensemble"]["seed"])
 
-artifacts_dir = project_dir / f"artifacts/{model_name}"
+artifacts_dir = project_dir / f"artifacts/{model_id}"
 save_dir = artifacts_dir / "samples_ensemble"
 if not save_dir.exists():
     save_dir.mkdir()
@@ -32,7 +32,7 @@ if not save_dir.exists():
 # load the model and params
 rng = get_rng(seed)
 model = load_artifact(artifacts_dir / "model.pkl")
-model_params = load_artifact(artifacts_dir / "params.json")
+model_params = load_artifact(artifacts_dir / "model_params.json")
 
 # generate initial values for the visible layer
 V = rng.choice([0, 1], (ensemble_size, model_params["X_train_shape"][1]))
@@ -78,4 +78,4 @@ Parallel(n_jobs=n_jobs)(
 print(f"Completed {ensemble_size} iterations in {timedelta(seconds=time() - start_time)}")
 
 # save config
-save_artifact(config, save_dir / "config.json")
+save_artifact(config["ensemble"], save_dir / "ensemble_params.json")

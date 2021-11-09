@@ -16,11 +16,11 @@ from qbm.sampling import generate_rbm_samples_df
 project_dir = get_project_dir()
 
 config = load_artifact(project_dir / "scripts/rbm/config.json")
-model_name = config["load_model_name"]
+model_id = config["model"]["id"]
 n_samples_per_df = int(config["autocorrelation"]["n_samples_per_df"])
 n_sample_dfs = int(config["autocorrelation"]["n_sample_dfs"])
 
-artifacts_dir = project_dir / f"artifacts/{model_name}"
+artifacts_dir = project_dir / f"artifacts/{model_id}"
 save_dir = artifacts_dir / "samples_autocorrelation"
 if not save_dir.exists():
     save_dir.mkdir()
@@ -28,7 +28,7 @@ if not save_dir.exists():
 # load model and params
 rng = get_rng(42)
 model = load_artifact(artifacts_dir / "model.pkl")
-model_params = load_artifact(artifacts_dir / "params.json")
+model_params = load_artifact(artifacts_dir / "model_params.json")
 
 # generate initial values for the visible layer
 v = rng.choice([0, 1], model_params["X_train_shape"][1])
@@ -59,4 +59,4 @@ for i in range(n_sample_dfs):
 print(f"Completed {n_sample_dfs} iterations in {timedelta(seconds=time() - start_time)}")
 
 # save config
-save_artifact(config, save_dir / "config.json")
+save_artifact(config["autocorrelation"], save_dir / "autocorrelation_params.json")

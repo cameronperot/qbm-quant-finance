@@ -12,10 +12,10 @@ from qbm.utils import get_project_dir, load_artifact, load_log_returns
 project_dir = get_project_dir()
 
 config = load_artifact(project_dir / "scripts/rbm/config.json")
-model_name = config["load_model_name"]
+model_id = config["model"]["id"]
 n_lags = int(config["autocorrelation"]["n_lags"])
 
-artifacts_dir = project_dir / f"artifacts/{model_name}"
+artifacts_dir = project_dir / f"artifacts/{model_id}"
 data_dir = artifacts_dir / "samples_autocorrelation"
 plot_dir = artifacts_dir / "plots"
 if not plot_dir.exists():
