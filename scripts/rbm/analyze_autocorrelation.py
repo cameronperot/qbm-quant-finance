@@ -41,10 +41,14 @@ for column in samples.columns:
     if column.endswith("_binary"):
         continue
     acfs[column] = sm.tsa.stattools.acf(samples[column], nlags=n_lags, fft=True)
-    integrated_times[column] = emcee.autocorr.integrated_time(samples[column])[0]
-    print(f"{column}\t{integrated_times[column]:.2f}")
+    integrated_times[column] = {
+        "autocorrelation_time": emcee.autocorr.integrated_time(samples[column])[0]
+    }
+integrated_times = pd.DataFrame.from_dict(integrated_times, orient="index")
+print(integrated_times)
 print("--------------------------------")
 acfs = pd.DataFrame(acfs)
+integrated_times.to_csv(data_dir / "autocorrelation_times.csv")
 
 # plot the acfs
 fig, ax = plot_autocorrelation_grid(acfs)

@@ -63,6 +63,14 @@ correlation_coefficients_sample = compute_stats_over_dfs(
 for k, v in correlation_coefficients_sample.items():
     correlation_coefficients_sample[k] = v.reindex_like(correlation_coefficients_data)
 
+correlation_coefficients_data.to_csv(data_dir / "correlation_coefficients_data.csv")
+correlation_coefficients_sample["means"].to_csv(
+    data_dir / "correlation_coefficients_sample_means.csv"
+)
+correlation_coefficients_sample["stds"].to_csv(
+    data_dir / "correlation_coefficients_sample_stds.csv"
+)
+
 print("--------------------------------")
 print("Correlation Coefficients")
 print("--------------------------------")
@@ -86,6 +94,9 @@ volatilities = pd.DataFrame(
         "Sample Std": volatilities_sample["stds"],
     }
 )
+
+volatilities.to_csv(data_dir / "volatilities.csv")
+
 print("--------------------------------")
 print("Annualized Volatility")
 print("--------------------------------")
@@ -104,6 +115,11 @@ for samples in samples_ensemble:
         )
     )
 tails_sample = compute_stats_over_dfs(quantiles_sample)
+
+tails_data.to_csv(data_dir / "tails_data.csv")
+tails_sample["means"].to_csv(data_dir / "tails_sample_means.csv")
+tails_sample["stds"].to_csv(data_dir / "tails_sample_stds.csv")
+
 print("--------------------------------")
 print("Tails")
 print("--------------------------------")
