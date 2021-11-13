@@ -1,4 +1,6 @@
 import json
+import numpy as np
+import pandas as pd
 
 from copy import deepcopy
 from datetime import timedelta
@@ -37,6 +39,11 @@ model_params = load_artifact(artifacts_dir / "model_params.json")
 # generate initial values for the visible layer
 V = rng.choice([0, 1], (ensemble_size, model_params["X_train_shape"][1]))
 
+# load the transformer
+transformer = None
+if model_params["transform"].get("type") is not None:
+    transformer = load_artifact(artifacts_dir / "transformer.pkl")
+
 
 def generate_rbm_samples_df_wrapper(i):
     """
@@ -60,6 +67,17 @@ def generate_rbm_samples_df_wrapper(i):
         model_params=model_params,
     )
     samples = unbinarize_df(samples, model_params["binarization_params"])
+
+    # transform the samples back to the original space
+    if transformer is not None:
+        if model_params["transform"]["type"] == "quantile":
+            samples = pd.DataFrame(
+                transformer.inverse_transform(samples),
+                columns=samples.columns,
+                index=samples.index,
+            )
+        elif model_params["transform"]["type"] == "power":
+            samples = transformer.inverse_transform(samples)
 
     # save the samples to csv
     samples.to_pickle(save_dir / f"{i+1:03}.pkl")

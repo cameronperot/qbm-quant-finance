@@ -1,7 +1,9 @@
 import numpy as np
+import pandas as pd
 
 from datetime import datetime, timedelta
 from sklearn.neural_network import BernoulliRBM
+from sklearn.preprocessing import QuantileTransformer
 
 from qbm.metrics import compute_rolling_volatility
 from qbm.utils import (
@@ -15,6 +17,7 @@ from qbm.utils import (
     lr_exp_decay,
     prepare_training_data,
     save_artifact,
+    PowerTransformer,
 )
 
 # configuration
@@ -32,6 +35,22 @@ rng = get_rng(model_params["seed"])
 
 # data loading
 log_returns = load_log_returns(data_dir / "train/log_returns.csv")
+log_returns_raw = log_returns.copy()
+
+# data transformation
+transformer = None
+if model_params["transform"].get("type") is not None:
+    if model_params["transform"]["type"] == "quantile":
+        transformer = QuantileTransformer(**model_params["transform"]["params"])
+        log_returns = pd.DataFrame(
+            transformer.fit_transform(log_returns),
+            columns=log_returns.columns,
+            index=log_returns.index,
+        )
+    elif model_params["transform"]["type"] == "power":
+        transformer = PowerTransformer(log_returns, **model_params["transform"]["params"])
+        log_returns = transformer.transform(log_returns)
+
 
 # binarization
 binarization_params = get_binarization_params(log_returns, n_bits=16)
@@ -75,4 +94,6 @@ model.fit(X_train)
 save_artifact(config, project_dir / "scripts/rbm/config.json")
 save_artifact(model_params, artifacts_dir / "model_params.json")
 save_artifact(model, artifacts_dir / "model.pkl")
-log_returns.loc[training_data["index"]].to_csv(artifacts_dir / "log_returns.csv")
+log_returns_raw.loc[training_data["index"]].to_csv(artifacts_dir / "log_returns.csv")
+if transformer is not None:
+    save_artifact(transformer, artifacts_dir / "transformer.pkl")

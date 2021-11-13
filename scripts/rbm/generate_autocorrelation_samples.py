@@ -1,4 +1,4 @@
-import json
+import pandas as pd
 
 from datetime import timedelta
 from time import time
@@ -33,6 +33,12 @@ model_params = load_artifact(artifacts_dir / "model_params.json")
 # generate initial values for the visible layer
 v = rng.choice([0, 1], model_params["X_train_shape"][1])
 
+# load the transformer
+transformer = None
+if model_params["transform"].get("type") is not None:
+    transformer = load_artifact(artifacts_dir / "transformer.pkl")
+
+
 # generate and save the samples
 start_time = time()
 for i in range(n_sample_dfs):
@@ -45,6 +51,17 @@ for i in range(n_sample_dfs):
     autocorrelation_samples = unbinarize_df(
         autocorrelation_samples, model_params["binarization_params"]
     )
+
+    # transform the samples back to the original space
+    if transformer is not None:
+        if model_params["transform"]["type"] == "quantile":
+            autocorrelation_samples = pd.DataFrame(
+                transformer.inverse_transform(autocorrelation_samples),
+                columns=autocorrelation_samples.columns,
+                index=autocorrelation_samples.index,
+            )
+        elif model_params["transform"]["type"] == "power":
+            autocorrelation_samples = transformer.inverse_transform(autocorrelation_samples)
 
     # increment the index (useful for when recombining the csv files)
     autocorrelation_samples.index += i * n_samples_per_df

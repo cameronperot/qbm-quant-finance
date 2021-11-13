@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from sklearn.metrics import mean_squared_error
+
 from qbm.metrics import compute_annualized_volatility, compute_correlation_coefficients
 from qbm.plotting import (
     plot_correlation_coefficients,
@@ -44,6 +46,27 @@ filter_columns = [
 ]
 samples_ensemble = [df.drop(filter_columns, axis=1) for df in samples_ensemble]
 
+# compute QQ distance
+qq_rmse = {column: [] for column in log_returns.columns}
+for samples in samples_ensemble:
+    for column in log_returns.columns:
+        qq_rmse[column].append(
+            mean_squared_error(
+                np.sort(samples[column]), np.sort(log_returns[column]), squared=False
+            )
+        )
+
+for column in log_returns.columns:
+    qq_rmse[column] = {"mean": np.mean(qq_rmse[column]), "std": np.std(qq_rmse[column])}
+qq_rmse = pd.DataFrame.from_dict(qq_rmse, orient="index")
+qq_rmse.to_csv(data_dir / "qq_rmse.csv")
+
+print("--------------------------------")
+print("QQ RMSE")
+print("--------------------------------")
+print(qq_rmse)
+print("--------------------------------\n\n")
+
 # compute the correlation coefficients
 combinations = (
     ("EURUSD", "GBPUSD"),
@@ -70,6 +93,15 @@ correlation_coefficients_sample["means"].to_csv(
 correlation_coefficients_sample["stds"].to_csv(
     data_dir / "correlation_coefficients_sample_stds.csv"
 )
+correlation_coefficients_rmse = pd.DataFrame(
+    np.sqrt(
+        (
+            (correlation_coefficients_data - correlation_coefficients_sample["means"]) ** 2
+        ).mean()
+    ),
+    columns=["RMSE"],
+)
+correlation_coefficients_rmse.to_csv(data_dir / "correlation_coefficients_rmse.csv")
 
 print("--------------------------------")
 print("Correlation Coefficients")
@@ -80,6 +112,8 @@ print("\n\tSample (mean)")
 print(correlation_coefficients_sample["means"])
 print("\n\tSample (std)")
 print(correlation_coefficients_sample["stds"])
+print("\n\tRMSE")
+print(correlation_coefficients_rmse)
 print("--------------------------------\n\n")
 
 # compute the volatilities
@@ -94,7 +128,6 @@ volatilities = pd.DataFrame(
         "Sample Std": volatilities_sample["stds"],
     }
 )
-
 volatilities.to_csv(data_dir / "volatilities.csv")
 
 print("--------------------------------")
