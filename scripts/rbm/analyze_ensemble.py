@@ -48,16 +48,24 @@ samples_ensemble = [df.drop(filter_columns, axis=1) for df in samples_ensemble]
 
 # compute QQ distance
 qq_rmse = {column: [] for column in log_returns.columns}
-for samples in samples_ensemble:
-    for column in log_returns.columns:
-        qq_rmse[column].append(
-            mean_squared_error(
-                np.sort(samples[column]), np.sort(log_returns[column]), squared=False
-            )
+qq_rmse = np.zeros((len(samples_ensemble), len(log_returns.columns)))
+for i, samples in enumerate(samples_ensemble):
+    for j, column in enumerate(log_returns.columns):
+        qq_rmse[i, j] = mean_squared_error(
+            np.sort(samples[column]), np.sort(log_returns[column]), squared=False
         )
 
-for column in log_returns.columns:
-    qq_rmse[column] = {"mean": np.mean(qq_rmse[column]), "std": np.std(qq_rmse[column])}
+qq_rmse_means = qq_rmse.mean(axis=0)
+qq_rmse_stds = qq_rmse.std(axis=0)
+qq_extrema = {
+    "min": np.argmin(qq_rmse.mean(axis=1)),
+    "max": np.argmax(qq_rmse.mean(axis=1)),
+}
+
+qq_rmse = {
+    column: {"mean": qq_rmse_means[j], "std": qq_rmse_stds[j]}
+    for j, column in enumerate(log_returns.columns)
+}
 qq_rmse = pd.DataFrame.from_dict(qq_rmse, orient="index")
 qq_rmse.to_csv(data_dir / "qq_rmse.csv")
 
@@ -172,9 +180,9 @@ qq_plot_params = {
     "xticks": np.linspace(-0.04, 0.04, 9),
     "yticks": np.linspace(-0.04, 0.04, 9),
 }
-for i, samples in enumerate(samples_ensemble):
-    fig, axs = plot_qq_grid(log_returns, samples, qq_plot_params)
-    plt.savefig(plot_dir / f"qq_{i+1:03}.png")
+for extrema, i in qq_extrema.items():
+    fig, axs = plot_qq_grid(log_returns, samples_ensemble[i], qq_plot_params)
+    plt.savefig(plot_dir / f"qq_{extrema}.png")
     plt.close(fig)
 
 # plot the correlation coefficients
