@@ -19,6 +19,7 @@ from .misc import (
     save_artifact,
 )
 from .training import prepare_training_data
+from .transformations import PowerTransformer
 
 __all__ = [
     # binarization
@@ -44,4 +45,6 @@ __all__ = [
     "save_artifact",
     # training
     "prepare_training_data",
+    # transformations
+    "PowerTransformer",
 ]
