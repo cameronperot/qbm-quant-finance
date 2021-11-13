@@ -84,7 +84,7 @@ def plot_correlation_coefficients(data, samples):
         ax.set_xlim((-0.75, 2.75))
         ax.grid(alpha=0.7)
         if i == 0:
-            ax.legend()
+            ax.legend(loc="lower left")
 
     plt.tight_layout()
 
