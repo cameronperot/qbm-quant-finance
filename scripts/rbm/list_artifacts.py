@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-
 import json
 import pandas as pd
 
 from qbm.utils import get_project_dir, load_artifact
 
-pd.set_option("display.max_columns", None)  # or 1000
-# pd.set_option("display.max_colwidth", 200)  # or 199
+pd.set_option("display.max_columns", None)
+# pd.set_option("display.max_colwidth", 200)
 project_dir = get_project_dir()
 artifacts_dir = project_dir / "artifacts"
 artifacts_subdirs = sorted(
@@ -21,7 +19,11 @@ rows = {}
 qq_rmse = {}
 cc_rmse = {}
 for dir in artifacts_subdirs:
-    model_params = load_artifact(dir / "model_params.json")
+    config = load_artifact(dir / "config.json")
+    model_params = config["model"]
+    ensemble_params = config.get("ensemble", {})
+    autocorrelation_params = config.get("autocorrelation", {})
+
     rows[dir.stem] = {
         "seed": model_params["seed"],
         "n_bits": model_params["n_bits"],
@@ -34,20 +36,6 @@ for dir in artifacts_subdirs:
         "volatility_indicators": model_params["volatility_indicators"],
         "transform": model_params["transform"],
     }
-
-    autocorrelation_params = {}
-    try:
-        autocorrelation_params = load_artifact(
-            dir / "samples_autocorrelation/autocorrelation_params.json"
-        )
-    except Exception:
-        pass
-
-    ensemble_params = {}
-    try:
-        ensemble_params = load_artifact(dir / "samples_ensemble/ensemble_params.json")
-    except Exception:
-        pass
 
     rows[dir.stem]["ensemble_size"] = ensemble_params.get("size")
     rows[dir.stem]["ensemble_n_steps"] = ensemble_params.get("n_steps")
