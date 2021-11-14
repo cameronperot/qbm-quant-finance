@@ -8,7 +8,6 @@ from .binarization import (
     unbinarize,
     unbinarize_df,
 )
-from .data_loading import load_log_returns, load_raw_data, merge_dfs
 from .misc import (
     compute_df_stats,
     compute_stats_over_dfs,
@@ -20,6 +19,7 @@ from .misc import (
 )
 from .training import prepare_training_data
 from .transformations import PowerTransformer
+from .data_loading import load_log_returns, load_raw_data, merge_dfs
 
 __all__ = [
     # binarization

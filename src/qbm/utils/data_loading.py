@@ -6,16 +6,48 @@ import numpy as np
 import pandas as pd
 import pandas_market_calendars as mcal
 
+from qbm.utils import get_project_dir
 
-def load_log_returns(file_path):
+
+def load_log_returns(data_source, start_date, end_date, outlier_threshold):
     """
     Loads the training data (log returns) in float form.
 
-    :param file_path: Path to the log_returns.csv file.
+    :param data_source: Name of the data source (will load {data_source}.csv from the train
+        data dir).
+    :param start_date: Datetime object or string of when to cutoff dates before (inclusive).
+    :param end_date: Datetime object or string of when to cutoff dates after (inclusive).
+    :param outlier_threshold: Number of standard deviations from the mean for which to
+        exclude outliers above.
 
     :returns: Log returns dataframe.
     """
-    return pd.read_csv(file_path, parse_dates=["date"], index_col="date",)
+    project_dir = get_project_dir()
+    data_dir = project_dir / "data/train"
+    log_returns = pd.read_csv(
+        data_dir / f"{data_source}.csv", parse_dates=["date"], index_col="date"
+    )
+
+    # filter dates
+    log_returns = log_returns.loc[
+        (log_returns.index >= start_date) & (log_returns.index <= end_date)
+    ].copy()
+    assert (log_returns.index >= start_date).all()
+    assert (log_returns.index <= end_date).all()
+
+    # remove outliers
+    if outlier_threshold is not None:
+        outlier_dates = []
+        for pair in log_returns.columns:
+            x = log_returns[pair].copy()
+            x = (x - x.mean()) / x.std()
+            outlier_dates.extend(x[x.abs() > outlier_threshold].index)
+
+        log_returns.drop(outlier_dates, axis=0, inplace=True)
+        for outlier_date in outlier_dates:
+            assert outlier_date not in log_returns.index
+
+    return log_returns
 
 
 def load_raw_data(
@@ -26,7 +58,7 @@ def load_raw_data(
     min_volume=1,
     common_dates=True,
     drop_holidays=True,
-):
+):  # pragma: no cover
     """
     Loads the raw csv files from the data directory. The files must corresponds to
     the strings in the currency_pairs list, i.e., if currency_pairs = ["abc", "xyz"], then the files
@@ -165,7 +197,7 @@ def load_raw_data(
         return df, log_returns
 
 
-def merge_dfs(dfs, currency_pairs):
+def merge_dfs(dfs, currency_pairs):  # pragma: no cover
     """
     Merges the dataframes into one, prefixing the columns with the keys of dfs.
 
@@ -193,7 +225,7 @@ def merge_dfs(dfs, currency_pairs):
     return df
 
 
-def _get_holidays(start_date, end_date, exchanges=["NYSE", "LSE"]):
+def _get_holidays(start_date, end_date, exchanges=["NYSE", "LSE"]):  # pragma: no cover
     """
     Returns a set of holidays for the provided exchanges. List of exchanges available here:
     https://pandas-market-calendars.readthedocs.io/en/latest/usage.html.

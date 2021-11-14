@@ -25,6 +25,7 @@ project_dir = get_project_dir()
 
 config = load_artifact(project_dir / "scripts/rbm/config.json")
 model_params = config["model"].copy()
+data_params = config["data"]
 model_params["id"] = f"BernoulliRBM_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 config["model"]["id"] = model_params["id"]
 
@@ -34,7 +35,18 @@ data_dir = project_dir / "data"
 rng = get_rng(model_params["seed"])
 
 # data loading
-log_returns = load_log_returns(data_dir / "train/log_returns.csv")
+date_format = "%Y-%m-%d"
+start_date = datetime.strptime(data_params["start_date"], date_format)
+end_date = datetime.strptime(data_params["end_date"], date_format)
+if model_params["volatility_indicators"]:
+    start_date -= timedelta(days=90)
+
+log_returns = load_log_returns(
+    data_params["data_source"],
+    start_date=start_date,
+    end_date=end_date,
+    outlier_threshold=data_params["outlier_threshold"],
+)
 log_returns_raw = log_returns.copy()
 
 # data transformation
@@ -93,6 +105,7 @@ model.fit(X_train)
 # save artifacts
 save_artifact(config, project_dir / "scripts/rbm/config.json")
 save_artifact(model_params, artifacts_dir / "model_params.json")
+save_artifact(data_params, artifacts_dir / "data_params.json")
 save_artifact(model, artifacts_dir / "model.pkl")
 log_returns_raw.loc[training_data["index"]].to_csv(artifacts_dir / "log_returns.csv")
 if transformer is not None:
