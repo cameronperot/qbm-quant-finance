@@ -20,11 +20,12 @@ from qbm.sampling import generate_rbm_samples_df
 project_dir = get_project_dir()
 
 config = load_artifact(project_dir / "scripts/rbm/config.json")
+ensemble_params = config["ensemble"]
 model_id = config["model"]["id"]
-ensemble_size = int(config["ensemble"]["size"])
-n_steps = int(config["ensemble"]["n_steps"])
-n_jobs = int(config["ensemble"]["n_jobs"])
-seed = int(config["ensemble"]["seed"])
+ensemble_size = int(ensemble_params["size"])
+n_steps = int(ensemble_params["n_steps"])
+n_jobs = int(ensemble_params["n_jobs"])
+seed = int(ensemble_params["seed"])
 
 artifacts_dir = project_dir / f"artifacts/{model_id}"
 save_dir = artifacts_dir / "samples_ensemble"
@@ -34,7 +35,7 @@ if not save_dir.exists():
 # load the model and params
 rng = get_rng(seed)
 model = load_artifact(artifacts_dir / "model.pkl")
-model_params = load_artifact(artifacts_dir / "model_params.json")
+model_params = load_artifact(artifacts_dir / "config.json")["model"]
 
 # generate initial values for the visible layer
 V = rng.choice([0, 1], (ensemble_size, model_params["X_train_shape"][1]))
@@ -95,5 +96,7 @@ Parallel(n_jobs=n_jobs)(
 
 print(f"Completed {ensemble_size} iterations in {timedelta(seconds=time() - start_time)}")
 
-# save config
-save_artifact(config["ensemble"], save_dir / "ensemble_params.json")
+# update the config for this run
+config = load_artifact(artifacts_dir / "config.json")
+config["ensemble"] = ensemble_params
+save_artifact(config, artifacts_dir / "config.json")

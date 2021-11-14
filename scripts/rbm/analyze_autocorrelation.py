@@ -16,13 +16,17 @@ model_id = config["model"]["id"]
 n_lags = int(config["autocorrelation"]["n_lags"])
 
 artifacts_dir = project_dir / f"artifacts/{model_id}"
-data_dir = artifacts_dir / "samples_autocorrelation"
-plot_dir = artifacts_dir / "plots"
-if not plot_dir.exists():
-    plot_dir.mkdir()
+results_dir = artifacts_dir / "results"
+data_dir = artifacts_dir / "autocorrelation_samples"
+if not results_dir.exists():
+    results_dir.mkdir()
+    (results_dir / "plots").mkdir()
+    (results_dir / "data").mkdir()
 
 # load the raw data
-log_returns = load_log_returns(artifacts_dir / "log_returns.csv")
+log_returns = pd.read_csv(
+    artifacts_dir / "log_returns.csv", parse_dates=["date"], index_col="date"
+)
 
 # load the sample chain
 file_names = [
@@ -48,9 +52,9 @@ integrated_times = pd.DataFrame.from_dict(integrated_times, orient="index")
 print(integrated_times)
 print("--------------------------------")
 acfs = pd.DataFrame(acfs)
-integrated_times.to_csv(data_dir / "autocorrelation_times.csv")
+integrated_times.to_csv(results_dir / "data/autocorrelation_times.csv")
 
 # plot the acfs
 fig, ax = plot_autocorrelation_grid(acfs)
-plt.savefig(plot_dir / "autocorrelations.png")
+plt.savefig(results_dir / "plots/autocorrelations.png")
 plt.close(fig)

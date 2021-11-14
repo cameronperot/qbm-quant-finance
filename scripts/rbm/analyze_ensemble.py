@@ -26,12 +26,16 @@ model_id = config["model"]["id"]
 
 artifacts_dir = project_dir / f"artifacts/{model_id}"
 data_dir = artifacts_dir / "samples_ensemble"
-plot_dir = artifacts_dir / "plots"
-if not plot_dir.exists():
-    plot_dir.mkdir()
+results_dir = artifacts_dir / "results"
+if not results_dir.exists():
+    results_dir.mkdir()
+    (results_dir / "plots").mkdir()
+    (results_dir / "data").mkdir()
 
 # load the training data
-log_returns = load_log_returns(artifacts_dir / "log_returns.csv")
+log_returns = pd.read_csv(
+    artifacts_dir / "log_returns.csv", parse_dates=["date"], index_col="date"
+)
 
 # load the sampled ensemble data
 samples_ensemble = [
@@ -67,7 +71,7 @@ qq_rmse = {
     for j, column in enumerate(log_returns.columns)
 }
 qq_rmse = pd.DataFrame.from_dict(qq_rmse, orient="index")
-qq_rmse.to_csv(data_dir / "qq_rmse.csv")
+qq_rmse.to_csv(results_dir / "data/qq_rmse.csv")
 
 print("--------------------------------")
 print("QQ RMSE")
@@ -94,12 +98,12 @@ correlation_coefficients_sample = compute_stats_over_dfs(
 for k, v in correlation_coefficients_sample.items():
     correlation_coefficients_sample[k] = v.reindex_like(correlation_coefficients_data)
 
-correlation_coefficients_data.to_csv(data_dir / "correlation_coefficients_data.csv")
+correlation_coefficients_data.to_csv(results_dir / "data/correlation_coefficients_data.csv")
 correlation_coefficients_sample["means"].to_csv(
-    data_dir / "correlation_coefficients_sample_means.csv"
+    results_dir / "data/correlation_coefficients_sample_means.csv"
 )
 correlation_coefficients_sample["stds"].to_csv(
-    data_dir / "correlation_coefficients_sample_stds.csv"
+    results_dir / "data/correlation_coefficients_sample_stds.csv"
 )
 correlation_coefficients_rmse = pd.DataFrame(
     np.sqrt(
@@ -109,7 +113,7 @@ correlation_coefficients_rmse = pd.DataFrame(
     ),
     columns=["RMSE"],
 )
-correlation_coefficients_rmse.to_csv(data_dir / "correlation_coefficients_rmse.csv")
+correlation_coefficients_rmse.to_csv(results_dir / "data/correlation_coefficients_rmse.csv")
 
 print("--------------------------------")
 print("Correlation Coefficients")
@@ -136,7 +140,7 @@ volatilities = pd.DataFrame(
         "Sample Std": volatilities_sample["stds"],
     }
 )
-volatilities.to_csv(data_dir / "volatilities.csv")
+volatilities.to_csv(results_dir / "data/volatilities.csv")
 
 print("--------------------------------")
 print("Annualized Volatility")
@@ -157,9 +161,9 @@ for samples in samples_ensemble:
     )
 tails_sample = compute_stats_over_dfs(quantiles_sample)
 
-tails_data.to_csv(data_dir / "tails_data.csv")
-tails_sample["means"].to_csv(data_dir / "tails_sample_means.csv")
-tails_sample["stds"].to_csv(data_dir / "tails_sample_stds.csv")
+tails_data.to_csv(results_dir / "data/tails_data.csv")
+tails_sample["means"].to_csv(results_dir / "data/tails_sample_means.csv")
+tails_sample["stds"].to_csv(results_dir / "data/tails_sample_stds.csv")
 
 print("--------------------------------")
 print("Tails")
@@ -182,14 +186,14 @@ qq_plot_params = {
 }
 for extrema, i in qq_extrema.items():
     fig, axs = plot_qq_grid(log_returns, samples_ensemble[i], qq_plot_params)
-    plt.savefig(plot_dir / f"qq_{extrema}.png")
+    plt.savefig(results_dir / f"plots/qq_{extrema}.png")
     plt.close(fig)
 
 # plot the correlation coefficients
 fig, axs = plot_correlation_coefficients(
     correlation_coefficients_data, correlation_coefficients_sample
 )
-plt.savefig(plot_dir / "correlation_coefficients.png")
+plt.savefig(results_dir / "plots/correlation_coefficients.png")
 plt.close(fig)
 
 # plot the volatilities
@@ -201,5 +205,5 @@ volatility_plot_params = {
 fig, ax = plot_volatility_comparison(
     volatilities_data, volatilities_sample, volatility_plot_params
 )
-plt.savefig(plot_dir / "volatilities.png")
+plt.savefig(results_dir / "plots/volatilities.png")
 plt.close(fig)

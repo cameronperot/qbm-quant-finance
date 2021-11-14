@@ -104,8 +104,7 @@ model.fit(X_train)
 
 # save artifacts
 save_artifact(config, project_dir / "scripts/rbm/config.json")
-save_artifact(model_params, artifacts_dir / "model_params.json")
-save_artifact(data_params, artifacts_dir / "data_params.json")
+save_artifact({"model": model_params, "data": data_params}, artifacts_dir / "config.json")
 save_artifact(model, artifacts_dir / "model.pkl")
 log_returns_raw.loc[training_data["index"]].to_csv(artifacts_dir / "log_returns.csv")
 if transformer is not None:
