@@ -42,10 +42,10 @@ for dir in artifacts_subdirs:
 
     try:
         qq_rmse[model_params["id"]] = pd.read_csv(
-            dir / "samples_ensemble/qq_rmse.csv", index_col=0
+            dir / "results/data/qq_rmse.csv", index_col=0
         )["mean"]
         cc_rmse[model_params["id"]] = pd.read_csv(
-            dir / "samples_ensemble/correlation_coefficients_rmse.csv", index_col=0
+            dir / "results/data/correlation_coefficients_rmse.csv", index_col=0
         )["RMSE"]
     except:
         pass
