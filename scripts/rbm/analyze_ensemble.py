@@ -9,6 +9,7 @@ from qbm.metrics import compute_annualized_volatility, compute_correlation_coeff
 from qbm.plotting import (
     plot_correlation_coefficients,
     plot_qq_grid,
+    plot_tail_concentrations,
     plot_volatility_comparison,
 )
 from qbm.utils import (
@@ -277,3 +278,11 @@ fig, ax = plot_volatility_comparison(
 )
 plt.savefig(results_dir / "plots/volatilities.png")
 plt.close(fig)
+
+# plot the tail concentration functions
+for extrema, i in qq_extrema.items():
+    fig, axs = plot_tail_concentrations(
+        {"Data": log_returns, "Generated": samples_ensemble[i]}, combinations
+    )
+    plt.savefig(results_dir / f"plots/tail_concentration_functions_{extrema}.png")
+    plt.close(fig)

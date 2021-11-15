@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.dates import DateFormatter
 from datetime import timedelta
+
+from qbm.utils import compute_lower_tail_concentration, compute_upper_tail_concentration
 
 
 def plot_autocorrelation(ax, lags, acf, title):
@@ -132,7 +135,7 @@ def plot_qq_grid(data, samples, params):
 
     :returns: Matplotlib figure and axes.
     """
-    fig, axs = plt.subplots(2, 2, figsize=(10, 10), dpi=300, tight_layout=True)
+    fig, axs = plt.subplots(2, 2, figsize=(9, 9), dpi=300, tight_layout=True)
     for column, ax in zip(data.columns, axs.flatten()):
         plot_qq(ax, data[column], samples[column], column, params)
 
@@ -216,6 +219,47 @@ def plot_volatility(ax, dates, volatility, title, params):
     ax.xaxis.grid(alpha=0.7)
     ax.yaxis.grid(False)
     ax.xaxis.set_major_formatter(DateFormatter("%Y"))
+
+
+def plot_tail_concentrations(dfs, combinations, interval_size=1e-3):
+    """
+    Plots the upper and lower tail concentration functions for the provided
+    dataframes.
+
+    :param dfs: Dictionary where keys are the plot labels, and the values are the
+        corresponding dataframes to be plotted.
+    :param combinations: List of tuples of column names to be plotted, e.g.
+        [("EURUSD", "GBPUSD"), ("EURUSD", "USDJPY"), ...]
+    :param interval_size: Spacing between the values on the independent axis.
+
+    :returns: Matplotlib figure and axes.
+    """
+    fig, axs = plt.subplots(3, 2, figsize=(11, 11), dpi=300)
+    colors = ["tab:blue", "tab:red", "tab:green", "tab:orange", "tab:purple"]
+
+    for i, (ax, (pair_X, pair_Y)) in enumerate(zip(axs.flatten(), combinations)):
+        for j, (label, df) in enumerate(dfs.items()):
+            U = df[pair_X].rank() / (df.shape[0] + 1)
+            V = df[pair_Y].rank() / (df.shape[0] + 1)
+
+            z_lower = np.arange(interval_size, 0.5 + interval_size, interval_size)
+            z_upper = np.arange(0.5, 1, interval_size)
+            lower_concentration = compute_lower_tail_concentration(z_lower, U, V)
+            upper_concentration = compute_upper_tail_concentration(z_upper, U, V)
+
+            x = np.concatenate([z_lower, z_upper])
+            y = np.concatenate([lower_concentration, upper_concentration])
+
+            ax.plot(x, y, color=colors[j], label=label)
+            ax.set_title(f"{pair_X}/{pair_Y}")
+            ax.grid(True)
+
+        if i == 0:
+            ax.legend(loc="lower center")
+
+    plt.tight_layout()
+
+    return fig, axs
 
 
 def plot_volatility_grid(volatility, params):

@@ -9,6 +9,8 @@ from unittest.mock import patch, mock_open
 
 from qbm.utils import (
     compute_df_stats,
+    compute_lower_tail_concentration,
+    compute_upper_tail_concentration,
     compute_stats_over_dfs,
     filter_df_on_values,
     get_rng,
@@ -49,6 +51,44 @@ def test_compute_df_stats(monkeypatch):
     df_stats = compute_df_stats(df)
 
     assert df_stats.equals(expected_df)
+
+
+@patch("qbm.utils.misc.np.logical_and")
+@patch("qbm.utils.misc.np.sum")
+def test_compute_lower_tail_concentration(mock_sum, mock_logical_and):
+    mock_sum.return_value = 123
+    mock_logical_and.return_value = "test_logical_and"
+
+    z = 0.5
+    U = np.linspace(0, 0.9, 100)
+    V = np.linspace(0, 1, 100)
+
+    lower_tail_concentration = compute_lower_tail_concentration(z, U, V)
+
+    assert (mock_logical_and.call_args[0][0] == (U <= z)).all()
+    assert (mock_logical_and.call_args[0][1] == (V <= z)).all()
+    assert mock_sum.call_args_list[0][0][0] == "test_logical_and"
+    assert (mock_sum.call_args_list[1][0][0] == (U <= z)).all()
+    assert lower_tail_concentration == 1
+
+
+@patch("qbm.utils.misc.np.logical_and")
+@patch("qbm.utils.misc.np.sum")
+def test_compute_upper_tail_concentration(mock_sum, mock_logical_and):
+    mock_sum.return_value = 123
+    mock_logical_and.return_value = "test_logical_and"
+
+    z = 0.5
+    U = np.linspace(0, 0.9, 100)
+    V = np.linspace(0, 1, 100)
+
+    upper_tail_concentration = compute_upper_tail_concentration(z, U, V)
+
+    assert (mock_logical_and.call_args[0][0] == (U > 1 - z)).all()
+    assert (mock_logical_and.call_args[0][1] == (V > 1 - z)).all()
+    assert mock_sum.call_args_list[0][0][0] == "test_logical_and"
+    assert (mock_sum.call_args_list[1][0][0] == (U > 1 - z)).all()
+    assert upper_tail_concentration == 1
 
 
 def test_compute_stats_over_dfs(monkeypatch):

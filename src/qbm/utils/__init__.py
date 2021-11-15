@@ -10,6 +10,8 @@ from .binarization import (
 )
 from .misc import (
     compute_df_stats,
+    compute_lower_tail_concentration,
+    compute_upper_tail_concentration,
     compute_stats_over_dfs,
     filter_df_on_values,
     get_project_dir,
@@ -38,6 +40,8 @@ __all__ = [
     "merge_dfs",
     # misc.
     "compute_df_stats",
+    "compute_lower_tail_concentration",
+    "compute_upper_tail_concentration",
     "compute_stats_over_dfs",
     "filter_df_on_values",
     "get_project_dir",

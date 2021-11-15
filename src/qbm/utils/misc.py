@@ -45,6 +45,56 @@ def compute_stats_over_dfs(dfs):
     return {"means": means, "medians": medians, "stds": stds}
 
 
+def compute_lower_tail_concentration(z, U, V):
+    """
+    Lower tail concentration function defined as:
+    L(z) = P(U <= z | V <= z) = P(U <= z, V <= z) / P(U <= z)
+    References:
+        - https://freakonometrics.hypotheses.org/2435
+        - https://openacttexts.github.io/Loss-Data-Analytics/C-DependenceModel
+            (section 14.5.4.3)
+        - https://www.casact.org/sites/default/files/old/studynotes_venter_tails_of_copulas.pdf
+            (section 3)
+
+    :param z: Tail dependence parameter.
+    :param U: Input array for first variable (e.g. X.rank() / (len(X) + 1)).
+    :param V: Input array for second variable (e.g. Y.rank() / (len(Y) + 1)).
+
+    :returns: Lower tail concentration function.
+    """
+    return np.sum(np.logical_and(U <= z, V <= z)) / np.sum(U <= z)
+
+
+compute_lower_tail_concentration = np.vectorize(
+    compute_lower_tail_concentration, excluded=[1, 2]
+)
+
+
+def compute_upper_tail_concentration(z, U, V):
+    """
+    Upper tail concentration function defined as:
+    R(z) = P(U > z | V > z) = P(U > z, V > z) / P(U > z)
+    References:
+        - https://freakonometrics.hypotheses.org/2435
+        - https://openacttexts.github.io/Loss-Data-Analytics/C-DependenceModel
+            (section 14.5.4.3)
+        - https://www.casact.org/sites/default/files/old/studynotes_venter_tails_of_copulas.pdf
+            (section 3)
+
+    :param z: Tail dependence parameter.
+    :param U: Input array for first variable (e.g. X.rank() / (len(X) + 1)).
+    :param V: Input array for second variable (e.g. Y.rank() / (len(Y) + 1)).
+
+    :returns: Upper tail concentration function.
+    """
+    return np.sum(np.logical_and(U > z, V > z)) / np.sum(U > z)
+
+
+compute_upper_tail_concentration = np.vectorize(
+    compute_upper_tail_concentration, excluded=[1, 2]
+)
+
+
 def filter_df_on_values(df, column_values, drop_filter_columns=True):
     """
     Return a copy of the dataframe filtered conditionally on provided
