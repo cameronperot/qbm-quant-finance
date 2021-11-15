@@ -11,6 +11,7 @@ from .binarization import (
 from .misc import (
     compute_df_stats,
     compute_stats_over_dfs,
+    filter_df_on_values,
     get_project_dir,
     get_rng,
     load_artifact,
@@ -38,6 +39,7 @@ __all__ = [
     # misc.
     "compute_df_stats",
     "compute_stats_over_dfs",
+    "filter_df_on_values",
     "get_project_dir",
     "get_rng",
     "load_artifact",

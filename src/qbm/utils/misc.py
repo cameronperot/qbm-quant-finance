@@ -45,6 +45,29 @@ def compute_stats_over_dfs(dfs):
     return {"means": means, "medians": medians, "stds": stds}
 
 
+def filter_df_on_values(df, column_values, drop_filter_columns=True):
+    """
+    Return a copy of the dataframe filtered conditionally on provided
+    column values.
+
+    :param df: Dataframe to filter.
+    :param column_values: Dictionary where the keys are column names, and the
+        values are values on which to filter the dataframe.
+    :param drop_filter_columns: If True returns a copy of the dataframe with
+        the filtered columns dropped.
+
+    :returns: A dataframe filtered conditionally on the provided column values.
+    """
+    df = df.copy()
+    for column, value in column_values.items():
+        df = df.loc[df[column] == value]
+
+    if drop_filter_columns:
+        df.drop(column_values.keys(), axis=1, inplace=True)
+
+    return df
+
+
 def get_project_dir():
     """
     Gets the project directory path from the environment and checks if it is valid.

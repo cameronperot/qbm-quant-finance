@@ -10,12 +10,28 @@ from unittest.mock import patch, mock_open
 from qbm.utils import (
     compute_df_stats,
     compute_stats_over_dfs,
+    filter_df_on_values,
     get_rng,
     get_project_dir,
     load_artifact,
     lr_exp_decay,
     save_artifact,
 )
+
+
+@pytest.fixture
+def df():
+    n_rows = 100
+    return pd.DataFrame(
+        {
+            "a": np.linspace(0, 1, n_rows),
+            "b": np.linspace(-1, 1, n_rows),
+            "c": np.concatenate([np.zeros(round(n_rows / 2)), np.ones(round(n_rows / 2))]),
+            "d": np.concatenate(
+                [np.zeros(round(n_rows / 3)), np.ones(round(2 * n_rows / 3))]
+            ),
+        }
+    )
 
 
 def test_compute_df_stats(monkeypatch):
@@ -43,6 +59,28 @@ def test_compute_stats_over_dfs(monkeypatch):
     assert stats_over_dfs["means"].equals(df)
     assert stats_over_dfs["medians"].equals(df)
     assert stats_over_dfs["stds"].equals(pd.DataFrame(np.zeros((3, 2))))
+
+
+def test_filter_df_on_values_drop_filter_columns_False(df):
+    column_values = {"c": 0, "d": 1}
+
+    df_filtered = filter_df_on_values(df, column_values, drop_filter_columns=False)
+
+    assert "c" in df_filtered.columns
+    assert "d" in df_filtered.columns
+    assert (df_filtered["c"] == column_values["c"]).all()
+    assert (df_filtered["d"] == column_values["d"]).all()
+    assert df_filtered.shape[0] == round(df.shape[0] * (1 / 2 - 1 / 3))
+
+
+def test_filter_df_on_values_drop_filter_columns_True(df):
+    column_values = {"c": 0, "d": 1}
+
+    df_filtered = filter_df_on_values(df, column_values, drop_filter_columns=True)
+
+    assert "c" not in df_filtered.columns
+    assert "d" not in df_filtered.columns
+    assert df_filtered.shape[0] == round(df.shape[0] * (1 / 2 - 1 / 3))
 
 
 def test_get_project_dir_env_not_set(monkeypatch):

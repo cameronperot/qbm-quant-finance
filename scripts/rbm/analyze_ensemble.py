@@ -14,6 +14,7 @@ from qbm.plotting import (
 from qbm.utils import (
     get_project_dir,
     compute_stats_over_dfs,
+    filter_df_on_values,
     load_artifact,
     load_log_returns,
 )
@@ -32,13 +33,15 @@ if not results_dir.exists():
     (results_dir / "plots").mkdir()
     (results_dir / "data").mkdir()
 
+model_params = load_artifact(artifacts_dir / "config.json")["model"]
+
 # load the training data
 log_returns = pd.read_csv(
     artifacts_dir / "log_returns.csv", parse_dates=["date"], index_col="date"
 )
 
 # load the sampled ensemble data
-samples_ensemble = [
+samples_ensemble_raw = [
     pd.read_pickle(data_dir / file_name)
     for file_name in data_dir.iterdir()
     if str(file_name).endswith(".pkl")
@@ -46,9 +49,9 @@ samples_ensemble = [
 
 # filter out binary indicator columns
 filter_columns = [
-    column for column in samples_ensemble[0].columns if column.endswith("_binary")
+    column for column in samples_ensemble_raw[0].columns if column.endswith("_binary")
 ]
-samples_ensemble = [df.drop(filter_columns, axis=1) for df in samples_ensemble]
+samples_ensemble = [df.drop(filter_columns, axis=1) for df in samples_ensemble_raw]
 
 # compute QQ distance
 qq_rmse = {column: [] for column in log_returns.columns}
@@ -147,6 +150,73 @@ print("Annualized Volatility")
 print("--------------------------------")
 print(volatilities)
 print("--------------------------------\n\n")
+
+# compute the conditional volatilities
+if model_params["volatility_indicators"]:
+    volatility_binarized = pd.read_csv(
+        artifacts_dir / "volatility_binarized.csv", parse_dates=["date"], index_col="date"
+    )
+    log_returns_volatility = pd.merge(
+        log_returns, volatility_binarized, left_index=True, right_index=True
+    )
+    currency_pairs = {
+        column for column in model_params["columns"] if not column.endswith("_binary")
+    }
+    low_volatility_column_values = {
+        f"{pair}_volatility_binary": 0 for pair in currency_pairs
+    }
+    high_volatility_column_values = {
+        f"{pair}_volatility_binary": 1 for pair in currency_pairs
+    }
+
+    volatilities_low_data = compute_annualized_volatility(
+        filter_df_on_values(log_returns_volatility, low_volatility_column_values)
+    )
+    volatilities_low_sample = compute_stats_over_dfs(
+        [
+            compute_annualized_volatility(
+                filter_df_on_values(samples, low_volatility_column_values)
+            )
+            for samples in samples_ensemble_raw
+        ]
+    )
+    volatilities_low = pd.DataFrame(
+        {
+            "Data": volatilities_low_data,
+            "Sample Mean": volatilities_low_sample["means"],
+            "Sample Std": volatilities_low_sample["stds"],
+        }
+    )
+    volatilities_low.to_csv(results_dir / "data/volatilities_low.csv")
+
+    volatilities_high_data = compute_annualized_volatility(
+        filter_df_on_values(log_returns_volatility, high_volatility_column_values)
+    )
+    volatilities_high_sample = compute_stats_over_dfs(
+        [
+            compute_annualized_volatility(
+                filter_df_on_values(samples, high_volatility_column_values)
+            )
+            for samples in samples_ensemble_raw
+        ]
+    )
+    volatilities_high = pd.DataFrame(
+        {
+            "Data": volatilities_high_data,
+            "Sample Mean": volatilities_high_sample["means"],
+            "Sample Std": volatilities_high_sample["stds"],
+        }
+    )
+    volatilities_high.to_csv(results_dir / "data/volatilities_high.csv")
+
+    print("--------------------------------")
+    print("Conditional Volatilities")
+    print("--------------------------------")
+    print("\tLow")
+    print(volatilities_low)
+    print("\n\tHigh")
+    print(volatilities_high)
+    print("--------------------------------\n\n")
 
 # compute the tails
 tails_data = pd.DataFrame(

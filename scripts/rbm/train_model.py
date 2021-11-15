@@ -107,5 +107,9 @@ save_artifact(config, project_dir / "scripts/rbm/config.json")
 save_artifact({"model": model_params, "data": data_params}, artifacts_dir / "config.json")
 save_artifact(model, artifacts_dir / "model.pkl")
 log_returns_raw.loc[training_data["index"]].to_csv(artifacts_dir / "log_returns.csv")
+if volatility_binarized is not None:
+    volatility_binarized.loc[training_data["index"]].to_csv(
+        artifacts_dir / "volatility_binarized.csv"
+    )
 if transformer is not None:
     save_artifact(transformer, artifacts_dir / "transformer.pkl")
