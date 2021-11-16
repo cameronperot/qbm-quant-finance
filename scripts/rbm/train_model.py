@@ -49,6 +49,13 @@ log_returns = load_log_returns(
 )
 log_returns_raw = log_returns.copy()
 
+# volatility indicators
+volatility_binarized = None
+if model_params["volatility_indicators"]:
+    volatility_binarized = binarize_volatility(
+        compute_rolling_volatility(log_returns, timedelta(days=90))
+    )
+
 # data transformation
 transformer = None
 if model_params["transform"].get("type") is not None:
@@ -68,13 +75,6 @@ if model_params["transform"].get("type") is not None:
 binarization_params = get_binarization_params(log_returns, n_bits=16)
 log_returns_binarized = binarize_df(log_returns, binarization_params)
 model_params["binarization_params"] = binarization_params
-
-# volatility indicators
-volatility_binarized = None
-if model_params["volatility_indicators"]:
-    volatility_binarized = binarize_volatility(
-        compute_rolling_volatility(log_returns, timedelta(days=90))
-    )
 
 # create the training set
 training_data = prepare_training_data(log_returns_binarized, volatility_binarized)
