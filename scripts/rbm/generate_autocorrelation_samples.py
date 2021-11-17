@@ -1,6 +1,7 @@
 import pandas as pd
 
 from datetime import timedelta
+from pathlib import Path
 from time import time
 
 from qbm.utils import (
@@ -12,71 +13,102 @@ from qbm.utils import (
 )
 from qbm.sampling import generate_rbm_samples_df
 
-# configuration
-project_dir = get_project_dir()
 
-config = load_artifact(project_dir / "scripts/rbm/config.json")
-autocorrelation_params = config["autocorrelation"]
-model_id = config["model"]["id"]
-n_samples_per_df = int(autocorrelation_params["n_samples_per_df"])
-n_sample_dfs = int(autocorrelation_params["n_sample_dfs"])
+def main(config_path):
+    # configuration
+    project_dir = get_project_dir()
 
-artifacts_dir = project_dir / f"artifacts/{model_id}"
-save_dir = artifacts_dir / "autocorrelation_samples"
-if not save_dir.exists():
-    save_dir.mkdir()
+    if config_path is None:
+        config_path = project_dir / "scripts/rbm/config.json"
+    config = load_artifact(config_path)
 
-# load model and params
-rng = get_rng(42)
-model = load_artifact(artifacts_dir / "model.pkl")
-model_params = load_artifact(artifacts_dir / "config.json")["model"]
+    autocorrelation_params = config["autocorrelation"]
+    model_id = config["model"]["id"]
+    n_samples_per_df = int(autocorrelation_params["n_samples_per_df"])
+    n_sample_dfs = int(autocorrelation_params["n_sample_dfs"])
 
-# generate initial values for the visible layer
-v = rng.choice([0, 1], model_params["X_train_shape"][1])
+    artifacts_dir = project_dir / f"artifacts/{model_id}"
+    save_dir = artifacts_dir / "autocorrelation_samples"
+    if not save_dir.exists():
+        save_dir.mkdir()
 
-# load the transformer
-transformer = None
-if model_params["transform"].get("type") is not None:
-    transformer = load_artifact(artifacts_dir / "transformer.pkl")
+    # load model and params
+    model = load_artifact(artifacts_dir / "model.pkl")
+    model_params = load_artifact(artifacts_dir / "config.json")["model"]
+    rng = get_rng(model_params["seed"])
 
+    # generate initial values for the visible layer
+    v = rng.choice([0, 1], model_params["X_train_shape"][1])
 
-# generate and save the samples
-start_time = time()
-for i in range(n_sample_dfs):
-    iter_start_time = time()
+    # load the transformer
+    transformer = None
+    if model_params["transform"].get("type") is not None:
+        transformer = load_artifact(artifacts_dir / "transformer.pkl")
 
-    # generate the samples
-    autocorrelation_samples, v = generate_rbm_samples_df(
-        model=model, v=v, n_samples=n_samples_per_df, n_steps=1, model_params=model_params,
-    )
-    autocorrelation_samples = unbinarize_df(
-        autocorrelation_samples, model_params["binarization_params"]
-    )
+    # generate and save the samples
+    start_time = time()
+    for i in range(n_sample_dfs):
+        iter_start_time = time()
 
-    # transform the samples back to the original space
-    if transformer is not None:
-        if model_params["transform"]["type"] == "quantile":
-            autocorrelation_samples = pd.DataFrame(
-                transformer.inverse_transform(autocorrelation_samples),
-                columns=autocorrelation_samples.columns,
-                index=autocorrelation_samples.index,
-            )
-        elif model_params["transform"]["type"] == "power":
-            autocorrelation_samples = transformer.inverse_transform(autocorrelation_samples)
+        # generate the samples
+        autocorrelation_samples, v = generate_rbm_samples_df(
+            model=model,
+            v=v,
+            n_samples=n_samples_per_df,
+            n_steps=1,
+            model_params=model_params,
+        )
+        autocorrelation_samples = unbinarize_df(
+            autocorrelation_samples, model_params["binarization_params"]
+        )
 
-    # increment the index (useful for when recombining the csv files)
-    autocorrelation_samples.index += i * n_samples_per_df
+        # transform the samples back to the original space
+        if transformer is not None:
+            if model_params["transform"]["type"] == "quantile":
+                autocorrelation_samples = pd.DataFrame(
+                    transformer.inverse_transform(autocorrelation_samples),
+                    columns=autocorrelation_samples.columns,
+                    index=autocorrelation_samples.index,
+                )
+            elif model_params["transform"]["type"] == "power":
+                autocorrelation_samples = transformer.inverse_transform(
+                    autocorrelation_samples
+                )
 
-    # save the samples to csv
-    autocorrelation_samples.to_pickle(save_dir / f"{i+1:03}.pkl")
+        # increment the index (useful for when recombining the csv files)
+        autocorrelation_samples.index += i * n_samples_per_df
+
+        # save the samples to csv
+        autocorrelation_samples.to_pickle(save_dir / f"{i+1:03}.pkl")
+
+        print(
+            f"Completed iteration {i+1} of {n_sample_dfs} in {timedelta(seconds=time() - iter_start_time)}"
+        )
 
     print(
-        f"Completed iteration {i+1} of {n_sample_dfs} in {timedelta(seconds=time() - iter_start_time)}"
+        f"Completed {n_sample_dfs} iterations in {timedelta(seconds=time() - start_time)}"
     )
 
-print(f"Completed {n_sample_dfs} iterations in {timedelta(seconds=time() - start_time)}")
+    # update the config for this run
+    config = load_artifact(artifacts_dir / "config.json")
+    config["autocorrelation"] = autocorrelation_params
+    save_artifact(config, artifacts_dir / "config.json")
 
-# update the config for this run
-config = load_artifact(artifacts_dir / "config.json")
-config["autocorrelation"] = autocorrelation_params
-save_artifact(config, artifacts_dir / "config.json")
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Generate an ensemble.")
+    parser.add_argument(
+        "--config",
+        type=str,
+        default=None,
+        help="Path to the config.json file for which to generate the ensemble based on.",
+    )
+    args = parser.parse_args()
+
+    config_path = args.config
+    if config_path is not None:
+        config_path = Path(config_path).resolve()
+
+    main(config_path)

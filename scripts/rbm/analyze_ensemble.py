@@ -21,271 +21,304 @@ from qbm.utils import (
     save_artifact,
 )
 
-# configuration
-project_dir = get_project_dir()
 
-config = load_artifact(project_dir / "scripts/rbm/config.json")
-model_id = config["model"]["id"]
+def main(model_id):
+    # configuration
+    project_dir = get_project_dir()
 
-artifacts_dir = project_dir / f"artifacts/{model_id}"
-data_dir = artifacts_dir / "samples_ensemble"
-results_dir = artifacts_dir / "results"
-if not results_dir.exists():
-    results_dir.mkdir()
-    (results_dir / "plots").mkdir()
-    (results_dir / "data").mkdir()
+    if model_id is None:
+        config = load_artifact(project_dir / "scripts/rbm/config.json")
+        model_id = config["model"]["id"]
 
-model_params = load_artifact(artifacts_dir / "config.json")["model"]
+    artifacts_dir = project_dir / f"artifacts/{model_id}"
+    data_dir = artifacts_dir / "samples_ensemble"
+    results_dir = artifacts_dir / "results"
+    if not results_dir.exists():
+        results_dir.mkdir()
+        (results_dir / "plots").mkdir()
+        (results_dir / "data").mkdir()
 
-# load the training data
-log_returns = pd.read_csv(
-    artifacts_dir / "log_returns.csv", parse_dates=["date"], index_col="date"
-)
+    model_params = load_artifact(artifacts_dir / "config.json")["model"]
 
-# load the sampled ensemble data
-samples_ensemble_raw = [
-    pd.read_pickle(data_dir / file_name)
-    for file_name in data_dir.iterdir()
-    if str(file_name).endswith(".pkl")
-]
+    # load the training data
+    log_returns = pd.read_csv(
+        artifacts_dir / "log_returns.csv", parse_dates=["date"], index_col="date"
+    )
 
-# filter out binary indicator columns
-filter_columns = [
-    column for column in samples_ensemble_raw[0].columns if column.endswith("_binary")
-]
-samples_ensemble = [df.drop(filter_columns, axis=1) for df in samples_ensemble_raw]
-
-# compute QQ distance
-qq_rmse = {column: [] for column in log_returns.columns}
-qq_rmse = np.zeros((len(samples_ensemble), len(log_returns.columns)))
-for i, samples in enumerate(samples_ensemble):
-    for j, column in enumerate(log_returns.columns):
-        qq_rmse[i, j] = mean_squared_error(
-            np.sort(samples[column]), np.sort(log_returns[column]), squared=False
-        )
-
-qq_rmse_means = qq_rmse.mean(axis=0)
-qq_rmse_stds = qq_rmse.std(axis=0)
-qq_extrema = {
-    "min": int(np.argmin(qq_rmse.mean(axis=1))),
-    "max": int(np.argmax(qq_rmse.mean(axis=1))),
-}
-save_artifact(qq_extrema, results_dir / "data/qq_extrema.json")
-
-qq_rmse = {
-    column: {"mean": qq_rmse_means[j], "std": qq_rmse_stds[j]}
-    for j, column in enumerate(log_returns.columns)
-}
-qq_rmse = pd.DataFrame.from_dict(qq_rmse, orient="index")
-qq_rmse.to_csv(results_dir / "data/qq_rmse.csv")
-
-print("--------------------------------")
-print("QQ RMSE")
-print("--------------------------------")
-print(qq_rmse)
-print("--------------------------------\n\n")
-
-# compute the correlation coefficients
-combinations = (
-    ("EURUSD", "GBPUSD"),
-    ("EURUSD", "USDJPY"),
-    ("EURUSD", "USDCAD"),
-    ("GBPUSD", "USDJPY"),
-    ("GBPUSD", "USDCAD"),
-    ("USDJPY", "USDCAD"),
-)
-correlation_coefficients_data = compute_correlation_coefficients(log_returns, combinations)
-correlation_coefficients_sample = compute_stats_over_dfs(
-    [
-        compute_correlation_coefficients(samples, combinations)
-        for samples in samples_ensemble
+    # load the sampled ensemble data
+    samples_ensemble_raw = [
+        pd.read_pickle(data_dir / file_name)
+        for file_name in data_dir.iterdir()
+        if str(file_name).endswith(".pkl")
     ]
-)
-for k, v in correlation_coefficients_sample.items():
-    correlation_coefficients_sample[k] = v.reindex_like(correlation_coefficients_data)
 
-correlation_coefficients_data.to_csv(results_dir / "data/correlation_coefficients_data.csv")
-correlation_coefficients_sample["means"].to_csv(
-    results_dir / "data/correlation_coefficients_sample_means.csv"
-)
-correlation_coefficients_sample["stds"].to_csv(
-    results_dir / "data/correlation_coefficients_sample_stds.csv"
-)
-correlation_coefficients_rmse = pd.DataFrame(
-    np.sqrt(
-        (
-            (correlation_coefficients_data - correlation_coefficients_sample["means"]) ** 2
-        ).mean()
-    ),
-    columns=["RMSE"],
-)
-correlation_coefficients_rmse.to_csv(results_dir / "data/correlation_coefficients_rmse.csv")
+    # filter out binary indicator columns
+    filter_columns = [
+        column for column in samples_ensemble_raw[0].columns if column.endswith("_binary")
+    ]
+    samples_ensemble = [df.drop(filter_columns, axis=1) for df in samples_ensemble_raw]
 
-print("--------------------------------")
-print("Correlation Coefficients")
-print("--------------------------------")
-print("\tData")
-print(correlation_coefficients_data)
-print("\n\tSample (mean)")
-print(correlation_coefficients_sample["means"])
-print("\n\tSample (std)")
-print(correlation_coefficients_sample["stds"])
-print("\n\tRMSE")
-print(correlation_coefficients_rmse)
-print("--------------------------------\n\n")
-
-# compute the volatilities
-volatilities_data = compute_annualized_volatility(log_returns)
-volatilities_sample = compute_stats_over_dfs(
-    [compute_annualized_volatility(samples) for samples in samples_ensemble]
-)
-volatilities = pd.DataFrame(
-    {
-        "Data": volatilities_data,
-        "Sample Mean": volatilities_sample["means"],
-        "Sample Std": volatilities_sample["stds"],
-    }
-)
-volatilities.to_csv(results_dir / "data/volatilities.csv")
-
-print("--------------------------------")
-print("Annualized Volatility")
-print("--------------------------------")
-print(volatilities)
-print("--------------------------------\n\n")
-
-# compute the conditional volatilities
-if model_params["volatility_indicators"]:
-    volatility_binarized = pd.read_csv(
-        artifacts_dir / "volatility_binarized.csv", parse_dates=["date"], index_col="date"
-    )
-    log_returns_volatility = pd.merge(
-        log_returns, volatility_binarized, left_index=True, right_index=True
-    )
-    currency_pairs = {
-        column for column in model_params["columns"] if not column.endswith("_binary")
-    }
-    low_volatility_column_values = {
-        f"{pair}_volatility_binary": 0 for pair in currency_pairs
-    }
-    high_volatility_column_values = {
-        f"{pair}_volatility_binary": 1 for pair in currency_pairs
-    }
-
-    volatilities_low_data = compute_annualized_volatility(
-        filter_df_on_values(log_returns_volatility, low_volatility_column_values)
-    )
-    volatilities_low_sample = compute_stats_over_dfs(
-        [
-            compute_annualized_volatility(
-                filter_df_on_values(samples, low_volatility_column_values)
+    # compute QQ distance
+    qq_rmse = {column: [] for column in log_returns.columns}
+    qq_rmse = np.zeros((len(samples_ensemble), len(log_returns.columns)))
+    for i, samples in enumerate(samples_ensemble):
+        for j, column in enumerate(log_returns.columns):
+            qq_rmse[i, j] = mean_squared_error(
+                np.sort(samples[column]), np.sort(log_returns[column]), squared=False
             )
-            for samples in samples_ensemble_raw
-        ]
-    )
-    volatilities_low = pd.DataFrame(
-        {
-            "Data": volatilities_low_data,
-            "Sample Mean": volatilities_low_sample["means"],
-            "Sample Std": volatilities_low_sample["stds"],
-        }
-    )
-    volatilities_low.to_csv(results_dir / "data/volatilities_low.csv")
 
-    volatilities_high_data = compute_annualized_volatility(
-        filter_df_on_values(log_returns_volatility, high_volatility_column_values)
-    )
-    volatilities_high_sample = compute_stats_over_dfs(
-        [
-            compute_annualized_volatility(
-                filter_df_on_values(samples, high_volatility_column_values)
-            )
-            for samples in samples_ensemble_raw
-        ]
-    )
-    volatilities_high = pd.DataFrame(
-        {
-            "Data": volatilities_high_data,
-            "Sample Mean": volatilities_high_sample["means"],
-            "Sample Std": volatilities_high_sample["stds"],
-        }
-    )
-    volatilities_high.to_csv(results_dir / "data/volatilities_high.csv")
+    qq_rmse_means = qq_rmse.mean(axis=0)
+    qq_rmse_stds = qq_rmse.std(axis=0)
+    qq_extrema = {
+        "min": int(np.argmin(qq_rmse.mean(axis=1))),
+        "max": int(np.argmax(qq_rmse.mean(axis=1))),
+    }
+    save_artifact(qq_extrema, results_dir / "data/qq_extrema.json")
+
+    qq_rmse = {
+        column: {"mean": qq_rmse_means[j], "std": qq_rmse_stds[j]}
+        for j, column in enumerate(log_returns.columns)
+    }
+    qq_rmse = pd.DataFrame.from_dict(qq_rmse, orient="index")
+    qq_rmse.to_csv(results_dir / "data/qq_rmse.csv")
 
     print("--------------------------------")
-    print("Conditional Volatilities")
+    print("QQ RMSE")
     print("--------------------------------")
-    print("\tLow")
-    print(volatilities_low)
-    print("\n\tHigh")
-    print(volatilities_high)
+    print(qq_rmse)
     print("--------------------------------\n\n")
 
-# compute the tails
-tails_data = pd.DataFrame(
-    {"quantile_01": log_returns.quantile(0.01), "quantile_99": log_returns.quantile(0.99),}
-)
-quantiles_sample = []
-for samples in samples_ensemble:
-    quantiles_sample.append(
-        pd.DataFrame(
-            {"quantile_01": samples.quantile(0.01), "quantile_99": samples.quantile(0.99),}
+    # compute the correlation coefficients
+    combinations = (
+        ("EURUSD", "GBPUSD"),
+        ("EURUSD", "USDJPY"),
+        ("EURUSD", "USDCAD"),
+        ("GBPUSD", "USDJPY"),
+        ("GBPUSD", "USDCAD"),
+        ("USDJPY", "USDCAD"),
+    )
+    correlation_coefficients_data = compute_correlation_coefficients(
+        log_returns, combinations
+    )
+    correlation_coefficients_sample = compute_stats_over_dfs(
+        [
+            compute_correlation_coefficients(samples, combinations)
+            for samples in samples_ensemble
+        ]
+    )
+    for k, v in correlation_coefficients_sample.items():
+        correlation_coefficients_sample[k] = v.reindex_like(correlation_coefficients_data)
+
+    correlation_coefficients_data.to_csv(
+        results_dir / "data/correlation_coefficients_data.csv"
+    )
+    correlation_coefficients_sample["means"].to_csv(
+        results_dir / "data/correlation_coefficients_sample_means.csv"
+    )
+    correlation_coefficients_sample["stds"].to_csv(
+        results_dir / "data/correlation_coefficients_sample_stds.csv"
+    )
+    correlation_coefficients_rmse = pd.DataFrame(
+        np.sqrt(
+            (
+                (correlation_coefficients_data - correlation_coefficients_sample["means"])
+                ** 2
+            ).mean()
+        ),
+        columns=["RMSE"],
+    )
+    correlation_coefficients_rmse.to_csv(
+        results_dir / "data/correlation_coefficients_rmse.csv"
+    )
+
+    print("--------------------------------")
+    print("Correlation Coefficients")
+    print("--------------------------------")
+    print("\tData")
+    print(correlation_coefficients_data)
+    print("\n\tSample (mean)")
+    print(correlation_coefficients_sample["means"])
+    print("\n\tSample (std)")
+    print(correlation_coefficients_sample["stds"])
+    print("\n\tRMSE")
+    print(correlation_coefficients_rmse)
+    print("--------------------------------\n\n")
+
+    # compute the volatilities
+    volatilities_data = compute_annualized_volatility(log_returns)
+    volatilities_sample = compute_stats_over_dfs(
+        [compute_annualized_volatility(samples) for samples in samples_ensemble]
+    )
+    volatilities = pd.DataFrame(
+        {
+            "Data": volatilities_data,
+            "Sample Mean": volatilities_sample["means"],
+            "Sample Std": volatilities_sample["stds"],
+        }
+    )
+    volatilities.to_csv(results_dir / "data/volatilities.csv")
+
+    print("--------------------------------")
+    print("Annualized Volatility")
+    print("--------------------------------")
+    print(volatilities)
+    print("--------------------------------\n\n")
+
+    # compute the conditional volatilities
+    if model_params["volatility_indicators"]:
+        volatility_binarized = pd.read_csv(
+            artifacts_dir / "volatility_binarized.csv",
+            parse_dates=["date"],
+            index_col="date",
         )
+        log_returns_volatility = pd.merge(
+            log_returns, volatility_binarized, left_index=True, right_index=True
+        )
+        currency_pairs = {
+            column for column in model_params["columns"] if not column.endswith("_binary")
+        }
+        low_volatility_column_values = {
+            f"{pair}_volatility_binary": 0 for pair in currency_pairs
+        }
+        high_volatility_column_values = {
+            f"{pair}_volatility_binary": 1 for pair in currency_pairs
+        }
+
+        volatilities_low_data = compute_annualized_volatility(
+            filter_df_on_values(log_returns_volatility, low_volatility_column_values)
+        )
+        volatilities_low_sample = compute_stats_over_dfs(
+            [
+                compute_annualized_volatility(
+                    filter_df_on_values(samples, low_volatility_column_values)
+                )
+                for samples in samples_ensemble_raw
+            ]
+        )
+        volatilities_low = pd.DataFrame(
+            {
+                "Data": volatilities_low_data,
+                "Sample Mean": volatilities_low_sample["means"],
+                "Sample Std": volatilities_low_sample["stds"],
+            }
+        )
+        volatilities_low.to_csv(results_dir / "data/volatilities_low.csv")
+
+        volatilities_high_data = compute_annualized_volatility(
+            filter_df_on_values(log_returns_volatility, high_volatility_column_values)
+        )
+        volatilities_high_sample = compute_stats_over_dfs(
+            [
+                compute_annualized_volatility(
+                    filter_df_on_values(samples, high_volatility_column_values)
+                )
+                for samples in samples_ensemble_raw
+            ]
+        )
+        volatilities_high = pd.DataFrame(
+            {
+                "Data": volatilities_high_data,
+                "Sample Mean": volatilities_high_sample["means"],
+                "Sample Std": volatilities_high_sample["stds"],
+            }
+        )
+        volatilities_high.to_csv(results_dir / "data/volatilities_high.csv")
+
+        print("--------------------------------")
+        print("Conditional Volatilities")
+        print("--------------------------------")
+        print("\tLow")
+        print(volatilities_low)
+        print("\n\tHigh")
+        print(volatilities_high)
+        print("--------------------------------\n\n")
+
+    # compute the tails
+    tails_data = pd.DataFrame(
+        {
+            "quantile_01": log_returns.quantile(0.01),
+            "quantile_99": log_returns.quantile(0.99),
+        }
     )
-tails_sample = compute_stats_over_dfs(quantiles_sample)
+    quantiles_sample = []
+    for samples in samples_ensemble:
+        quantiles_sample.append(
+            pd.DataFrame(
+                {
+                    "quantile_01": samples.quantile(0.01),
+                    "quantile_99": samples.quantile(0.99),
+                }
+            )
+        )
+    tails_sample = compute_stats_over_dfs(quantiles_sample)
 
-tails_data.to_csv(results_dir / "data/tails_data.csv")
-tails_sample["means"].to_csv(results_dir / "data/tails_sample_means.csv")
-tails_sample["stds"].to_csv(results_dir / "data/tails_sample_stds.csv")
+    tails_data.to_csv(results_dir / "data/tails_data.csv")
+    tails_sample["means"].to_csv(results_dir / "data/tails_sample_means.csv")
+    tails_sample["stds"].to_csv(results_dir / "data/tails_sample_stds.csv")
 
-print("--------------------------------")
-print("Tails")
-print("--------------------------------")
-print("\tData")
-print(tails_data)
-print("\n\tSample (mean)")
-print(tails_sample["means"])
-print("\n\tSample (std)")
-print(tails_sample["stds"])
-print("--------------------------------\n\n")
+    print("--------------------------------")
+    print("Tails")
+    print("--------------------------------")
+    print("\tData")
+    print(tails_data)
+    print("\n\tSample (mean)")
+    print(tails_sample["means"])
+    print("\n\tSample (std)")
+    print(tails_sample["stds"])
+    print("--------------------------------\n\n")
 
-# QQ plots
-qq_plot_params = {
-    "title": "test",
-    "xlims": (-0.045, 0.045),
-    "ylims": (-0.045, 0.045),
-    "xticks": np.linspace(-0.04, 0.04, 9),
-    "yticks": np.linspace(-0.04, 0.04, 9),
-}
-for extrema, i in qq_extrema.items():
-    fig, axs = plot_qq_grid(log_returns, samples_ensemble[i], qq_plot_params)
-    save_artifact((fig, axs), results_dir / f"plots/qq_{extrema}.pkl")
-    plt.savefig(results_dir / f"plots/qq_{extrema}.png")
+    # QQ plots
+    qq_plot_params = {
+        "title": "test",
+        "xlims": (-0.045, 0.045),
+        "ylims": (-0.045, 0.045),
+        "xticks": np.linspace(-0.04, 0.04, 9),
+        "yticks": np.linspace(-0.04, 0.04, 9),
+    }
+    for extrema, i in qq_extrema.items():
+        fig, axs = plot_qq_grid(log_returns, samples_ensemble[i], qq_plot_params)
+        save_artifact((fig, axs), results_dir / f"plots/qq_{extrema}.pkl")
+        plt.savefig(results_dir / f"plots/qq_{extrema}.png")
+        plt.close(fig)
+
+    # plot the correlation coefficients
+    fig, axs = plot_correlation_coefficients(
+        correlation_coefficients_data, correlation_coefficients_sample
+    )
+    plt.savefig(results_dir / "plots/correlation_coefficients.png")
     plt.close(fig)
 
-# plot the correlation coefficients
-fig, axs = plot_correlation_coefficients(
-    correlation_coefficients_data, correlation_coefficients_sample
-)
-plt.savefig(results_dir / "plots/correlation_coefficients.png")
-plt.close(fig)
-
-# plot the volatilities
-volatility_plot_params = {
-    "xlims": (-0.75, 3.75),
-    "ylims": (0.08, 0.11),
-    "yticks": np.linspace(0.08, 0.11, 7),
-}
-fig, ax = plot_volatility_comparison(
-    volatilities_data, volatilities_sample, volatility_plot_params
-)
-plt.savefig(results_dir / "plots/volatilities.png")
-plt.close(fig)
-
-# plot the tail concentration functions
-for extrema, i in qq_extrema.items():
-    fig, axs = plot_tail_concentrations(
-        {"Data": log_returns, "Generated": samples_ensemble[i]}, combinations
+    # plot the volatilities
+    volatility_plot_params = {
+        "xlims": (-0.75, 3.75),
+        "ylims": (0.08, 0.11),
+        "yticks": np.linspace(0.08, 0.11, 7),
+    }
+    fig, ax = plot_volatility_comparison(
+        volatilities_data, volatilities_sample, volatility_plot_params
     )
-    plt.savefig(results_dir / f"plots/tail_concentration_functions_{extrema}.png")
+    plt.savefig(results_dir / "plots/volatilities.png")
     plt.close(fig)
+
+    # plot the tail concentration functions
+    for extrema, i in qq_extrema.items():
+        fig, axs = plot_tail_concentrations(
+            {"Data": log_returns, "Generated": samples_ensemble[i]}, combinations
+        )
+        plt.savefig(results_dir / f"plots/tail_concentration_functions_{extrema}.png")
+        plt.close(fig)
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Analyze the statistical ensemble.")
+    parser.add_argument(
+        "--model_id",
+        type=str,
+        default=None,
+        help="model_id of the form BernoulliRBM_YYYYMMDD_HHMMSS",
+    )
+    args = parser.parse_args()
+
+    main(args.model_id)
