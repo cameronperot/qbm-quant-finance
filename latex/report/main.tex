@@ -1,33 +1,46 @@
 \documentclass[12pt,twoside]{report}
-\usepackage[a4paper,width=140mm,top=25mm,bottom=25mm,bindingoffset=6mm]{geometry}
+\usepackage[a4paper,width=150mm,top=25mm,bottom=25mm,bindingoffset=6mm]{geometry}
 \usepackage[utf8]{inputenc}
-\usepackage{color}
 \usepackage{hyperref}
 \hypersetup{
     colorlinks,
     citecolor=black,
     filecolor=black,
     linkcolor=black,
-    urlcolor=black
+    urlcolor=black,
+    breaklinks=true
 }
-\usepackage[style=numeric-comp, sorting=none]{biblatex}
-\addbibresource{../references.bib}
-\usepackage{graphicx}
-\graphicspath{ {../images/}{../../results/plots/} }
-\usepackage{notoccite}
-\usepackage{amssymb}
-\usepackage{amsmath}
-\usepackage{float}
+\usepackage{xstring}
+\usepackage{adjustbox}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
-\usepackage{listings}
-\usepackage[T1]{fontenc}
-%\usepackage{sourcecodepro}
-\lstset{basicstyle=\small\ttfamily}
-\usepackage{braket}
-\usepackage{multirow}
+\usepackage{amssymb}
+\usepackage{amsmath}
 \usepackage{bbm}
+\usepackage{booktabs}
+\usepackage[style=numeric-comp, sorting=none]{biblatex}
+\usepackage{braket}
+\usepackage{catchfile}
+\usepackage{cleveref}
+\usepackage{color}
+\usepackage{datatool}
+\usepackage{easy-todo}
+\usepackage{float}
+\usepackage{sourcecodepro}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{multirow}
 \usepackage{mathtools}
+\usepackage{notoccite}
+\usepackage{siunitx}
+\usepackage{tabularx}
+
+\addbibresource{../references.bib}
+\graphicspath{ {../images/}{../../results/plots/} }
+\lstset{basicstyle=\small\ttfamily}
+
+\input{../newcommands.tex}
 
 %----------------------------------------------------------------------------------------
 % Title Page
@@ -52,31 +65,17 @@
 \pagenumbering{roman}
 
 %----------------------------------------------------------------------------------------
-% Declaration of Authorship
-%----------------------------------------------------------------------------------------
-\clearpage\shipout\null
-\begin{center}
-\bf{Declaration of Authorship}
-\end{center}
-
-I hereby declare that I have created this work completely on my own and used no other sources or tools than the ones listed, and that I have marked any citations accordingly.
-
-Hiermit versichere ich, dass ich die vorliegende Arbeit selbst\"andig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt sowie Zitate kenntlich gemacht habe. \\
-
-\vspace{1.2cm}
-\noindent \rule{5cm}{0.15mm} \hfill \rule{5cm}{0.15mm}\\
-\noindent Ort, Datum \hfill Cameron Perot
-
-%----------------------------------------------------------------------------------------
 % Abstract
 %----------------------------------------------------------------------------------------
 \clearpage\shipout\null
 \chapter*{Abstract}
+\clearpage\shipout\null
 
 %----------------------------------------------------------------------------------------
 % Table of Contents
 %----------------------------------------------------------------------------------------
 \tableofcontents
+\clearpage\shipout\null
 
 %----------------------------------------------------------------------------------------
 % Introduction
