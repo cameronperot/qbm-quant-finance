@@ -1,12 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from matplotlib.dates import DateFormatter
 from datetime import timedelta
 
 from qbm.utils import compute_lower_tail_concentration, compute_upper_tail_concentration
 
 
-def plot_autocorrelation(ax, lags, acf, title):
+def plot_autocorrelation(ax, lags, acf, title, **kwargs):
     """
     Plots the autocorrelation (acf) as a function of the lag on ax.
 
@@ -17,7 +18,7 @@ def plot_autocorrelation(ax, lags, acf, title):
 
     :returns: Matplotlib axis.
     """
-    ax.plot(lags, acf)
+    ax.plot(lags, acf, **kwargs)
     ax.set_title(title)
     ax.set_xscale("log")
     ax.set_yscale("log")
@@ -30,17 +31,43 @@ def plot_autocorrelation(ax, lags, acf, title):
     return ax
 
 
-def plot_autocorrelation_grid(samples):
+def plot_autocorrelation_grid(acfs, colors=None):
     """
     Plots the autocorrelation function (acf) for all currencies in the samples dataframe.
 
-    :param samples: Dataframe of samples.
+    :param acfs: Dataframe of autocorrelation function values, or dictionary of dataframes,
+        where the keys are the labels.
 
     :returns: Matplotlib figure and axes.
     """
     fig, axs = plt.subplots(2, 2, figsize=(10, 6), dpi=300)
-    for column, ax in zip(samples.columns, axs.flatten()):
-        plot_autocorrelation(ax, range(len(samples[column])), samples[column], column)
+
+    if isinstance(acfs, pd.DataFrame):
+        for column, ax in zip(acfs.columns, axs.flatten()):
+            lags = acfs.index
+            plot_autocorrelation(ax, lags, acfs[column], title=column, color=colors[0])
+
+    elif isinstance(acfs, dict):
+        acfs_dict = acfs.copy()
+        labels = list(acfs_dict.keys())
+        columns = acfs_dict[labels[0]].columns
+        for i, (column, ax) in enumerate(zip(columns, axs.flatten())):
+            for j, (label, acfs) in enumerate(acfs_dict.items()):
+                lags = acfs.index
+                if j == 0:
+                    ax = plot_autocorrelation(
+                        ax,
+                        lags,
+                        acfs[column],
+                        title=column,
+                        label=label,
+                        color=colors[label],
+                    )
+                else:
+                    ax.plot(lags, acfs[column], label=label, color=colors[label])
+
+            if i == 0:
+                ax.legend(loc="lower left")
 
     plt.tight_layout()
 
@@ -221,7 +248,7 @@ def plot_volatility(ax, dates, volatility, title, params):
     ax.xaxis.set_major_formatter(DateFormatter("%Y"))
 
 
-def plot_tail_concentrations(dfs, combinations, interval_size=1e-3):
+def plot_tail_concentrations_grid(dfs, combinations, colors, interval_size=1e-3):
     """
     Plots the upper and lower tail concentration functions for the provided
     dataframes.
@@ -230,12 +257,12 @@ def plot_tail_concentrations(dfs, combinations, interval_size=1e-3):
         corresponding dataframes to be plotted.
     :param combinations: List of tuples of column names to be plotted, e.g.
         [("EURUSD", "GBPUSD"), ("EURUSD", "USDJPY"), ...]
+    :param colors: Dictionary where the keys are the plot labels, and the values are colors.
     :param interval_size: Spacing between the values on the independent axis.
 
     :returns: Matplotlib figure and axes.
     """
     fig, axs = plt.subplots(3, 2, figsize=(11, 11), dpi=300)
-    colors = ["tab:blue", "tab:red", "tab:green", "tab:orange", "tab:purple"]
 
     for i, (ax, (pair_X, pair_Y)) in enumerate(zip(axs.flatten(), combinations)):
         for j, (label, df) in enumerate(dfs.items()):
@@ -250,7 +277,7 @@ def plot_tail_concentrations(dfs, combinations, interval_size=1e-3):
             x = np.concatenate([z_lower, z_upper])
             y = np.concatenate([lower_concentration, upper_concentration])
 
-            ax.plot(x, y, color=colors[j], label=label)
+            ax.plot(x, y, label=label, color=colors[label])
             ax.set_title(f"{pair_X}/{pair_Y}")
             ax.grid(True)
 
