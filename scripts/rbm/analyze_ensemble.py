@@ -80,7 +80,7 @@ def main(model_id):
         for j, column in enumerate(log_returns.columns)
     }
     qq_rmse = pd.DataFrame.from_dict(qq_rmse, orient="index")
-    qq_rmse.to_csv(results_dir / "data/qq_rmse.csv")
+    qq_rmse.to_csv(results_dir / "data/qq_rmse.csv", index_label="currency_pair")
 
     print("--------------------------------")
     print("QQ RMSE")
@@ -110,13 +110,15 @@ def main(model_id):
         correlation_coefficients_sample[k] = v.reindex_like(correlation_coefficients_data)
 
     correlation_coefficients_data.to_csv(
-        results_dir / "data/correlation_coefficients_data.csv"
+        results_dir / "data/correlation_coefficients_data.csv", index_label="currency_pairs"
     )
     correlation_coefficients_sample["means"].to_csv(
-        results_dir / "data/correlation_coefficients_sample_means.csv"
+        results_dir / "data/correlation_coefficients_sample_means.csv",
+        index_label="currency_pairs",
     )
     correlation_coefficients_sample["stds"].to_csv(
-        results_dir / "data/correlation_coefficients_sample_stds.csv"
+        results_dir / "data/correlation_coefficients_sample_stds.csv",
+        index_label="currency_pairs",
     )
     correlation_coefficients_rmse = pd.DataFrame(
         np.sqrt(
@@ -128,7 +130,8 @@ def main(model_id):
         columns=["RMSE"],
     )
     correlation_coefficients_rmse.to_csv(
-        results_dir / "data/correlation_coefficients_rmse.csv"
+        results_dir / "data/correlation_coefficients_rmse.csv",
+        index_label="correlation_coefficient",
     )
 
     print("--------------------------------")
@@ -156,7 +159,7 @@ def main(model_id):
             "Sample Std": volatilities_sample["stds"],
         }
     )
-    volatilities.to_csv(results_dir / "data/volatilities.csv")
+    volatilities.to_csv(results_dir / "data/volatilities.csv", index_label="currency_pair")
 
     print("--------------------------------")
     print("Annualized Volatility")
@@ -202,7 +205,9 @@ def main(model_id):
                 "Sample Std": volatilities_low_sample["stds"],
             }
         )
-        volatilities_low.to_csv(results_dir / "data/volatilities_low.csv")
+        volatilities_low.to_csv(
+            results_dir / "data/volatilities_low.csv", index_label="currency_pair"
+        )
 
         volatilities_high_data = compute_annualized_volatility(
             filter_df_on_values(log_returns_volatility, high_volatility_column_values)
@@ -222,7 +227,9 @@ def main(model_id):
                 "Sample Std": volatilities_high_sample["stds"],
             }
         )
-        volatilities_high.to_csv(results_dir / "data/volatilities_high.csv")
+        volatilities_high.to_csv(
+            results_dir / "data/volatilities_high.csv", index_label="currency_pair"
+        )
 
         print("--------------------------------")
         print("Conditional Volatilities")
@@ -252,9 +259,13 @@ def main(model_id):
         )
     tails_sample = compute_stats_over_dfs(quantiles_sample)
 
-    tails_data.to_csv(results_dir / "data/tails_data.csv")
-    tails_sample["means"].to_csv(results_dir / "data/tails_sample_means.csv")
-    tails_sample["stds"].to_csv(results_dir / "data/tails_sample_stds.csv")
+    tails_data.to_csv(results_dir / "data/tails_data.csv", index_label="currency_pair")
+    tails_sample["means"].to_csv(
+        results_dir / "data/tails_sample_means.csv", index_label="currency_pair"
+    )
+    tails_sample["stds"].to_csv(
+        results_dir / "data/tails_sample_stds.csv", index_label="currency_pair"
+    )
 
     print("--------------------------------")
     print("Tails")

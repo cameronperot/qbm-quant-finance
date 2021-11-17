@@ -60,8 +60,11 @@ def main(model_id):
     print(integrated_times)
     print("--------------------------------")
     acfs = pd.DataFrame(acfs)
-    acfs.to_csv(results_dir / "data/autocorrelation_functions.csv")
-    integrated_times.to_csv(results_dir / "data/autocorrelation_times.csv")
+    acfs.index.rename("lag", inplace=True)
+    acfs.to_csv(results_dir / "data/autocorrelation_functions.csv", index_label="lag")
+    integrated_times.to_csv(
+        results_dir / "data/autocorrelation_times.csv", index_label="currency_pair"
+    )
 
     # plot the acfs
     fig, ax = plot_autocorrelation_grid(acfs)
