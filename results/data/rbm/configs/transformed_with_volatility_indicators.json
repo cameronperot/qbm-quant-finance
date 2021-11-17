@@ -1,0 +1,86 @@
+[
+    {
+        "model": {
+            "id": "BernoulliRBM_20211116_184303",
+            "seed": 42,
+            "n_bits": 16,
+            "n_components": 30,
+            "learning_rate": 0.001,
+            "n_iter": 10000,
+            "lr_decay_epoch": 5000,
+            "lr_decay_period": 1000,
+            "early_stopping_criteria": -35,
+            "batch_size": 10,
+            "volatility_indicators": true,
+            "transform": {
+                "type": "power",
+                "params": {
+                    "power": 0.5,
+                    "threshold": 1
+                }
+            },
+            "binarization_params": {
+                "EURUSD": {
+                    "n_bits": 16,
+                    "x_min": -0.012892878383680738,
+                    "x_max": 0.014558070130902129
+                },
+                "GBPUSD": {
+                    "n_bits": 16,
+                    "x_min": -0.014833817136772398,
+                    "x_max": 0.014073681565715267
+                },
+                "USDCAD": {
+                    "n_bits": 16,
+                    "x_min": -0.01417090290116494,
+                    "x_max": 0.013644529443497356
+                },
+                "USDJPY": {
+                    "n_bits": 16,
+                    "x_min": -0.014905936895712414,
+                    "x_max": 0.01818691133375923
+                }
+            },
+            "X_train_shape": [
+                5165,
+                68
+            ],
+            "columns": [
+                "EURUSD",
+                "GBPUSD",
+                "USDCAD",
+                "USDJPY",
+                "EURUSD_volatility_binary",
+                "GBPUSD_volatility_binary",
+                "USDCAD_volatility_binary",
+                "USDJPY_volatility_binary"
+            ],
+            "split_indices": [
+                16,
+                32,
+                48,
+                64,
+                65,
+                66,
+                67
+            ]
+        },
+        "data": {
+            "data_source": "dukascopy",
+            "start_date": "1999-01-01",
+            "end_date": "2019-12-31",
+            "outlier_threshold": 10
+        },
+        "ensemble": {
+            "size": 100,
+            "n_steps": 10000,
+            "n_jobs": 6,
+            "seed": 42
+        },
+        "autocorrelation": {
+            "n_samples_per_df": 10000000,
+            "n_sample_dfs": 10,
+            "n_lags": 2000
+        }
+    }
+]
