@@ -358,7 +358,7 @@ TSWLatexianTemp*
 *.spl
 
 papers/
-data/
+/data/
 starter-files/
 notebooks/jupyter_notebook_config.py
 artifacts/
