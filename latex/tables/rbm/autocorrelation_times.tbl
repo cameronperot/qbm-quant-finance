@@ -1,0 +1,11 @@
+\begin{tabular}{l r r r r}
+\multicolumn{5}{c}{\textbf{Integrated Autocorrelation Times}} \\
+\toprule
+Currency Pair & \textbf{RBM (B)} & \textbf{RBM (V)} & \textbf{RBM (X)} & \textbf{RBM (XV)} \\
+\midrule
+EURUSD & 295.7 & 267.4 & 147.5 & 129.2 \\
+GBPUSD & 307.0 & 308.9 & 173.2 & 121.6 \\
+USDCAD & 340.6 & 258.8 & 120.0 & 91.3 \\
+USDJPY & 33.9 & 28.8 & 46.7 & 36.7 \\
+\bottomrule
+\end{tabular}
