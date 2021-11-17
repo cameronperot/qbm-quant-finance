@@ -18,6 +18,7 @@ from qbm.utils import (
     filter_df_on_values,
     load_artifact,
     load_log_returns,
+    save_artifact,
 )
 
 # configuration
@@ -66,9 +67,10 @@ for i, samples in enumerate(samples_ensemble):
 qq_rmse_means = qq_rmse.mean(axis=0)
 qq_rmse_stds = qq_rmse.std(axis=0)
 qq_extrema = {
-    "min": np.argmin(qq_rmse.mean(axis=1)),
-    "max": np.argmax(qq_rmse.mean(axis=1)),
+    "min": int(np.argmin(qq_rmse.mean(axis=1))),
+    "max": int(np.argmax(qq_rmse.mean(axis=1))),
 }
+save_artifact(qq_extrema, results_dir / "data/qq_extrema.json")
 
 qq_rmse = {
     column: {"mean": qq_rmse_means[j], "std": qq_rmse_stds[j]}
@@ -257,6 +259,7 @@ qq_plot_params = {
 }
 for extrema, i in qq_extrema.items():
     fig, axs = plot_qq_grid(log_returns, samples_ensemble[i], qq_plot_params)
+    save_artifact((fig, axs), results_dir / f"plots/qq_{extrema}.pkl")
     plt.savefig(results_dir / f"plots/qq_{extrema}.png")
     plt.close(fig)
 

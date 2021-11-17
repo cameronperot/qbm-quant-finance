@@ -52,6 +52,7 @@ integrated_times = pd.DataFrame.from_dict(integrated_times, orient="index")
 print(integrated_times)
 print("--------------------------------")
 acfs = pd.DataFrame(acfs)
+acfs.to_csv(results_dir / "data/autocorrelation_functions.csv")
 integrated_times.to_csv(results_dir / "data/autocorrelation_times.csv")
 
 # plot the acfs
