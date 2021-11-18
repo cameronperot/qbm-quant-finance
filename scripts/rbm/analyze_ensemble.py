@@ -9,7 +9,7 @@ from qbm.metrics import compute_annualized_volatility, compute_correlation_coeff
 from qbm.plotting import (
     plot_correlation_coefficients,
     plot_qq_grid,
-    plot_tail_concentrations,
+    plot_tail_concentrations_grid,
     plot_volatility_comparison,
 )
 from qbm.utils import (
@@ -48,7 +48,7 @@ def main(model_id):
     # load the sampled ensemble data
     samples_ensemble_raw = [
         pd.read_pickle(data_dir / file_name)
-        for file_name in data_dir.iterdir()
+        for file_name in sorted(data_dir.iterdir())
         if str(file_name).endswith(".pkl")
     ]
 
@@ -313,8 +313,10 @@ def main(model_id):
 
     # plot the tail concentration functions
     for extrema, i in qq_extrema.items():
-        fig, axs = plot_tail_concentrations(
-            {"Data": log_returns, "Generated": samples_ensemble[i]}, combinations
+        fig, axs = plot_tail_concentrations_grid(
+            {"Data": log_returns, "Generated": samples_ensemble[i]},
+            combinations,
+            {"Data": "tab:cyan", "Generated": "tab:blue"},
         )
         plt.savefig(results_dir / f"plots/tail_concentration_functions_{extrema}.png")
         plt.close(fig)
