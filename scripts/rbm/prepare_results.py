@@ -1,9 +1,10 @@
+import itertools
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 from qbm.utils import get_project_dir, load_artifact, save_artifact
-from qbm.plotting import plot_autocorrelation_grid, plot_tail_concentrations_grid
+from qbm.plotting import plot_autocorrelation_grid, plot_tail_concentrations_grid, plot_qq
 
 # pd.set_option("display.max_columns", None)
 
@@ -32,6 +33,12 @@ def save_table(table, file_name):
 def textbf(x):
     return "\\textbf{%s}" % x
 
+
+log_returns = pd.read_csv(
+    artifacts_dir / f"{models['baseline']['id']}/log_returns.csv",
+    index_col="date",
+    parse_dates=["date"],
+)
 
 qq_rmses = {}
 ccs = {}
@@ -153,6 +160,34 @@ for model_name, model_info in models.items():
     column_map = {column: f"{prefix}_ac_time" for column in ac_times[prefix].columns}
     ac_times[prefix].rename(columns=column_map, inplace=True)
 
+# combined QQ plot
+qq_plot_params = {
+    "title": "test",
+    "xlims": (-0.045, 0.045),
+    "ylims": (-0.045, 0.045),
+    "xticks": np.linspace(-0.04, 0.04, 9),
+    "yticks": np.linspace(-0.04, 0.04, 9),
+}
+fig, axs = plt.subplots(4, 4, figsize=(12, 12), dpi=300)
+for j, (model_name, model_info) in enumerate(models.items()):
+    model_id = model_info["id"]
+    prefix = model_info["prefix"]
+    qq_extrema = load_artifact(artifacts_dir / f"{model_id}/results/data/qq_extrema.json")
+    samples = load_artifact(
+        artifacts_dir / f"{model_id}/samples_ensemble/{qq_extrema['min'] + 1:03}.pkl"
+    )
+    for i, column in enumerate(log_returns.columns):
+        if i == 0:
+            title = f"RBM ({prefix})\n{column}"
+        else:
+            title = column
+        plot_qq(axs[i, j], log_returns[column], samples[column], title, qq_plot_params)
+        axs[i, j].ticklabel_format(axis="x", style="sci", scilimits=(0, 0))
+        axs[i, j].ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+
+plt.tight_layout()
+plt.savefig(plots_dir / "qq.png")
+
 """
 Plotting
 """
@@ -177,14 +212,7 @@ plt.savefig(plots_dir / "autocorrelation_functions.png")
 plt.close(fig)
 
 # plot tail concentrations
-combinations = (
-    ("EURUSD", "GBPUSD"),
-    ("EURUSD", "USDJPY"),
-    ("EURUSD", "USDCAD"),
-    ("GBPUSD", "USDJPY"),
-    ("GBPUSD", "USDCAD"),
-    ("USDJPY", "USDCAD"),
-)
+combinations = list(itertools.combinations(log_returns.columns, 2))
 tail_concentration_dfs = {}
 for model_name, model_info in models.items():
     if model_name == "baseline":
@@ -205,7 +233,6 @@ for model_name, model_info in models.items():
 fig, axs = plot_tail_concentrations_grid(tail_concentration_dfs, combinations, colors)
 plt.savefig(plots_dir / "tail_concentrations.png")
 plt.close(fig)
-
 
 """
 LaTeX Tables

@@ -1,3 +1,4 @@
+import itertools
 import json
 import matplotlib.pyplot as plt
 import numpy as np
@@ -89,14 +90,7 @@ def main(model_id):
     print("--------------------------------\n\n")
 
     # compute the correlation coefficients
-    combinations = (
-        ("EURUSD", "GBPUSD"),
-        ("EURUSD", "USDJPY"),
-        ("EURUSD", "USDCAD"),
-        ("GBPUSD", "USDJPY"),
-        ("GBPUSD", "USDCAD"),
-        ("USDJPY", "USDCAD"),
-    )
+    combinations = list(itertools.combinations(log_returns.columns, 2))
     correlation_coefficients_data = compute_correlation_coefficients(
         log_returns, combinations
     )
