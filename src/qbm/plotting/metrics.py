@@ -304,7 +304,7 @@ def plot_volatility_grid(volatility, params):
         plot_volatility(
             ax, volatility.index, volatility[column], column.split("_")[0], params
         )
-    axs[0, 1].legend()
+    axs[0, 0].legend()
     plt.tight_layout()
 
     return fig, axs
