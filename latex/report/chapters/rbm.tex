@@ -24,6 +24,14 @@
 \section{Application}
 
 \section{Results}
+In this section we will compare four different RBM models, denoted as:
+\begin{itemize}
+    \item (B): baseline model.
+    \item (V): using volatility indicators.
+    \item (X): using a transformed feature space.
+    \item (XV): using a transformed feature space and volatility indicators.
+\end{itemize}
+
 \begin{table}[ht]
     \centering
     \begin{adjustbox}{max width=\textwidth}
@@ -92,4 +100,12 @@
     \end{center}
     \caption{Autocorrelation functions of the RBM models. Function values are computed from Gibbs sample chains of length \( 10^8 \).}
     \label{fig:rbm_autocorrelation_functions}
+\end{figure}
+
+\begin{figure}[ht]
+    \begin{center}
+        \includegraphics[width=1\linewidth]{rbm/qq.png}
+    \end{center}
+    \caption{QQ plots of the RBM models.}
+    \label{fig:rbm_qq_plots}
 \end{figure}
