@@ -166,6 +166,21 @@ def load_artifact(file_path):
 
 
 @np.vectorize
+def log_logistic(x):
+    """
+    Computes the log of the logistic sigmoid function.
+
+    :param x: Value or array of values for which to compute using.
+
+    :returns: log(1 / (1 + e^-x))
+    """
+    if x > 0:
+        return -np.log(1 + np.exp(-x))
+    else:
+        return x - np.log(1 + np.exp(x))
+
+
+@np.vectorize
 def lr_exp_decay(epoch, decay_epoch, period):
     """
     Exponential decay function for use in learning rate scheduling.

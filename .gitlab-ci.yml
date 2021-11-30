@@ -9,6 +9,7 @@ test:
     - python -c "import qbm.plotting"
     - python -c "import qbm.sampling"
     - python -c "import qbm.utils"
+    - python -c "import qbm.models"
     - pytest --cov-report=term-missing --cov=qbm --cov-config=.coveragerc
     - coverage xml
   artifacts:
