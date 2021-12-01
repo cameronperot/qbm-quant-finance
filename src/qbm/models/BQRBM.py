@@ -58,7 +58,7 @@ class BQRBM(QBMBase):
 
         self.grads["a_pos"] = np.mean(V, axis=0)
         self.grads["b_pos"] = np.mean(b_tanh, axis=0)
-        self.grads["W_pos"] = np.mean(np.einsum("ki,kj->kij", V, b_tanh), axis=0)
+        self.grads["W_pos"] = V.T @ b_tanh / V.shape[0]
 
     def _compute_negative_grads(self):
         """
