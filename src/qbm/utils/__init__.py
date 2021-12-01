@@ -48,6 +48,7 @@ __all__ = [
     "get_project_dir",
     "get_rng",
     "load_artifact",
+    "log_logistic",
     "lr_exp_decay",
     "save_artifact",
     # training
