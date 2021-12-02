@@ -27,7 +27,6 @@ class QBMBase(ABC):
         self.seed = seed
         self.rng = get_rng(self.seed)
         self.grads = {}
-        self.pseudolikelihoods = []
 
         self._initialize_weights_and_biases()
 
@@ -44,8 +43,11 @@ class QBMBase(ABC):
         Initializes the weights and biases.
         """
         self.W = self.rng.normal(0, 0.01, (self.n_visible, self.n_hidden))
+        # compute the proportion of training vectors in which the units are on
         p = self.X.mean(axis=0)
-        self.a = np.log(p / (1 - p + 1e-15))
+        # avoid any division by zero errors
+        p[p == 1] -= 1e-15
+        self.a = np.log(p / (1 - p))
         self.b = np.zeros(self.n_hidden)
 
     def _random_mini_batch_indices(self, mini_batch_size):
@@ -123,6 +125,7 @@ class QBMBase(ABC):
         learning_rate_schedule=None,
         mini_batch_size=16,
         print_interval=None,
+        store_pseudolikelihoods=True,
     ):
         """
         Fits the model to the training data.
@@ -134,12 +137,19 @@ class QBMBase(ABC):
         :param mini_batch_size: Size of the mini-batches.
         :param print_interval: How many epochs between printing the pseudolikelihood and
             learning rate. If None, then nothing is printed.
+        :param store_pseudolikelihoods: If True will compute and store the pseudolikelihood
+            every epoch in the pseudolikelihoods attribute. Note that this can impact
+            performance as the pseudolikelihood calculation can be computationally expensive
+            depending on the data.
         """
         if learning_rate_schedule is not None:
             assert len(learning_rate_schedule) == n_epochs
 
+        if store_pseudolikelihoods and not hasattr(self, "pseudolikelihoods"):
+            self.pseudolikelihoods = []
+
         for epoch in range(1, n_epochs + 1):
-            epoch_start_time = time()
+            start_time = time()
 
             # set the effective learning rate
             learning_rate_effective = learning_rate
@@ -154,14 +164,21 @@ class QBMBase(ABC):
                 self._apply_grads(learning_rate_effective / V.shape[0])
 
             # compute and store the pseudolikelihood
-            self.pseudolikelihoods.append(self.pseudolikelihood(self.X).mean())
+            if store_pseudolikelihoods:
+                pseudolikelihood = self.pseudolikelihood(self.X).mean()
+                self.pseudolikelihoods.append(pseudolikelihood)
+
+            end_time = time()
 
             # print information if verbose
             if print_interval is not None:
                 if epoch % print_interval == 0:
+                    if not store_pseudolikelihoods:
+                        pseudolikelihood = self.pseudolikelihood(self.X).mean()
+
                     print(
                         f"[{type(self).__name__}] Epoch {epoch}:",
-                        f"pseudolikelihood = {self.pseudolikelihoods[-1]},",
-                        f"learning_rate = {learning_rate},",
-                        f"time = {(time() - epoch_start_time) * 1e3:.3f}ms",
+                        f"pseudolikelihood = {pseudolikelihood:.2f},",
+                        f"learning rate = {learning_rate},",
+                        f"epoch time = {(end_time - start_time) * 1e3:.2f}ms",
                     )
