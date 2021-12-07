@@ -30,14 +30,6 @@ class QBMBase(ABC):
 
         self._initialize_weights_and_biases()
 
-    @property
-    @abstractmethod
-    def Q(self):
-        """
-        The QUBO coefficient matrix Q.
-        """
-        pass
-
     def _initialize_weights_and_biases(self):
         """
         Initializes the weights and biases.
