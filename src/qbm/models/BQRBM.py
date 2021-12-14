@@ -20,7 +20,7 @@ class BQRBM(QBMBase):
         n_hidden,
         embedding,
         annealing_params,
-        β,
+        β_initial=1.5,
         qpu_params={"region": "eu-central-1", "solver": "Advantage_system5.1"},
         seed=42,
     ):
@@ -32,19 +32,27 @@ class BQRBM(QBMBase):
             ["schedule", "s_freeze", "A_freeze", "B_freeze", "relative_chain_strength"]
             representing the annealing schedule (list of tuples), relative freeze time,
             A(s_freeze), B(s_freeze), and relative chain strength, respectively.
-        :param β: Effective β of the D-Wave. Used for scaling the coefficients.
+        :param β: Initial effective β of the D-Wave. Used for scaling the coefficients.
         :param qpu_params: Parameters dict to unpack for the qpu.
         :param seed: Seed for the random number generator (used for randomizing minibatches).
         """
         super().__init__(X=X, n_hidden=n_hidden, seed=seed)
         self.embedding = embedding
         self.annealing_params = annealing_params
-        self.β = β
+        self.β_initial = β
 
         self._initialize_weights_and_biases()
         self._update_Γ()
         self._update_Q()
         self._initialize_sampler()
+
+    def _initialize_sampler(self):
+        """
+        Initializes the D-Wave sampler using the fixed embedding provided to the object
+        instantiation.
+        """
+        self.qpu = DWaveSampler(**self.qpu_params)
+        self.sampler = FixedEmbeddingComposite(self.qpu, self.embedding)
 
     def _update_Q(self):
         """
@@ -98,15 +106,7 @@ class BQRBM(QBMBase):
         """
         self.Γ = self.β * self.annealing_params["A_freeze"]
 
-    def _initialize_sampler(self):
-        """
-        Initializes the D-Wave sampler using the fixed embedding provided to the object
-        instantiation.
-        """
-        self.qpu = DWaveSampler(**qpu_params)
-        self.sampler = FixedEmbeddingComposite(self.qpu, self.embedding)
-
-    def _compute_positive_grads(self, V):
+    def _compute_positive_grads(self, V_pos):
         """
         Computes the gradients for the positive phase, i.e., the expectation values w.r.t.
         the clamped Hamiltonian.
@@ -114,26 +114,23 @@ class BQRBM(QBMBase):
         :param V: Numpy array where the rows are data vectors which to clamp the Hamiltonian
             with.
         """
-        b = self.b + V @ self.W
+        b = self.b + V_pos @ self.W
         D = np.sqrt(self.Γ ** 2 + b ** 2)
-        b_tanh = (b / D) * np.tanh(D)
+        # add one and divide by two here to convert from -1/+1 to 0/1
+        H_pos = ((b / D) * np.tanh(D) + 1) / 2
 
-        self.grads["a_pos"] = np.mean(V, axis=0)
+        self.grads["a_pos"] = np.mean(V_pos, axis=0)
         self.grads["b_pos"] = np.mean(b_tanh, axis=0)
-        self.grads["W_pos"] = V.T @ b_tanh / V.shape[0]
+        self.grads["W_pos"] = V_pos.T @ H_pos / V.shape[0]
 
     def _compute_negative_grads(self, num_reads):
         """
         Computes the gradients for the negative phase, i.e., the expectation values w.r.t.
         the model distribution.
         """
-        # TODO: implement
         chain_strength = self.relative_chain_strength * np.abs(self.Q).max()
 
-        self.grads["a_neg"] = 0
-        self.grads["b_neg"] = 0
-        self.grads["W_neg"] = 0
-
+        # TODO: sample qubo
         # samples = sample_qubo(
         # self.Q, num_reads=num_reads, anneal_schedule=self.anneal_params["schedule"],
         # )
@@ -142,6 +139,10 @@ class BQRBM(QBMBase):
         # self.grads["a_neg"] = V.mean(axis=0)
         # self.grads["b_neg"] = H.mean(axis=0)
         # self.grads["W_neg"] = V.T @ H / V.shape[0]
+
+        self.grads["a_neg"] = 0
+        self.grads["b_neg"] = 0
+        self.grads["W_neg"] = 0
 
     def train(
         self,
@@ -187,9 +188,11 @@ class BQRBM(QBMBase):
                 self._compute_positive_grads(V)
                 self._compute_negative_grads(mini_batch_size)
                 self._apply_grads(learning_rate / V.shape[0])
-                self._update_β()
                 self._update_Γ()
                 self._update_Q()
+
+            # update the effective temperature
+            self._update_β()
 
             # compute and store the pseudolikelihood
             if store_pseudolikelihoods:
