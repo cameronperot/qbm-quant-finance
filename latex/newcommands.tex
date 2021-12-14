@@ -4,8 +4,10 @@
 \newcommand{\CZ}{\text{CZ}}
 \newcommand{\tr}{\text{tr}}
 \newcommand{\frt}{\frac{1}{\sqrt{2}}}
-\newcommand{\vv}{\mathbf{v}}
-\newcommand{\hv}{\mathbf{h}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\mat}[1]{\mathbf{#1}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
 \newcommand{\basistwo}{\{\ket{00}, \ket{01}, \ket{10}, \ket{11}\}}
 \DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 \DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
@@ -43,7 +45,7 @@
 }
 
 % R_X
-\newcommand{\RX}[1]{
+\newcommand{\RXGate}[1]{
     \begin{bmatrix}
         \cos\frac{#1}{2} & -i\sin\frac{#1}{2} \\
         -i\sin\frac{#1}{2} & \cos\frac{#1}{2}
@@ -51,7 +53,7 @@
 }
 
 % R_Y
-\newcommand{\RY}[1]{
+\newcommand{\RYGate}[1]{
     \begin{bmatrix}
         \cos\frac{#1}{2} & -\sin\frac{#1}{2} \\
         \sin\frac{#1}{2} & \cos\frac{#1}{2}
@@ -59,7 +61,7 @@
 }
 
 % R_Z
-\newcommand{\RZ}[1]{
+\newcommand{\RZGate}[1]{
     \begin{bmatrix}
         e^{-i{#1}/2} & 0 \\
         0 & e^{i{#1}/2}
@@ -67,7 +69,7 @@
 }
 
 % Pauli X operator
-\newcommand{\X}{
+\newcommand{\XGate}{
     \begin{bmatrix}
         0 & 1 \\
         1 & 0
@@ -75,7 +77,7 @@
 }
 
 % Pauli Y operator
-\newcommand{\Y}{
+\newcommand{\YGate}{
     \begin{bmatrix}
         0 & -i \\
         i & 0
@@ -83,7 +85,7 @@
 }
 
 % Pauli Z operator
-\newcommand{\Z}{
+\newcommand{\ZGate}{
     \begin{bmatrix}
         1 & 0 \\
         0 & -1
