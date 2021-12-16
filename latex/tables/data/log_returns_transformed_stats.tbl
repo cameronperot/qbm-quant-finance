@@ -1,0 +1,11 @@
+\begin{tabular}{l r r}
+\multicolumn{3}{c}{\textbf{Transformed Log Return Sample Statistics}} \\
+\toprule
+Currency Pair & Mean & Standard Deviation \\
+\midrule
+EURUSD & \( 5.54 \cdot 10^{-5} \) & \( 4.88 \cdot 10^{-3} \) \\
+GBPUSD & \( 1.66 \cdot 10^{-5} \) & \( 4.48 \cdot 10^{-3} \) \\
+USDCAD & \( -6.42 \cdot 10^{-5} \) & \( 4.21 \cdot 10^{-3} \) \\
+USDJPY & \( -4.68 \cdot 10^{-5} \) & \( 4.93 \cdot 10^{-3} \) \\
+\bottomrule
+\end{tabular}
