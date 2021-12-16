@@ -41,7 +41,7 @@ def generate_anneal_schedule_samples(
     # initialize the sampler
     sampler = FixedEmbeddingComposite(sampler_qpu, embedding)
 
-    # generate multiple embeddings
+    # generate samples for each annealing schedule
     for name, anneal_schedule in anneal_schedules.items():
         # ensure that samples do not get accidentally overwritten
         if (save_dir / f"samples/{name}.pkl").exists():
