@@ -1,9 +1,0 @@
-\multicolumn{6}{c}{\textbf{Historical Volatility}} \\
-\toprule
-Currency Pair & \textbf{Data} & \textbf{RBM (B)} & \textbf{RBM (V)} & \textbf{RBM (X)} & \textbf{RBM (XV)} \\
-\midrule
-EURUSD & 9.78 & 9.94 \% $\pm$ 0.15 \% & 10.19 \% $\pm$ 0.13 \% & 10.09 \% $\pm$ 0.14 \% & 10.38 \% $\pm$ 0.13 \% \\
-GBPUSD & 8.98 & 9.36 \% $\pm$ 0.15 \% & 9.56 \% $\pm$ 0.15 \% & 9.35 \% $\pm$ 0.15 \% & 9.48 \% $\pm$ 0.18 \% \\
-USDCAD & 8.56 & 8.93 \% $\pm$ 0.18 \% & 9.31 \% $\pm$ 0.20 \% & 9.01 \% $\pm$ 0.17 \% & 9.38 \% $\pm$ 0.16 \% \\
-USDJPY & 10.02 & 10.23 \% $\pm$ 0.17 \% & 10.78 \% $\pm$ 0.19 \% & 10.43 \% $\pm$ 0.18 \% & 10.54 \% $\pm$ 0.16 \% \\
-\bottomrule
