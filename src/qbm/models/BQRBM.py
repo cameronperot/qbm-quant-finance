@@ -36,13 +36,16 @@ class BQRBM(QBMBase):
         :param qpu_params: Parameters dict to unpack for the qpu.
         :param seed: Seed for the random number generator (used for randomizing minibatches).
         """
+        # convert from binary to ±1 if necessary
+        if set(np.unique(X)) == set([0, 1]):
+            X = 2 * X - 1
+        assert set(np.unique(X)) == set([-1, 1])
+
         super().__init__(X=X, n_hidden=n_hidden, seed=seed)
         self.embedding = embedding
         self.annealing_params = annealing_params
         self.β_initial = β
 
-        self._initialize_weights_and_biases()
-        self._update_Γ()
         self._initialize_sampler()
 
     def _initialize_sampler(self):
@@ -92,13 +95,6 @@ class BQRBM(QBMBase):
 
         self.β += self.learning_rate / self.β ** 2 * (E_train - E_model)
 
-    def _update_Γ(self):
-        """
-        Computes the Γ coefficient in the QBM Hamiltonian based off the annealing schedule
-        at the freeze-out time.
-        """
-        self.Γ = self.β * self.annealing_params["A_freeze"]
-
     def _compute_positive_grads(self, V_pos):
         """
         Computes the gradients for the positive phase, i.e., the expectation values w.r.t.
@@ -107,12 +103,13 @@ class BQRBM(QBMBase):
         :param V: Numpy array where the rows are data vectors which to clamp the Hamiltonian
             with.
         """
+        Γ = self.β * self.annealing_params["A_freeze"]
         b_eff = self.b + V_pos @ self.W
-        D = np.sqrt(self.Γ ** 2 + b_eff ** 2)
+        D = np.sqrt(Γ ** 2 + b_eff ** 2)
         H_pos = (b_eff / D) * np.tanh(D)
 
         self.grads["a_pos"] = np.mean(V_pos, axis=0)
-        self.grads["b_pos"] = np.mean(b_tanh, axis=0)
+        self.grads["b_pos"] = np.mean(H_pos, axis=0)
         self.grads["W_pos"] = V_pos.T @ H_pos / V.shape[0]
 
     def _compute_negative_grads(self):
@@ -204,7 +201,6 @@ class BQRBM(QBMBase):
                 self._compute_positive_grads(V)
                 self._compute_negative_grads()
                 self._apply_grads(learning_rate / V.shape[0])
-                self._update_Γ()
 
             # update the effective temperature
             self._update_β()
