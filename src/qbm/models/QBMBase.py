@@ -24,6 +24,7 @@ class QBMBase(ABC):
         self.X = X
         self.n_visible = X.shape[1]
         self.n_hidden = n_hidden
+        self.n_qubits = self.n_visible + self.n_hidden
         self.seed = seed
         self.rng = get_rng(self.seed)
         self.grads = {}
