@@ -35,13 +35,9 @@ class QBMBase(ABC):
         """
         Initializes the weights and biases.
         """
-        self.W = self.rng.normal(0, 0.01, (self.n_visible, self.n_hidden))
-        # compute the proportion of training vectors in which the units are on
-        p = self.X.mean(axis=0)
-        # avoid any division by zero errors
-        p[p == 1] -= 1e-15
-        self.a = np.log(p / (1 - p))
+        self.a = np.zeros(self.n_visible)
         self.b = np.zeros(self.n_hidden)
+        self.W = self.rng.normal(0, 0.01, (self.n_visible, self.n_hidden))
 
     def _random_mini_batch_indices(self, mini_batch_size):
         """
