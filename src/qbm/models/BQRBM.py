@@ -43,7 +43,6 @@ class BQRBM(QBMBase):
 
         self._initialize_weights_and_biases()
         self._update_Γ()
-        self._update_Q()
         self._initialize_sampler()
 
     def _initialize_sampler(self):
@@ -53,14 +52,8 @@ class BQRBM(QBMBase):
         """
         self.qpu = DWaveSampler(**self.qpu_params)
         self.sampler = FixedEmbeddingComposite(self.qpu, self.embedding)
-
-    def _update_Q(self):
-        """
-        The QUBO coefficient matrix Q.
-        """
-        scaling_factor = self.β * self.annealing_params["B_freeze"]
-        self.Q = np.diag(np.concatenate((self.a, self.b)) / scaling_factor)
-        self.Q[: self.n_visible, self.n_visible :] = self.W / scaling_factor
+        self.h_range = qpu.properties["h_range"]
+        self.J_range = qpu.properties["j_range"]
 
     def _update_β(self):
         """
@@ -114,35 +107,50 @@ class BQRBM(QBMBase):
         :param V: Numpy array where the rows are data vectors which to clamp the Hamiltonian
             with.
         """
-        b = self.b + V_pos @ self.W
-        D = np.sqrt(self.Γ ** 2 + b ** 2)
-        # add one and divide by two here to convert from -1/+1 to 0/1
-        H_pos = ((b / D) * np.tanh(D) + 1) / 2
+        b_eff = self.b + V_pos @ self.W
+        D = np.sqrt(self.Γ ** 2 + b_eff ** 2)
+        H_pos = (b_eff / D) * np.tanh(D)
 
         self.grads["a_pos"] = np.mean(V_pos, axis=0)
         self.grads["b_pos"] = np.mean(b_tanh, axis=0)
         self.grads["W_pos"] = V_pos.T @ H_pos / V.shape[0]
 
-    def _compute_negative_grads(self, num_reads):
+    def _compute_negative_grads(self):
         """
         Computes the gradients for the negative phase, i.e., the expectation values w.r.t.
         the model distribution.
         """
-        chain_strength = self.relative_chain_strength * np.abs(self.Q).max()
+        # compute the h's and J's
+        scaling_factor = self.β * self.annealing_params["B_freeze"]
+        h = np.concatenate((self.a, self.b)) / scaling_factor
+        J = np.zeros((self.n_qubits, self.n_qubits)) / scaling_factor
+        J[: self.n_visible, self.n_visible :] = self.W / scaling_factor
 
-        # TODO: sample qubo
-        # samples = sample_qubo(
-        # self.Q, num_reads=num_reads, anneal_schedule=self.anneal_params["schedule"],
-        # )
-        # V = samples.record.samples[:, :n_visible]
-        # H = samples.record.samples[:, n_visible:]
-        # self.grads["a_neg"] = V.mean(axis=0)
-        # self.grads["b_neg"] = H.mean(axis=0)
-        # self.grads["W_neg"] = V.T @ H / V.shape[0]
+        # compute the chain strength
+        chain_strength = self.relative_chain_strength * max(
+            (
+                max((h.max() / max(h_range), 0)),
+                max((h.min() / min(h_range), 0)),
+                max((J[: self.n_visible, self.n_visible :].max() / max(self.J_range), 0)),
+                max((J[: self.n_visible, self.n_visible :].min() / min(self.J_range), 0)),
+            )
+        )
 
-        self.grads["a_neg"] = 0
-        self.grads["b_neg"] = 0
-        self.grads["W_neg"] = 0
+        # get samples from the annealer
+        samples = self.sampler.sample_ising(
+            h,
+            J,
+            num_reads=num_reads,
+            anneal_schedule=self.anneal_params["schedule"],
+            chain_strength=chain_strength,
+        )
+
+        # compute the negative phase grads
+        V_neg = samples.record.samples[:, :n_visible]
+        H_neg = samples.record.samples[:, n_visible:]
+        self.grads["a_neg"] = V_neg.mean(axis=0)
+        self.grads["b_neg"] = H_neg.mean(axis=0)
+        self.grads["W_neg"] = V_neg.T @ H_neg / V_neg.shape[0]
 
     def train(
         self,
@@ -150,6 +158,7 @@ class BQRBM(QBMBase):
         learning_rate=1e-3,
         learning_rate_schedule=None,
         mini_batch_size=16,
+        num_reads=None,
         print_interval=None,
         store_pseudolikelihoods=True,
     ):
@@ -161,6 +170,8 @@ class BQRBM(QBMBase):
         :param learning_rate_schedule: Array of length n_epochs, where the ith entry is
             used to scale the initial learning rate during epoch i.
         :param mini_batch_size: Size of the mini-batches.
+        :param num_reads: Number of reads per negative gradient phase. If None then the
+            mini batch size will be used.
         :param print_interval: How many epochs between printing the pseudolikelihood and
             learning rate. If None, then nothing is printed.
         :param store_pseudolikelihoods: If True will compute and store the pseudolikelihood
@@ -170,6 +181,11 @@ class BQRBM(QBMBase):
         """
         if learning_rate_schedule is not None:
             assert len(learning_rate_schedule) == n_epochs
+
+        if num_reads is not None:
+            self.num_reads = num_reads
+        else:
+            self.num_reads = mini_batch_size
 
         if store_pseudolikelihoods and not hasattr(self, "pseudolikelihoods"):
             self.pseudolikelihoods = []
@@ -186,10 +202,9 @@ class BQRBM(QBMBase):
             for mini_batch_indices in self._random_mini_batch_indices(mini_batch_size):
                 V = self.X[mini_batch_indices]
                 self._compute_positive_grads(V)
-                self._compute_negative_grads(mini_batch_size)
+                self._compute_negative_grads()
                 self._apply_grads(learning_rate / V.shape[0])
                 self._update_Γ()
-                self._update_Q()
 
             # update the effective temperature
             self._update_β()
