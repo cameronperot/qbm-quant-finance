@@ -40,11 +40,13 @@ class BQRBM(QBMBase):
         if set(np.unique(X)) == set([0, 1]):
             X = 2 * X - 1
         assert set(np.unique(X)) == set([-1, 1])
+        self.X_binary = (self.X + 1) / 2
 
         super().__init__(X=X, n_hidden=n_hidden, seed=seed)
         self.embedding = embedding
         self.annealing_params = annealing_params
-        self.β_initial = β
+        self.β = β
+        self.βs = [β]
 
         self._initialize_sampler()
 
@@ -55,8 +57,8 @@ class BQRBM(QBMBase):
         """
         self.qpu = DWaveSampler(**self.qpu_params)
         self.sampler = FixedEmbeddingComposite(self.qpu, self.embedding)
-        self.h_range = qpu.properties["h_range"]
-        self.J_range = qpu.properties["j_range"]
+        self.h_range = np.array(qpu.properties["h_range"])
+        self.J_range = np.array(qpu.properties["j_range"])
 
     def _update_β(self):
         """
@@ -94,6 +96,8 @@ class BQRBM(QBMBase):
         E_model = E_classical_model + E_quantum_model
 
         self.β += self.learning_rate / self.β ** 2 * (E_train - E_model)
+        self.βs.append(self.β)
+        self.scaling_factor = self.β * self.annealing_params["B_freeze"]
 
     def _compute_positive_grads(self, V_pos):
         """
@@ -112,24 +116,48 @@ class BQRBM(QBMBase):
         self.grads["b_pos"] = np.mean(H_pos, axis=0)
         self.grads["W_pos"] = V_pos.T @ H_pos / V.shape[0]
 
-    def _compute_negative_grads(self):
+    def _compute_negative_grads(self, n_samples):
         """
         Computes the gradients for the negative phase, i.e., the expectation values w.r.t.
         the model distribution.
+
+        :param n_samples: Number of samples to obtain from the annealer.
         """
+        samples = self.sample(n_samples)
+        V_neg = samples.record.samples[:, :n_visible]
+        H_neg = samples.record.samples[:, n_visible:]
+
+        self.grads["a_neg"] = V_neg.mean(axis=0)
+        self.grads["b_neg"] = H_neg.mean(axis=0)
+        self.grads["W_neg"] = V_neg.T @ H_neg / V_neg.shape[0]
+
+    def _clip_weights_and_biases(self):
+        """
+        Clip the weights and biases so that the corresponding h's and J's passed to the
+        annealer are within the allowed ranges.
+        """
+        # here we multiply by (1 - 1e-15) to avoid possible floating point errors that might
+        # lead to the computed h's and J's being outside of their allowed ranges
+        bias_range = self.h_range * self.scaling_factor * (1 - 1e-15)
+        weight_range = self.J_range * self.scaling_factor * (1 - 1e-15)
+
+        self.a = np.clip(self.a, *bias_range)
+        self.b = np.clip(self.b, *bias_range)
+        self.W = np.clip(self.W, *weight_range)
+
+    def sample(self, n_samples):
         # compute the h's and J's
-        scaling_factor = self.β * self.annealing_params["B_freeze"]
-        h = np.concatenate((self.a, self.b)) / scaling_factor
-        J = np.zeros((self.n_qubits, self.n_qubits)) / scaling_factor
-        J[: self.n_visible, self.n_visible :] = self.W / scaling_factor
+        h = np.concatenate((self.a, self.b)) / self.scaling_factor
+        J = np.zeros((self.n_qubits, self.n_qubits)) / self.scaling_factor
+        J[: self.n_visible, self.n_visible :] = self.W / self.scaling_factor
 
         # compute the chain strength
         chain_strength = self.relative_chain_strength * max(
             (
-                max((h.max() / max(h_range), 0)),
-                max((h.min() / min(h_range), 0)),
-                max((J[: self.n_visible, self.n_visible :].max() / max(self.J_range), 0)),
-                max((J[: self.n_visible, self.n_visible :].min() / min(self.J_range), 0)),
+                max((h.max() / self.h_range.max(), 0)),
+                max((h.min() / self.h_range.min(), 0)),
+                max((J[: self.n_visible, self.n_visible :].max() / self.J_range.max(), 0)),
+                max((J[: self.n_visible, self.n_visible :].min() / self.J_range.min(), 0)),
             )
         )
 
@@ -137,17 +165,13 @@ class BQRBM(QBMBase):
         samples = self.sampler.sample_ising(
             h,
             J,
-            num_reads=num_reads,
+            num_reads=n_samples,
             anneal_schedule=self.anneal_params["schedule"],
             chain_strength=chain_strength,
+            answer_mode="raw",
         )
 
-        # compute the negative phase grads
-        V_neg = samples.record.samples[:, :n_visible]
-        H_neg = samples.record.samples[:, n_visible:]
-        self.grads["a_neg"] = V_neg.mean(axis=0)
-        self.grads["b_neg"] = H_neg.mean(axis=0)
-        self.grads["W_neg"] = V_neg.T @ H_neg / V_neg.shape[0]
+        return samples
 
     def train(
         self,
@@ -155,9 +179,7 @@ class BQRBM(QBMBase):
         learning_rate=1e-3,
         learning_rate_schedule=None,
         mini_batch_size=16,
-        num_reads=None,
-        print_interval=None,
-        store_pseudolikelihoods=True,
+        verbose=True,
     ):
         """
         Fits the model to the training data.
@@ -167,63 +189,50 @@ class BQRBM(QBMBase):
         :param learning_rate_schedule: Array of length n_epochs, where the ith entry is
             used to scale the initial learning rate during epoch i.
         :param mini_batch_size: Size of the mini-batches.
-        :param num_reads: Number of reads per negative gradient phase. If None then the
-            mini batch size will be used.
-        :param print_interval: How many epochs between printing the pseudolikelihood and
-            learning rate. If None, then nothing is printed.
-        :param store_pseudolikelihoods: If True will compute and store the pseudolikelihood
-            every epoch in the pseudolikelihoods attribute. Note that this can impact
-            performance as the pseudolikelihood calculation can be computationally expensive
-            depending on the data.
+        :param verbose: If True then will print the pseudolikelihood, learning rate,
+            effective β, and epoch duration.
         """
+        self.learning_rate = learning_rate
+
         if learning_rate_schedule is not None:
             assert len(learning_rate_schedule) == n_epochs
 
-        if num_reads is not None:
-            self.num_reads = num_reads
-        else:
-            self.num_reads = mini_batch_size
-
-        if store_pseudolikelihoods and not hasattr(self, "pseudolikelihoods"):
+        if not hasattr(self, "pseudolikelihoods"):
             self.pseudolikelihoods = []
 
         for epoch in range(1, n_epochs + 1):
             start_time = time()
 
             # set the effective learning rate
-            learning_rate = learning_rate
             if learning_rate_schedule is not None:
-                learning_rate *= learning_rate_schedule[epoch - 1]
+                self.learning_rate = learning_rate * learning_rate_schedule[epoch - 1]
 
             # loop over the mini-batches and compute/apply the gradients for each
             for mini_batch_indices in self._random_mini_batch_indices(mini_batch_size):
                 V = self.X[mini_batch_indices]
                 self._compute_positive_grads(V)
-                self._compute_negative_grads()
-                self._apply_grads(learning_rate / V.shape[0])
+                self._compute_negative_grads(V.shape[0])
+                self._apply_grads(self.learning_rate / V.shape[0])
+                self._clip_weights_and_biases()
 
             # update the effective temperature
             self._update_β()
+            self._clip_weights_and_biases()
 
             # compute and store the pseudolikelihood
-            if store_pseudolikelihoods:
-                pseudolikelihood = self.pseudolikelihood(self.X).mean()
-                self.pseudolikelihoods.append(pseudolikelihood)
+            self.pseudolikelihoods.append(self.pseudolikelihood(self.X_binary).mean())
 
             end_time = time()
 
-            # print information if verbose
-            if print_interval is not None:
-                if epoch % print_interval == 0:
-                    if not store_pseudolikelihoods:
-                        pseudolikelihood = self.pseudolikelihood(self.X).mean()
-
-                    print(
-                        f"[{type(self).__name__}] Epoch {epoch}:",
-                        f"pseudolikelihood = {pseudolikelihood:.2f},",
-                        f"learning rate = {learning_rate},",
-                        f"epoch time = {(end_time - start_time) * 1e3:.2f}ms",
-                    )
+            # print information to stdout
+            if verbose:
+                print(
+                    f"[{type(self).__name__}] epoch {epoch}:",
+                    f"pseudolikelihood = {self.pseudolikelihoods[-1]:.2f},",
+                    f"learning rate = {self.learning_rate:.2e},",
+                    f"effective β = {self.β:.2f},",
+                    f"epoch duration = {(end_time - start_time) * 1e3:.2f}ms",
+                )
 
 
 if __name__ == "__main__":
