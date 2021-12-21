@@ -152,7 +152,7 @@ class BQRBM(QBMBase):
         J[: self.n_visible, self.n_visible :] = self.W / self.scaling_factor
 
         # compute the chain strength
-        chain_strength = self.relative_chain_strength * max(
+        r = max(
             (
                 max((h.max() / self.h_range.max(), 0)),
                 max((h.min() / self.h_range.min(), 0)),
@@ -160,6 +160,7 @@ class BQRBM(QBMBase):
                 max((J[: self.n_visible, self.n_visible :].min() / self.J_range.min(), 0)),
             )
         )
+        chain_strength = self.relative_chain_strength * r
 
         # get samples from the annealer
         samples = self.sampler.sample_ising(
