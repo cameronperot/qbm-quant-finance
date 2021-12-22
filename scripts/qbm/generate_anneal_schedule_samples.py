@@ -5,9 +5,15 @@ from minorminer import find_embedding
 from qbm.utils import get_project_dir, get_rng, load_artifact, save_artifact
 
 
-def main(
-    h, J, config, anneal_schedules, qpu, save_dir, embedding_id, batch_id,
-):
+def main(h, J, config, anneal_schedules, qpu, save_dir, embedding_id, batch_id, gauge=None):
+    if gauge is not None:
+        h = h * gauge
+        J = J * np.outer(gauge, gauge)
+        save_artifact(
+            gauge,
+            save_dir / f"samples/embedding_{embedding_id:02}/batch_{batch_id:02}/gauge.pkl",
+        )
+
     embedding_path = save_dir / f"samples/embedding_{embedding_id:02}/embedding.json"
     if embedding_path.exists():
         # load the saved embedding
@@ -118,13 +124,17 @@ if __name__ == "__main__":
         name = f"anneal_schedule=0,0_{quench_start[0]},{quench_start[1]}_{quench_stop[0]},{quench_stop[1]}"
         anneal_schedules[name] = [(0, 0), quench_start, quench_stop]
 
-    main(
-        h=h,
-        J=J,
-        config=config,
-        anneal_schedules=anneal_schedules,
-        qpu=qpu,
-        save_dir=config_dir,
-        embedding_id=embedding_id,
-        batch_id=batch_id,
-    )
+    for batch_id in range(1, 11):
+        rng = get_rng(batch_id)
+        gauge = rng.choice([-1, 1], n_qubits)
+        main(
+            h=h,
+            J=J,
+            config=config,
+            anneal_schedules=anneal_schedules,
+            qpu=qpu,
+            save_dir=config_dir,
+            embedding_id=embedding_id,
+            batch_id=batch_id,
+            gauge=gauge,
+        )
