@@ -69,13 +69,13 @@ def compute_H(h, J, s, n_qubits, σ):
     # linear terms
     for i in range(n_qubits):
         if h[i] != 0:
-            H -= (B * h[i]) * σ["z", i]
+            H += (B * h[i]) * σ["z", i]
 
     # quadratic terms
     for i in range(n_qubits):
         for j in range(i + 1, n_qubits):
             if J[i, j] != 0:
-                H -= (B * J[i, j]) * (σ["z", i] @ σ["z", j])
+                H += (B * J[i, j]) * (σ["z", i] @ σ["z", j])
 
     return H.toarray()
 
