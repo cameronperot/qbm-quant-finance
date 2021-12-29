@@ -29,13 +29,13 @@ Z = csr_matrix(([1, -1], ([0, 1], [0, 1])), dtype=np.float64)
 
 def sparse_kron(i, n_qubits, A):
     """
-    Compute I_{i} ⊗ A ⊗ I_{n_qubits-i-1}.
+    Compute I_{2^i} ⊗ A ⊗ I_{2^(n_qubits-i-1)}.
 
     :param i: Index of the "A" matrix.
     :param n_qubits: Total number of qubits.
     :param A: Matrix to tensor with identities.
 
-    :returns: I_{i} ⊗ A ⊗ I_{n_qubits-i-1}.
+    :returns: I_{2^i} ⊗ A ⊗ I_{2^(n_qubits-i-1)}.
     """
     if i != 0 and i != n_qubits - 1:
         return kron(kron(identity(2 ** i), A), identity(2 ** (n_qubits - i - 1)))
@@ -47,8 +47,7 @@ def sparse_kron(i, n_qubits, A):
 
 def compute_H(h, J, s, n_qubits, σ):
     """
-    Computes the Hamiltonian of the annealer at the freeze-out
-    point s*.
+    Computes the Hamiltonian of the annealer at relative time s.
 
     :param h: Linear Ising terms.
     :param J: Quadratic Ising terms.
@@ -86,7 +85,7 @@ def compute_ρ(H, T, matrix_exp="torch"):
 
     Note: torch's matrix exp is faster than scipy's even when accounting for conversions.
 
-    :param H: Hamiltonian matrix (in GHz units)
+    :param H: Hamiltonian matrix.
     :param T: Temperature.
     :param matrix_exp: If "torch" will use torch's matrix exp, if "scipy" will use scipy's.
 
@@ -116,8 +115,6 @@ if __name__ == "__main__":
     T_bar = tqdm(range(len(T_values)), desc="T values")
 
     for config_id in config_ids:
-        config_bar.update(1)
-
         # load the config
         config_dir = project_dir / f"artifacts/exact_analysis/{config_id:02}"
         config = load_artifact(config_dir / "config.json")
@@ -137,17 +134,18 @@ if __name__ == "__main__":
         data = {}
         errors = {}
         for s in s_values:
-            s_bar.update(1)
             for T in T_values:
-                T_bar.update(1)
                 try:
                     H = compute_H(h, J, s, n_qubits, σ)
                     ρ = compute_ρ(H, T)
-                    data[(s, T)] = {"E": np.diag(H).copy(), "p": np.diag(ρ).copy()}
+                    data[s, T] = {"E": np.diag(H).copy(), "p": np.diag(ρ).copy()}
                 except Exception as error:
-                    errors[(s, T)] = error
+                    errors[s, T] = error
+
+                T_bar.update(1)
 
             T_bar.reset()
+            s_bar.update(1)
 
         # save the exact data and errors (if any)
         save_artifact(data, config_dir / "exact_data.pkl")
@@ -155,3 +153,4 @@ if __name__ == "__main__":
             save_artifact(errors, config_dir / "errors.pkl")
 
         s_bar.reset()
+        config_bar.update(1)
