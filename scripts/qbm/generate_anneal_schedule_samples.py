@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import numpy as np
 from dwave.system import DWaveSampler, FixedEmbeddingComposite
 from minorminer import find_embedding
@@ -5,14 +7,13 @@ from minorminer import find_embedding
 from qbm.utils import get_project_dir, get_rng, load_artifact, save_artifact
 
 
-def main(h, J, config, anneal_schedules, qpu, save_dir, embedding_id, batch_id, gauge=None):
-    if gauge is not None:
-        h = h * gauge
-        J = J * np.outer(gauge, gauge)
-        save_artifact(
-            gauge,
-            save_dir / f"samples/embedding_{embedding_id:02}/batch_{batch_id:02}/gauge.pkl",
-        )
+def main(h, J, config, anneal_params_dict, qpu, save_dir, embedding_id, gauge_id, gauge):
+    h = h * gauge
+    J = J * np.outer(gauge, gauge)
+    save_artifact(
+        gauge,
+        save_dir / f"samples/embedding_{embedding_id:02}/gauge_{gauge_id:02}/gauge.pkl",
+    )
 
     embedding_path = save_dir / f"samples/embedding_{embedding_id:02}/embedding.json"
     if embedding_path.exists():
@@ -48,9 +49,12 @@ def main(h, J, config, anneal_schedules, qpu, save_dir, embedding_id, batch_id, 
     sampler = FixedEmbeddingComposite(qpu, embedding)
 
     # generate samples for each annealing schedule
-    for name, anneal_schedule in anneal_schedules.items():
+    for i, (name, anneal_params) in enumerate(anneal_params_dict.items()):
+        print(
+            f"{i + 1} of {len(anneal_params_dict)} {name}, num_reads = {anneal_params['num_reads']}"
+        )
         samples_path = (
-            save_dir / f"samples/embedding_{embedding_id:02}/batch_{batch_id:02}/{name}.pkl"
+            save_dir / f"samples/embedding_{embedding_id:02}/gauge_{gauge_id:02}/{name}.pkl"
         )
 
         # ensure that samples do not get accidentally overwritten
@@ -62,14 +66,10 @@ def main(h, J, config, anneal_schedules, qpu, save_dir, embedding_id, batch_id, 
                 continue
 
         # generate samples using the annealer
-        samples = sampler.sample_ising(
-            h,
-            J,
-            anneal_schedule=anneal_schedule,
-            num_reads=config["sampling_params"]["num_reads"],
-            auto_scale=False,
-            label=name,
-        )
+        samples = sampler.sample_ising(h, J, auto_scale=False, label=name, **anneal_params)
+
+        # undo the gauge transformation
+        samples.record.sample *= gauge
 
         # save the samples
         save_artifact(samples, samples_path)
@@ -78,7 +78,6 @@ def main(h, J, config, anneal_schedules, qpu, save_dir, embedding_id, batch_id, 
 if __name__ == "__main__":
     config_id = 1
     embedding_id = 1
-    batch_id = 1
 
     project_dir = get_project_dir()
     config_dir = project_dir / f"artifacts/exact_analysis/{config_id:02}"
@@ -90,6 +89,7 @@ if __name__ == "__main__":
 
     qpu = DWaveSampler(**config["qpu_params"])
 
+    # configure h's and J's
     if (config_dir / "h.pkl").exists() and (config_dir / "J.pkl").exists():
         print(f"Loading h's and J's at {config_dir}")
         h = load_artifact(config_dir / "h.pkl")
@@ -112,29 +112,48 @@ if __name__ == "__main__":
         save_artifact(h, config_dir / "h.pkl")
         save_artifact(J, config_dir / "J.pkl")
 
-    quench_start_times = range(4, 13)
-    anneal_schedules = {
-        "anneal_schedule=0,0_20,1": [(0, 0), (20, 1)],
-    }
-    max_slope = 2
-    for t in quench_start_times:
-        quench_start = (t, t / 20)
-        quench_duration = (1 - quench_start[1]) / max_slope
-        quench_stop = (t + quench_duration, 1)
-        name = f"anneal_schedule=0,0_{quench_start[0]},{quench_start[1]}_{quench_stop[0]},{quench_stop[1]}"
-        anneal_schedules[name] = [(0, 0), quench_start, quench_stop]
+    # set anneal schedules and max allowed number of reads
+    anneal_durations = [Decimal(x) for x in (20, 100)]
+    s_pauses = [Decimal(str(round(x, 2))) for x in np.arange(2.5, 8, 0.5) / 10]
+    pause_durations = [Decimal(x) for x in (10, 100, 1_000)]
+    max_slope = Decimal(1 / min(qpu.properties["annealing_time_range"]))
+    max_problem_duration = 1_000_000 - 1_000  # subtract 1_000 for buffer
+    anneal_params_dict = {}
+    for anneal_duration in anneal_durations:
+        for s_pause in s_pauses:
+            for pause_duration in pause_durations:
+                t_pause = anneal_duration * s_pause
+                quench_duration = (1 - s_pause) / max_slope
+                anneal_schedule = [
+                    (0, 0),
+                    (t_pause, s_pause),
+                    (t_pause + pause_duration, s_pause),
+                    (t_pause + pause_duration + quench_duration, 1),
+                ]
+                anneal_schedule = [(float(t), float(s)) for (t, s) in anneal_schedule]
 
-    for batch_id in range(1, 11):
-        rng = get_rng(batch_id)
+                num_reads = min(int(max_problem_duration / anneal_schedule[-1][0]), 10_000)
+
+                name = f"anneal_duration={anneal_duration},s_pause={s_pause:.2f},pause_duration={pause_duration},max_slope={max_slope}"
+                anneal_params_dict[name] = {
+                    "anneal_schedule": anneal_schedule,
+                    "num_reads": num_reads,
+                }
+
+    # sample different gauges for each anneal schedule
+    gauge_ids = range(1, 11)
+    for gauge_id in gauge_ids:
+        print(f"Gauge {gauge_id} / {len(gauge_ids)}")
+        rng = get_rng(gauge_id)
         gauge = rng.choice([-1, 1], n_qubits)
         main(
-            h=h,
-            J=J,
+            h=h.copy(),
+            J=J.copy(),
             config=config,
-            anneal_schedules=anneal_schedules,
+            anneal_params_dict=anneal_params_dict,
             qpu=qpu,
             save_dir=config_dir,
             embedding_id=embedding_id,
-            batch_id=batch_id,
+            gauge_id=gauge_id,
             gauge=gauge,
         )
