@@ -104,7 +104,7 @@ if __name__ == "__main__":
     config_ids = (1, 2, 3, 4)
 
     # set s and T values
-    T_values = np.round(np.arange(2e-3, 52e-3, 2e-3), 3)  # [K]
+    T_values = np.round(np.arange(2e-3, 102e-3, 2e-3), 3)  # [K]
     s_values = np.round(np.arange(0.2, 1.01, 0.01), 2)
 
     # configure tqdm bars
