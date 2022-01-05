@@ -77,7 +77,7 @@ def main(h, J, config, anneal_params_dict, qpu, save_dir, embedding_id, gauge_id
 
 
 if __name__ == "__main__":
-    config_id = 2
+    config_id = 1
     embedding_id = 1
 
     project_dir = get_project_dir()
@@ -96,12 +96,19 @@ if __name__ == "__main__":
         h = load_artifact(config_dir / "h.pkl")
         J = load_artifact(config_dir / "J.pkl")
     else:
-        μ = config["mu"]
-        σ = config["sigma"]
         rng = get_rng(config["seed"])
-        a = rng.normal(μ, σ, n_visible)
-        b = rng.normal(μ, σ, n_hidden)
-        W = rng.normal(μ, σ, (n_visible, n_hidden))
+        if config["distribution"]["type"] == "normal":
+            μ = config["distribution"]["mu"]
+            σ = config["distribution"]["sigma"]
+            a = rng.normal(μ, σ, n_visible)
+            b = rng.normal(μ, σ, n_hidden)
+            W = rng.normal(μ, σ, (n_visible, n_hidden))
+        elif config["distribution"]["type"] == "uniform":
+            low = config["distribution"]["low"]
+            high = config["distribution"]["high"]
+            a = rng.uniform(low, high, n_visible)
+            b = rng.uniform(low, high, n_hidden)
+            W = rng.uniform(low, high, (n_visible, n_hidden))
 
         h = np.concatenate((a, b))
         J = np.zeros((n_qubits, n_qubits))
