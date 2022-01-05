@@ -1,102 +1,27 @@
 import numpy as np
 import pandas as pd
-from scipy.sparse import csr_matrix, kron, identity
-from scipy.linalg import eigh
 from tqdm import tqdm
 
 from qbm.utils import get_project_dir, load_artifact, save_artifact
-
-project_dir = get_project_dir()
-
-# load the anneal schedule data
-anneal_schedule_data = pd.read_csv(
-    project_dir
-    / "data/anneal_schedules/csv/09-1265A-A_Advantage_system5_1_annealing_schedule.csv",
-    index_col="s",
-)
-# for some reason 0.5 is missing for Advantage_system5.1 so we need to interpolate
-if 0.5 not in anneal_schedule_data.index:
-    anneal_schedule_data.loc[0.5] = (
-        anneal_schedule_data.loc[0.499] + anneal_schedule_data.loc[0.501]
-    ) / 2
-
-# set global constants
-k_B = 20.83661912  # [GHz/K]
-X = csr_matrix(([1, 1], ([0, 1], [1, 0])), dtype=np.float64)
-Z = csr_matrix(([1, -1], ([0, 1], [0, 1])), dtype=np.float64)
-
-
-def sparse_kron(i, n_qubits, A):
-    """
-    Compute I_{2^i} ⊗ A ⊗ I_{2^(n_qubits-i-1)}.
-
-    :param i: Index of the "A" matrix.
-    :param n_qubits: Total number of qubits.
-    :param A: Matrix to tensor with identities.
-
-    :returns: I_{2^i} ⊗ A ⊗ I_{2^(n_qubits-i-1)}.
-    """
-    if i != 0 and i != n_qubits - 1:
-        return kron(kron(identity(2 ** i), A), identity(2 ** (n_qubits - i - 1)))
-    if i == 0:
-        return kron(A, identity(2 ** (n_qubits - 1)))
-    if i == n_qubits - 1:
-        return kron(identity(2 ** (n_qubits - 1)), A)
-
-
-def compute_H(h, J, s, n_qubits, σ):
-    """
-    Computes the Hamiltonian of the annealer at relative time s.
-
-    :param h: Linear Ising terms.
-    :param J: Quadratic Ising terms.
-    :param s: Where in the anneal schedule to compute H.
-    :param n_qubits: Number of qubits.
-    :param σ: Kronecker product Pauli matrices dict.
-
-    :returns: Hamiltonian matrix H.
-    """
-    A = anneal_schedule_data.loc[s, "A(s) (GHz)"]
-    B = anneal_schedule_data.loc[s, "B(s) (GHz)"]
-    H = csr_matrix((2 ** n_qubits, 2 ** n_qubits), dtype=np.float64)
-
-    for i in range(n_qubits):
-        # off-diagonal terms
-        H -= A * σ["x", i]
-
-        # linear terms
-        if h[i] != 0:
-            H += (B * h[i]) * σ["z", i]
-
-        # quadratic terms
-        for j in range(i + 1, n_qubits):
-            if J[i, j] != 0:
-                H += (B * J[i, j]) * (σ["z", i] @ σ["z", j])
-
-    return H.toarray()
-
-
-def compute_ρ(H, T):
-    """
-    Computes the trace normalized density matrix ρ.
-
-    :param H: Hamiltonian matrix.
-    :param T: Temperature.
-
-    :return: Density matrix ρ.
-    """
-    β = 1 / (k_B * T)
-
-    Λ, S = eigh(H)
-    exp_βΛ = np.exp(-β * (Λ - Λ.min()))
-    exp_βH = (S * exp_βΛ) @ S.T
-
-    return exp_βH / exp_βΛ.sum()
+from qbm.utils.exact_qbm import sparse_kron, sparse_X, sparse_Z, compute_H, compute_ρ
 
 
 if __name__ == "__main__":
     # compute exact data for all specified configs
     config_ids = (3, 2, 1)
+    project_dir = get_project_dir()
+
+    # load the anneal schedule data
+    anneal_schedule_data = pd.read_csv(
+        project_dir
+        / "data/anneal_schedules/csv/09-1265A-A_Advantage_system5_1_annealing_schedule.csv",
+        index_col="s",
+    )
+    # for some reason 0.5 is missing for Advantage_system5.1 so we need to interpolate
+    if 0.5 not in anneal_schedule_data.index:
+        anneal_schedule_data.loc[0.5] = (
+            anneal_schedule_data.loc[0.499] + anneal_schedule_data.loc[0.501]
+        ) / 2
 
     # set s and T values
     T_values = np.round(np.arange(2e-3, 102e-3, 2e-3), 3)  # [K]
@@ -116,8 +41,8 @@ if __name__ == "__main__":
         # create Kronecker σ matrices
         σ = {}
         for i in range(n_qubits):
-            σ["x", i] = sparse_kron(i, n_qubits, X)
-            σ["z", i] = sparse_kron(i, n_qubits, Z)
+            σ["x", i] = sparse_kron(i, n_qubits, sparse_X)
+            σ["z", i] = sparse_kron(i, n_qubits, sparse_Z)
 
         # load h's and J's
         h = load_artifact(config_dir / "h.pkl")
@@ -127,9 +52,11 @@ if __name__ == "__main__":
         data = {}
         errors = {}
         for s in s_values:
+            A = anneal_schedule_data.loc[s, "A(s) (GHz)"]
+            B = anneal_schedule_data.loc[s, "B(s) (GHz)"]
             for T in T_values:
                 try:
-                    H = compute_H(h, J, s, n_qubits, σ)
+                    H = compute_H(h, J, A, B, n_qubits, σ)
                     ρ = compute_ρ(H, T)
                     data[s, T] = {"E": np.diag(H).copy(), "p": np.diag(ρ).copy()}
                 except Exception as error:
