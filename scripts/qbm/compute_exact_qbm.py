@@ -61,17 +61,15 @@ def compute_H(h, J, s, n_qubits, σ):
     B = anneal_schedule_data.loc[s, "B(s) (GHz)"]
     H = csr_matrix((2 ** n_qubits, 2 ** n_qubits), dtype=np.float64)
 
-    # off-diagonal terms
     for i in range(n_qubits):
+        # off-diagonal terms
         H -= A * σ["x", i]
 
-    # linear terms
-    for i in range(n_qubits):
+        # linear terms
         if h[i] != 0:
             H += (B * h[i]) * σ["z", i]
 
-    # quadratic terms
-    for i in range(n_qubits):
+        # quadratic terms
         for j in range(i + 1, n_qubits):
             if J[i, j] != 0:
                 H += (B * J[i, j]) * (σ["z", i] @ σ["z", j])
@@ -95,7 +93,7 @@ def compute_ρ(H, T, matrix_exp="torch"):
 
     if matrix_exp == "torch":
         exp_βH = torch.matrix_exp(-β * torch.from_numpy(H)).numpy()
-    if matrix_exp == "scipy":
+    elif matrix_exp == "scipy":
         exp_βH = expm(-β * H)
 
     return exp_βH / exp_βH.trace()
@@ -106,7 +104,7 @@ if __name__ == "__main__":
     config_ids = (1, 2, 3, 4)
 
     # set s and T values
-    T_values = np.round(np.arange(2e-3, 52e-3, 2e-3), 3)  # [K]
+    T_values = np.round(np.arange(2e-3, 102e-3, 2e-3), 3)  # [K]
     s_values = np.round(np.arange(0.2, 1.01, 0.01), 2)
 
     # configure tqdm bars

@@ -59,6 +59,7 @@ def main(h, J, config, anneal_params_dict, qpu, save_dir, embedding_id, gauge_id
 
         # ensure that samples do not get accidentally overwritten
         if samples_path.exists():
+            continue
             answer = input(
                 f"Directory {save_dir}/samples/{name} already exists, do you wish to overwrite the data in it? [y/N] "
             )
@@ -76,7 +77,7 @@ def main(h, J, config, anneal_params_dict, qpu, save_dir, embedding_id, gauge_id
 
 
 if __name__ == "__main__":
-    config_id = 1
+    config_id = 2
     embedding_id = 1
 
     project_dir = get_project_dir()
@@ -115,7 +116,7 @@ if __name__ == "__main__":
     # set anneal schedules and max allowed number of reads
     anneal_durations = [Decimal(x) for x in (20, 100)]
     s_pauses = [Decimal(str(round(x, 2))) for x in np.arange(2.5, 8, 0.5) / 10]
-    pause_durations = [Decimal(x) for x in (10, 100, 1_000)]
+    pause_durations = [Decimal(x) for x in (0, 10, 100, 1_000)]
     max_slope = Decimal(1 / min(qpu.properties["annealing_time_range"]))
     max_problem_duration = 1_000_000 - 1_000  # subtract 1_000 for buffer
     anneal_params_dict = {}
@@ -124,12 +125,19 @@ if __name__ == "__main__":
             for pause_duration in pause_durations:
                 t_pause = anneal_duration * s_pause
                 quench_duration = (1 - s_pause) / max_slope
-                anneal_schedule = [
-                    (0, 0),
-                    (t_pause, s_pause),
-                    (t_pause + pause_duration, s_pause),
-                    (t_pause + pause_duration + quench_duration, 1),
-                ]
+                if pause_duration > 0:
+                    anneal_schedule = [
+                        (0, 0),
+                        (t_pause, s_pause),
+                        (t_pause + pause_duration, s_pause),
+                        (t_pause + pause_duration + quench_duration, 1),
+                    ]
+                else:
+                    anneal_schedule = [
+                        (0, 0),
+                        (t_pause, s_pause),
+                        (t_pause + quench_duration, 1),
+                    ]
                 anneal_schedule = [(float(t), float(s)) for (t, s) in anneal_schedule]
 
                 num_reads = min(int(max_problem_duration / anneal_schedule[-1][0]), 10_000)
