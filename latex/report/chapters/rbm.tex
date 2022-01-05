@@ -7,12 +7,12 @@ The Restricted Boltzmann Machine (RBM) is an energy-based model defined by the e
 \end{align}
 where
 \begin{itemize}
-    \item \( \vec{v} \in \Z_2^{n_v} \) represents the visible units, with associated bias vector \( \vec{a} \in \R^{n_v} \).
-    \item \( \vec{h} \in \Z_2^{n_h} \) represents the hidden units, with associated bias vector \( \vec{b} \in \R^{n_h} \).
-    \item \( \mat{W} \in \R^{n_v \times n_h} \) represents the weights corresponding to the interaction strengths between visible and hidden units.
+    \item \( \vec{v} \in \binset^{n_v} \) represents the visible units, with associated bias vector \( \vec{a} \in \R^{n_v} \).
+    \item \( \vec{h} \in \binset^{n_h} \) represents the hidden units, with associated bias vector \( \vec{b} \in \R^{n_h} \).
+    \item \( \mat{W} \in \R^{n_v \times n_h} \) represents the weig!htbs corresponding to the interaction strengths between visible and hidden units.
 \end{itemize}
 
-\begin{figure}[ht]
+\begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{rbm_diagram.png}
     \end{center}
@@ -22,7 +22,7 @@ where
 
 It is termed "restricted" due to the fact that intra-layer connections are not allowed, i.e., visible units are only connected to hidden units, and vice versa.
 An example is depicted in \cref{fig:rbm_diagram}.
-We also Note that in this case we use RBM to refer to what one might call a Bernoulli RBM, due to the fact that the visible and hidden units are Bernoulli random variables.
+We also Note that in this case we use RBM to refer to what one mig!htb call a Bernoulli RBM, due to the fact that the visible and hidden units are Bernoulli random variables.
 
 The probability to find the system in the configuration \( \{\vec{v},\vec{h}\} \) is given by the Boltzmann distribution (with \( \beta = \frac{1}{k_BT} = 1 \) )
 \begin{align}
@@ -138,7 +138,7 @@ Applying the algorithm to a mini-batch is essentially the same except except tha
     %\item (XV): using a transformed feature space and volatility indicators.
 %\end{itemize}
 
-%\begin{table}[ht]
+%\begin{table}[!htb]
     %\centering
     %\begin{adjustbox}{max width=\textwidth}
         %\input{../tables/rbm/correlation_coefficients.tbl}
@@ -147,7 +147,7 @@ Applying the algorithm to a mini-batch is essentially the same except except tha
     %\label{tbl:rbm_correlation_coefficients}
 %\end{table}
 
-%\begin{table}[ht]
+%\begin{table}[!htb]
     %\centering
     %\begin{adjustbox}{max width=\textwidth}
         %\input{../tables/rbm/qq_rmses.tbl}
@@ -156,7 +156,7 @@ Applying the algorithm to a mini-batch is essentially the same except except tha
     %\label{tbl:rbm_qq_rmse}
 %\end{table}
 
-%\begin{table}[ht]
+%\begin{table}[!htb]
     %\centering
     %\begin{adjustbox}{max width=\textwidth}
         %\input{../tables/rbm/volatilities.tbl}
@@ -165,7 +165,7 @@ Applying the algorithm to a mini-batch is essentially the same except except tha
     %\label{tbl:rbm_volatilities}
 %\end{table}
 
-%\begin{table}[ht]
+%\begin{table}[!htb]
     %\centering
     %\begin{adjustbox}{max width=\textwidth}
         %\input{../tables/rbm/conditional_volatilities.tbl}
@@ -174,7 +174,7 @@ Applying the algorithm to a mini-batch is essentially the same except except tha
     %\label{tbl:rbm_conditional_volatilities}
 %\end{table}
 
-%\begin{table}[ht]
+%\begin{table}[!htb]
     %\centering
     %\begin{adjustbox}{max width=\textwidth}
         %\input{../tables/rbm/autocorrelation_times.tbl}
@@ -183,7 +183,7 @@ Applying the algorithm to a mini-batch is essentially the same except except tha
     %\label{tbl:rbm_ac_times}
 %\end{table}
 
-%\begin{table}[ht]
+%\begin{table}[!htb]
     %\centering
     %\begin{adjustbox}{max width=\textwidth}
         %\input{../tables/rbm/tails.tbl}
@@ -192,7 +192,7 @@ Applying the algorithm to a mini-batch is essentially the same except except tha
     %\label{tbl:rbm_tails}
 %\end{table}
 
-%\begin{figure}[ht]
+%\begin{figure}[!htb]
     %\begin{center}
         %\includegraphics[width=1\linewidth]{rbm/tail_concentrations.png}
     %\end{center}
@@ -200,7 +200,7 @@ Applying the algorithm to a mini-batch is essentially the same except except tha
     %\label{fig:rbm_tail_concentrations}
 %\end{figure}
 
-%\begin{figure}[ht]
+%\begin{figure}[!htb]
     %\begin{center}
         %\includegraphics[width=1\linewidth]{rbm/autocorrelation_functions.png}
     %\end{center}
@@ -208,7 +208,7 @@ Applying the algorithm to a mini-batch is essentially the same except except tha
     %\label{fig:rbm_autocorrelation_functions}
 %\end{figure}
 
-%\begin{figure}[ht]
+%\begin{figure}[!htb]
     %\begin{center}
         %\includegraphics[width=1\linewidth]{rbm/qq.png}
     %\end{center}
