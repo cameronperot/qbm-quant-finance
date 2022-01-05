@@ -1,53 +1,157 @@
 \section{Data Analysis}
-\begin{figure}
+We start with the daily open, high, low, close (OHLC) data for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs
+\begin{itemize}
+    \item EURUSD - Euro € / U.S. Dollar \$
+    \item GBPUSD - British Pound Sterling £ / U.S. Dollar \$
+    \item USDCAD - U.S. Dollar \$ / Canadian Dollar \$
+    \item USDJPY - U.S. Dollar \$ / Japanese Yen ¥
+\end{itemize}
+We will use the notation \( x_\text{open} \), \( x_\text{high} \), \( x_\text{low} \), and \( x_\text{close} \) to denote the open, high, low, and close values of a currency pair on a particular day.
+
+Given that the values are on an absolute basis, we would like to convert them to relative terms in order to be able to compare data from different time periods on a more equal footing.
+The natural way to do so is to compare the returns which are given by
+\begin{align}
+    r = \frac{x_\text{close} - x_\text{open}}{x_\text{open}}
+\end{align}
+However, this isn't necessarily the best way to approach this.
+Instead we opt to use the log returns
+\begin{align}
+    \tilde{r}
+        = \log(1+r)
+        = \log\bigg( \frac{x_\text{close}}{x_\text{open}} \bigg)
+\end{align}
+due to several advantages~\cite{quantivity_2012}
+\begin{itemize}
+    \item Log-normality: if \( r \sim \mathcal{N}(\mu, \sigma^2) \) then \( \tilde{r} \sim \mathcal{N}(\tilde{\mu}, \tilde{\sigma}^2) \).
+    \item Small \( r \) approximation: the expansion \( \log (1 + r) = r + \mathcal{O}(r^2) \approx r \) for \( r \ll 1 \).
+    \item Time-additivity: instead of having to multiply one plus the returns to compound them, using log returns allows us to simply add them.
+\end{itemize}
+
+The first thing we need to do is to get an idea of how the log returns are distributed.
+To get a visual overview we can analyze the histograms, depicted in~\cref{fig:histograms_raw}.
+From visual examination we see that the log returns are roughly normally distributed with sample statistics shown in~\cref{tbl:data_log_returns_raw_stats}.
+\begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/histograms.png}
     \end{center}
-    \caption{Histograms of the log returns for major currency pairs from 1999-01-01 through 2019-12-31.}
+    \caption{Histograms of the log returns of currency pairs.}
     \label{fig:histograms_raw}
 \end{figure}
 
-\begin{figure}
-    \begin{center}
-        \includegraphics[width=1\linewidth]{data_analysis/pairplot.png}
-    \end{center}
-    \caption{Scatter matrix of all major currency pairs from 1999-01-01 through 2019-12-31.}
-    \label{fig:pairplot}
-\end{figure}
+\begin{table}[!htb]
+    \centering
+    \begin{adjustbox}{max width=\textwidth}
+        \input{../tables/data/log_returns_raw_stats.tbl}
+    \end{adjustbox}
+    \caption{Sample statistics of the log returns.}
+    \label{tbl:data_log_returns_raw_stats}
+\end{table}
 
-\begin{figure}
+Another useful visualization to analyze the log returns is a violin/box plot, as shown in~\cref{fig:violin_raw}.
+This allows us to identify outliers and see how they are distributed.
+Immediately we see that there is one major outlier to the downside for the GBPUSD currency pair.
+Further analysis indicates that this was an \( 11.1\sigma \) event occurring on 2016-06-24, which corresponds to the results of the Brexit referendum in the UK~\cite{brexit_gov_uk}.
+The other outlier that really stands out is to the upside for the USDJPY currency pair on 2008-10-28.
+This \( 8.3\sigma \) event occurred right in midst of the financial crisis when people were talking about the end of the Yen carry trade~\cite{jpy_carry_trade_nyt}.
+\begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/violin.png}
     \end{center}
-    \caption{Violin/box plot of the log returns for major currency pairs from 1999-01-01 through 2019-12-31.}
+    \caption{Violin/box plot of the log returns for currency pairs.}
     \label{fig:violin_raw}
 \end{figure}
 
-\section{Data Preprocessing}
-\todo{Algorithm for binarization}
-
-\todo{Algorithm for transformation}
-
-\begin{figure}
+Next we would like to analyze the correlations between the currency pairs to get an idea of the interdependencies between them.
+This is visualized in~\cref{fig:scatters} where we see that there is a clear positive correlation between EURUSD/GBPUSD, and clear negative correlations between EURUSD/USDCAD and GBPUSD/USDCAD.
+We verify this by examining the Pearson \( r \), Spearman \( \rho \), and Kendall \( \tau \) correlation coefficients laid out in~\cref{tbl:data_correlation_coefficients}.
+The correlation coefficients are positive when the pairs are of the form \( X \)USD/\( Y \)USD and negative when the pairs are of the form \( X \)USD/USD\( Y \), for \( X,Y \in \) \{EUR, GBP, CAD, JPY\}.
+\begin{figure}[!htb]
     \begin{center}
-        \includegraphics[width=1\linewidth]{data_analysis/data_transformation.png}
+        \includegraphics[width=1\linewidth]{data_analysis/scatters.png}
     \end{center}
-    \caption{Transformation function applied to the data before training, for the purpose of reducing large "gaps" in the binarized data by scaling outliers above one standard deviation by taking the square root of the standardized value.}
-    \label{fig:data_transformation}
+    \caption{Scatter matrix of the currency pairs.}
+    \label{fig:scatters}
 \end{figure}
 
-\begin{figure}
+\begin{table}[!htb]
+    \centering
+    \begin{adjustbox}{max width=\textwidth}
+        \input{../tables/data/correlation_coefficients.tbl}
+    \end{adjustbox}
+    \caption{Correlation coefficients of the currency pairs.}
+    \label{tbl:data_correlation_coefficients}
+\end{table}
+
+
+\section{Data Preprocessing}
+In order to feed the data to the models in the following sections, we first need to binarize the data.
+Let \( \mat{X} \in \R^{4 \times N} \) represent the training dataset of log returns, where training examples are vectors in the column space, thus element \( x_{ij} \) represents the \( i \)th currency pair log return for the \( j \)th training example.
+
+When binarizing the data, we first rescale the entries of \( \mat{X} \) to integer values in \( \{0, 1, \dots, 2^{n_\text{bits}} - 1\} \), represented by the matrix \( \mat{X}' \in \N^{4 \times N} \) with entries
+\begin{align}
+    x_{ij}' = \bigg\lfloor \frac{x_{ij} - \min_k x_{kj}}{\max_k x_{kj} - \min_k x_{kj}} \cdot (2^{n_\text{bits}} - 1) \bigg\rceil
+\end{align}
+where \( \lfloor \ \cdot \ \rceil \) denotes rounding to the nearest integer.
+
+After we have the integer values we create a new matrix \( \mat{V} \in \binset^{4\cdot n_\text{bits} \times N} \) where the columns of \( \mat{V} \) are the \( n_\text{bits} \)-length binary representation vectors of the entries of the columns of \( \mat{X}' \) concatenated together.
+For example, if \( \vec{x} = (x_1,x_2,x_3,x_4) \) is a column of \( \mat{X} \), and the function \( \text{bin}(x) \) takes in an integer \( x \) and returns a binary vector, then the corresponding column in \( \mat{V} \) would be
+\begin{align}
+    \vec{v} = \begin{bmatrix}
+        \text{bin}(x_1) \\
+        \text{bin}(x_2) \\
+        \text{bin}(x_3) \\
+        \text{bin}(x_4) \\
+    \end{bmatrix}
+\end{align}
+
+\begin{figure}[!htb]
+    \begin{center}
+        \includegraphics[width=1\linewidth]{data_analysis/histograms_transformed.png}
+    \end{center}
+    \caption{Histograms of the transformed log returns of currency pairs.}
+    \label{fig:histograms_transformed}
+\end{figure}
+
+\begin{table}[!htb]
+    \centering
+    \begin{adjustbox}{max width=\textwidth}
+        \input{../tables/data/log_returns_transformed_stats.tbl}
+    \end{adjustbox}
+    \caption{Sample statistics of the transformed log returns.}
+    \label{tbl:data_log_returns_transformed_stats}
+\end{table}
+
+\begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/violin_transformed.png}
     \end{center}
-    \caption{Violin/box plot of the log returns for major currency pairs from 1999-01-01 through 2019-12-31.}
+    \caption{Violin/box plot of the transformed log returns for currency pairs.}
     \label{fig:violin_transformed}
 \end{figure}
 
-\begin{figure}
-    \begin{center}
-        \includegraphics[width=1\linewidth]{data_analysis/rolling_volatility.png}
-    \end{center}
-    \caption{3-month rolling volatility of the log returns for major currency pairs from 1999-01-01 through 2019-12-31.}
-    \label{fig:rolling_volatility}
-\end{figure}
+
+\todo{Algorithm for transformation}
+
+%\begin{figure}[!htb]
+    %\begin{center}
+        %\includegraphics[width=1\linewidth]{data_analysis/data_transformation.png}
+    %\end{center}
+    %\caption{Transformation function applied to the data before training, for the purpose of reducing large "gaps" in the binarized data by scaling outliers above one standard deviation by taking the square root of the standardized value.}
+    %\label{fig:data_transformation}
+%\end{figure}
+
+%\begin{figure}[!htb]
+    %\begin{center}
+        %\includegraphics[width=1\linewidth]{data_analysis/violin_transformed.png}
+    %\end{center}
+    %\caption{Violin/box plot of the log returns for currency pairs.}
+    %\label{fig:violin_transformed}
+%\end{figure}
+
+%\begin{figure}[!htb]
+    %\begin{center}
+        %\includegraphics[width=1\linewidth]{data_analysis/rolling_volatility.png}
+    %\end{center}
+    %\caption{3-month rolling volatility of the log returns for currency pairs.}
+    %\label{fig:rolling_volatility}
+%\end{figure}
