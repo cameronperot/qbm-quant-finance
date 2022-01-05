@@ -1,8 +1,7 @@
 import numpy as np
 import pandas as pd
-import torch
 from scipy.sparse import csr_matrix, kron, identity
-from scipy.linalg import expm
+from scipy.linalg import eigh
 from tqdm import tqdm
 
 from qbm.utils import get_project_dir, load_artifact, save_artifact
@@ -77,31 +76,27 @@ def compute_H(h, J, s, n_qubits, σ):
     return H.toarray()
 
 
-def compute_ρ(H, T, matrix_exp="torch"):
+def compute_ρ(H, T):
     """
     Computes the trace normalized density matrix ρ.
 
-    Note: torch's matrix exp is faster than scipy's even when accounting for conversions.
-
     :param H: Hamiltonian matrix.
     :param T: Temperature.
-    :param matrix_exp: If "torch" will use torch's matrix exp, if "scipy" will use scipy's.
 
     :return: Density matrix ρ.
     """
     β = 1 / (k_B * T)
 
-    if matrix_exp == "torch":
-        exp_βH = torch.matrix_exp(-β * torch.from_numpy(H)).numpy()
-    elif matrix_exp == "scipy":
-        exp_βH = expm(-β * H)
+    Λ, S = eigh(H)
+    exp_βΛ = np.exp(-β * (Λ - Λ.min()))
+    exp_βH = (S * exp_βΛ) @ S.T
 
-    return exp_βH / exp_βH.trace()
+    return exp_βH / exp_βΛ.sum()
 
 
 if __name__ == "__main__":
     # compute exact data for all specified configs
-    config_ids = (1, 2, 3, 4)
+    config_ids = (3, 2, 1)
 
     # set s and T values
     T_values = np.round(np.arange(2e-3, 102e-3, 2e-3), 3)  # [K]
