@@ -16,7 +16,7 @@ with \( \sigma_z \) being the Pauli \( z \) matrix, and \( I \) being the \( 2 \
 For convenience we use similar notation as in the classical RBM case, where \( i \) indices correspond to visible units and \( j \) indices correspond to hidden units.
 Therefore, one must take note that \( \sigma_j \) actually has an index offset of \( n_v \) since the preceding visible units need to be accounted for in the tensor product.
 
-Because the language of quantum mechanics deals in the values \( -1 \) and \( +1 \) (stemming from the eigenvalues of the Pauli matrices) rather than \( 0 \) and \( 1 \), we will keep the vectors \( \vec{v} \in \Z_2^{n_v} \) and \( \vec{h} \in \Z_2^{n_h} \) and define the vectors \( \tilde{\vec{v}} = 2\vec{v} - \vec{1} \in \{-1,+1\}^{n_v} \) and \( \tilde{\vec{h}} = 2\vec{h} - \vec{1} \in \{-1,+1\}^{n_h} \) to represent the binary vectors in the quantum realm.
+Because the language of quantum mechanics deals in the values \( -1 \) and \( +1 \) (stemming from the eigenvalues of the Pauli matrices) rather than \( 0 \) and \( 1 \), we will keep the vectors \( \vec{v} \in \binset^{n_v} \) and \( \vec{h} \in \binset^{n_h} \) and define the vectors \( \tilde{\vec{v}} = 2\vec{v} - \vec{1} \in \{-1,+1\}^{n_v} \) and \( \tilde{\vec{h}} = 2\vec{h} - \vec{1} \in \{-1,+1\}^{n_h} \) to represent the binary vectors in the quantum realm.
 
 To model the probabilities of the states we use the density operator
 \begin{align}
