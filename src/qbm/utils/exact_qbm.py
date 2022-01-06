@@ -4,7 +4,6 @@ from scipy.linalg import eigh
 
 
 # set constants
-k_B = 20.83661912  # [GHz/K]
 sparse_X = csr_matrix(([1, 1], ([0, 1], [1, 0])), dtype=np.float64)
 sparse_Z = csr_matrix(([1, -1], ([0, 1], [0, 1])), dtype=np.float64)
 
@@ -58,17 +57,15 @@ def compute_H(h, J, A, B, n_qubits, σ):
     return H.toarray()
 
 
-def compute_ρ(H, T):
+def compute_ρ(H, β):
     """
     Computes the trace normalized density matrix ρ.
 
     :param H: Hamiltonian matrix.
-    :param T: Temperature.
+    :param β: Inverse temperature β = 1 / (k_B * T).
 
     :return: Density matrix ρ.
     """
-    β = 1 / (k_B * T)
-
     Λ, S = eigh(H)
     exp_βΛ = np.exp(-β * (Λ - Λ.min()))
     exp_βH = (S * exp_βΛ) @ S.T

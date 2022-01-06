@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+from scipy.constants import h as h_P, k as k_B
+
 
 from qbm.utils import get_project_dir, load_artifact, save_artifact
 from qbm.utils.exact_qbm import sparse_kron, sparse_X, sparse_Z, compute_H, compute_ρ
@@ -32,6 +34,9 @@ if __name__ == "__main__":
     s_bar = tqdm(range(len(s_values)), desc="s values")
     T_bar = tqdm(range(len(T_values)), desc="T values")
 
+    # Boltzmann's constant in GHz/K
+    k_B_GHz_K = k_B / (h_P * 1e9)
+
     for config_id in config_ids:
         # load the config
         config_dir = project_dir / f"artifacts/exact_analysis/{config_id:02}"
@@ -55,9 +60,10 @@ if __name__ == "__main__":
             A = anneal_schedule_data.loc[s, "A(s) (GHz)"]
             B = anneal_schedule_data.loc[s, "B(s) (GHz)"]
             for T in T_values:
+                β = 1 / (k_B_GHz_K * T)
                 try:
                     H = compute_H(h, J, A, B, n_qubits, σ)
-                    ρ = compute_ρ(H, T)
+                    ρ = compute_ρ(H, β)
                     data[s, T] = {"E": np.diag(H).copy(), "p": np.diag(ρ).copy()}
                 except Exception as error:
                     errors[s, T] = error
