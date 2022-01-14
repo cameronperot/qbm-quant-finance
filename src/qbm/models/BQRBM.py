@@ -4,7 +4,7 @@ import numpy as np
 from dwave.system import DWaveSampler, FixedEmbeddingComposite
 
 from qbm.models import QBMBase
-from qbm.utils import convert_bin_str_to_list
+from qbm.utils import convert_bin_str_to_list, load_artifact, save_artifact
 from qbm.utils.exact_qbm import compute_H, compute_ρ, sparse_X, sparse_Z, sparse_kron
 
 
@@ -58,6 +58,7 @@ class BQRBM(QBMBase):
 
         self.embedding = embedding
         self.anneal_params = anneal_params
+        self.anneal_schedule_data = anneal_schedule_data
         self.qpu_params = qpu_params
         self.β = β_initial
         self.βs = [β_initial]
@@ -85,6 +86,31 @@ class BQRBM(QBMBase):
                     for x in range(2 ** self.n_qubits)
                 ]
             ).astype(np.int8)
+
+    def save(self, file_path):
+        """
+        Saves the BQRBM model at file_path. Necessary because of pickling issues with the
+        qpu and sampler objects.
+
+        :param file_path: Path to save the model to.
+        """
+        self.qpu = None
+        self.sampler = None
+        save_artifact(self, file_path)
+
+    @staticmethod
+    def load(file_path):
+        """
+        Loads the BQRBM model at file_path. Necessary because of pickling issues with the
+        qpu and sampler objects.
+
+        :param file_path: Path to the model to load.
+
+        :returns: BQRBM instance.
+        """
+        model = load_artifact(file_path)
+        model._initialize_sampler()
+        return model
 
     @property
     def Γ(self):
