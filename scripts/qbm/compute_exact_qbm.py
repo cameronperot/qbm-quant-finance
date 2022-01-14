@@ -26,7 +26,7 @@ if __name__ == "__main__":
         ) / 2
 
     # set s and T values
-    T_values = np.round(np.arange(2e-3, 102e-3, 2e-3), 3)  # [K]
+    T_values = np.concatenate(([1e-6], np.round(np.arange(2e-3, 202e-3, 2e-3), 3)))  # [K]
     s_values = np.round(np.arange(0, 1.01, 0.01), 2)
 
     # configure tqdm bars
