@@ -40,6 +40,7 @@ log_returns = pd.read_csv(
     parse_dates=["date"],
 )
 
+KL_divergences = {}
 qq_rmses = {}
 ccs = {}
 cc_rmses = {}
@@ -57,11 +58,21 @@ for model_name, model_info in models.items():
     config = (load_artifact(artifacts_dir / f"{model_id}/config.json"),)
     save_artifact(config, results_dir / f"configs/{model_name}.json")
 
+    # KL divergence
+    KL_divergence = pd.read_csv(
+        model_results_dir / "data/KL_divergences.csv", index_col="currency_pair"
+    )
+    column_map = {column: f"{prefix}_{column}" for column in KL_divergence.columns}
+    KL_divergence.loc["Mean"] = KL_divergence.mean()
+    KL_divergence.loc["Mean", "stds"] = np.sqrt(np.sum(KL_divergence["stds"][:-1] ** 2))
+    KL_divergence.rename(columns=column_map, inplace=True)
+    KL_divergences[prefix] = KL_divergence
+
     # QQ RMSE
     qq_rmse = pd.read_csv(model_results_dir / "data/qq_rmse.csv", index_col="currency_pair")
     column_map = {column: f"{prefix}_{column}" for column in qq_rmse.columns}
     qq_rmse.loc["Mean"] = qq_rmse.mean()
-    qq_rmse.loc["Mean", "std"] = np.sqrt(np.sum(qq_rmse["std"] ** 2))
+    qq_rmse.loc["Mean", "std"] = np.sqrt(np.sum(qq_rmse["std"][:-1] ** 2))
     qq_rmse.rename(columns=column_map, inplace=True)
     qq_rmses[prefix] = qq_rmse
 
@@ -237,6 +248,41 @@ plt.close(fig)
 """
 LaTeX Tables
 """
+# KL divergence table
+KL_divergences = pd.concat(KL_divergences.values(), axis=1).applymap(str_map, digits=3)
+print("KL_divergences")
+print(KL_divergences)
+
+prefixes = ("B", "V", "X", "XV")
+table = [
+    r"\begin{tabular}{l r r r r}",
+    r"\multicolumn{5}{c}{\textbf{ \(D_{KL}(p_\text{data} \ || \ p_\text{samples})\) }} \\",
+    r"\toprule",
+    r"Currency Pair & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} \\"
+    % prefixes,
+    r"\midrule",
+]
+for i, pair in enumerate(KL_divergences.index):
+    data = KL_divergences.loc[pair]
+    row = [pair]
+
+    for prefix in prefixes:
+        μ = data[f"{prefix}_means"]
+        σ = data[f"{prefix}_stds"]
+        row.append(fr"{μ} $\pm$ {σ}")
+
+    row = " & ".join(row)
+    row += r" \\"
+    if i == len(KL_divergences) - 1:
+        table.append(r"\midrule")
+
+    table.append(row)
+
+table.append(r"\bottomrule")
+table.append(r"\end{tabular}")
+table = "\n".join(table)
+save_table(table, "KL_divergences.tbl")
+
 # QQ RMSEs table
 qq_rmses = pd.concat(qq_rmses.values(), axis=1).applymap(str_map, digits=3, factor=100)
 print("QQ RMSEs")
