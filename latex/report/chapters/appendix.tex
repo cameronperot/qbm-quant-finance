@@ -153,38 +153,36 @@ Taking the partial derivative yields
         &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) [ \langle \partial_\theta H_\vec{v} \rangle_\vec{v} - \langle \partial_\theta H \rangle ] \\
         &= \overline{\langle \partial_\theta H_\vec{v} \rangle_\vec{v}} - \langle \partial_\theta H \rangle
 \end{align}
-Plugging in our parameters we get (note that we're still speaking in the quantum language with \( -1 \) and \( +1 \), so if we would rather have the results in \( 0 \) and \( 1 \) then we need to subtract add \( 1 \) and divide by \( 2 \) to convert)
+Plugging in our parameters we get
 \begin{align}
     \partial_{w_{ij}} \tilde{\ell}(\theta)
         &= \overline{\langle \sigma_i^z \sigma_j^z \rangle_\vec{v}} - \langle \sigma_i^z \sigma_j^z \rangle \\
-    \partial_{a_i} \tilde{\ell}(\theta)
-        &= \overline{\langle \sigma_i^z \rangle_\vec{v}} - \langle \sigma_i^z \rangle \\
-    \partial_{b_j} \tilde{\ell}(\theta)
-        &= \overline{\langle \sigma_j^z \rangle_\vec{v}} - \langle \sigma_j^z \rangle
+    \partial_{c_k} \tilde{\ell}(\theta)
+        &= \overline{\langle \sigma_k^z \rangle_\vec{v}} - \langle \sigma_k^z \rangle
 \end{align}
 When restrictions are imposed on connections within the hidden layer, the clamped Hamiltonian becomes
 \begin{align}
     H_\vec{v}
-        &= -\sum_i a_i \tilde{v}_i -\sum_j \big(\Gamma_j \sigma_j^x + b_j'(\tilde{\vec{v}}) \sigma_j^z\big)
+        &= -\sum_i a_i v_i -\sum_j \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big)
 \end{align}
-where \( b_j'(\tilde{\vec{v}}) = b_j + (W^\intercal\tilde{\vec{v}})_j \).
+where \( c_j'(\vec{v}) = c_j + (\mat{W}^\intercal\vec{v})_j \).
 This allows one to rewrite the clamped density matrix as
 \begin{align}
     \rho_\vec{v}
-        &= \frac{1}{Z} \exp\bigg( \sum_i a_i \tilde{v}_i + \sum_j \big(\Gamma_j \sigma_j^x + b_j'(\tilde{\vec{v}}) \sigma_j^z\big) \bigg) \\
-        &= \frac{1}{Z} \exp\bigg( \sum_i a_i \tilde{v}_i \bigg) \prod_j \exp \big(\Gamma_j \sigma_j^x + b_j'(\tilde{\vec{v}}) \sigma_j^z\big)
+        &= \frac{1}{Z} \exp\bigg( \sum_i a_i v_i + \sum_j \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big) \bigg) \\
+        &= \frac{1}{Z} \exp\bigg( \sum_i a_i v_i \bigg) \prod_j \exp \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big)
 \end{align}
 Therefore, we can see that the clamped density matrix is proportional to the product of the exponentials of the hidden unit factors.
 This allows us to compute the expectation values values
 \begin{align}
+    \langle \sigma_i^z \rangle_\vec{v}
+        &= v_i \\
     \langle \sigma_j^z \rangle_\vec{v}
         &= \tr(\rho_\vec{v}\sigma_j^z) \\
-        &= \frac{\tr\bigg[ \exp\bigg( \sum_i a_i \tilde{v}_i \bigg) \exp \big(\Gamma_j \sigma_j^x + b_j'(\tilde{\vec{v}}) \sigma_j^z\big) \sigma_j^z \bigg]}{\tr\bigg[ \exp\bigg( \sum_i a_i \tilde{v}_i \bigg) \exp \big(\Gamma_j \sigma_j^x + b_j'(\tilde{\vec{v}}) \sigma_j^z\big) \bigg) \bigg]} \\
-        &= \frac{\tr\bigg[ \exp \big(\Gamma_j \sigma_j^x + b_j'(\tilde{\vec{v}}) \sigma_j^z\big) \sigma_j^z \bigg]}{\tr\bigg[ \exp \big(\Gamma_j \sigma_j^x + b_j'(\tilde{\vec{v}}) \sigma_j^z\big) \bigg) \bigg]} \\
-        &= \frac{b_j'(\tilde{\vec{v}})}{D_j(\tilde{\vec{v}})} \tanh(D_j) \\
-    \langle \sigma_i^z \rangle_\vec{v}
-        &= \tilde{v}_i \\
+        &= \frac{\tr\bigg[ \exp\bigg( \sum_i a_i v_i \bigg) \exp \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big) \sigma_j^z \bigg]}{\tr\bigg[ \exp\bigg( \sum_i a_i v_i \bigg) \exp \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big) \bigg) \bigg]} \\
+        &= \frac{\tr\bigg[ \exp \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big) \sigma_j^z \bigg]}{\tr\bigg[ \exp \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big) \bigg]} \\
+        &= \frac{c_j'(\vec{v})}{D_j(\vec{v})} \tanh\big(D_j(\vec{v})\big) \\
     \langle \sigma_i^z \sigma_j^z \rangle_{\vec{v}}
-        &= \tilde{v}_i \frac{b_j'(\tilde{\vec{v}})}{D_j(\tilde{\vec{v}})} \tanh(D_j)
+        &= v_i \frac{c_j'(\vec{v})}{D_j(\vec{v})} \tanh\big(D_j(\vec{v})\big)
 \end{align}
-where \( D_j(\tilde{\vec{v}}) = \sqrt{\Gamma_j^2 + \big(b_j'(\tilde{\vec{v}})\big)^2} \).
+where \( D_j(\vec{v}) = \sqrt{\Gamma_j^2 + \big(c_j'(\vec{v})\big)^2} \).
