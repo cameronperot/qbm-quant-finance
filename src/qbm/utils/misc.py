@@ -154,6 +154,9 @@ def load_artifact(file_path):
 
     :returns: Loaded python object.
     """
+    if type(file_path) == str:
+        file_path = Path(file_path)
+
     if not file_path.exists() or file_path.suffix not in (".json", ".pkl"):
         raise Exception(f"File {file_path} does not exist")
 
@@ -201,6 +204,9 @@ def save_artifact(artifact, file_path):
     :param artifact: Python object to save.
     :param file_path: Path of the file to save.
     """
+    if type(file_path) == str:
+        file_path = Path(file_path)
+
     if not file_path.parent.exists():
         file_path.parent.mkdir(parents=True)
 
