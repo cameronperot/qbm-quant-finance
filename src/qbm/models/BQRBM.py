@@ -406,5 +406,5 @@ class BQRBM(QBMBase):
                 f"learning rate = {learning_rate:.2e},",
                 f"effective β = {self.β:.3f},",
                 f"epoch duration = {(end_time - start_time) * 1e3:.3f}ms,",
-                callback_output["print"],
+                callback_output["print"] if callback is not None else "",
             )
