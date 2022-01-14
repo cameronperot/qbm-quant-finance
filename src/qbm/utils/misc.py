@@ -135,7 +135,7 @@ def get_project_dir():
         raise Exception(f"Path '{dir_path}' does not exist")
 
 
-def get_rng(seed):
+def get_rng(seed=None):
     """
     Creates a random number generator with the specified seed value.
 
