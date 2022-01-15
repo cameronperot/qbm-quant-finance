@@ -40,7 +40,7 @@ log_returns = pd.read_csv(
     parse_dates=["date"],
 )
 
-KL_divergences = {}
+dkls = {}
 qq_rmses = {}
 ccs = {}
 cc_rmses = {}
@@ -59,20 +59,24 @@ for model_name, model_info in models.items():
     save_artifact(config, results_dir / f"configs/{model_name}.json")
 
     # KL divergence
-    KL_divergence = pd.read_csv(
-        model_results_dir / "data/KL_divergences.csv", index_col="currency_pair"
+    dkl = pd.read_csv(
+        model_results_dir / "data/kl_divergences.csv", index_col="currency_pair"
     )
-    column_map = {column: f"{prefix}_{column}" for column in KL_divergence.columns}
-    KL_divergence.loc["Mean"] = KL_divergence.mean()
-    KL_divergence.loc["Mean", "stds"] = np.sqrt(np.sum(KL_divergence["stds"][:-1] ** 2))
-    KL_divergence.rename(columns=column_map, inplace=True)
-    KL_divergences[prefix] = KL_divergence
+    column_map = {column: f"{prefix}_{column}" for column in dkl.columns}
+    dkl.loc["Mean"] = dkl.mean()
+    dkl.loc["Mean", "stds"] = np.sqrt(np.sum(dkl["stds"][:-1] ** 2)) / (
+        len(dkl["stds"]) - 1
+    )
+    dkl.rename(columns=column_map, inplace=True)
+    dkls[prefix] = dkl
 
     # QQ RMSE
     qq_rmse = pd.read_csv(model_results_dir / "data/qq_rmse.csv", index_col="currency_pair")
     column_map = {column: f"{prefix}_{column}" for column in qq_rmse.columns}
     qq_rmse.loc["Mean"] = qq_rmse.mean()
-    qq_rmse.loc["Mean", "std"] = np.sqrt(np.sum(qq_rmse["std"][:-1] ** 2))
+    qq_rmse.loc["Mean", "std"] = np.sqrt(np.sum(qq_rmse["std"][:-1] ** 2)) / (
+        len(qq_rmse["std"]) - 1
+    )
     qq_rmse.rename(columns=column_map, inplace=True)
     qq_rmses[prefix] = qq_rmse
 
@@ -249,9 +253,9 @@ plt.close(fig)
 LaTeX Tables
 """
 # KL divergence table
-KL_divergences = pd.concat(KL_divergences.values(), axis=1).applymap(str_map, digits=3)
-print("KL_divergences")
-print(KL_divergences)
+dkls = pd.concat(dkls.values(), axis=1).applymap(str_map, digits=3)
+print("dkls")
+print(dkls)
 
 prefixes = ("B", "V", "X", "XV")
 table = [
@@ -262,8 +266,8 @@ table = [
     % prefixes,
     r"\midrule",
 ]
-for i, pair in enumerate(KL_divergences.index):
-    data = KL_divergences.loc[pair]
+for i, pair in enumerate(dkls.index):
+    data = dkls.loc[pair]
     row = [pair]
 
     for prefix in prefixes:
@@ -273,7 +277,7 @@ for i, pair in enumerate(KL_divergences.index):
 
     row = " & ".join(row)
     row += r" \\"
-    if i == len(KL_divergences) - 1:
+    if i == len(dkls) - 1:
         table.append(r"\midrule")
 
     table.append(row)
@@ -281,7 +285,7 @@ for i, pair in enumerate(KL_divergences.index):
 table.append(r"\bottomrule")
 table.append(r"\end{tabular}")
 table = "\n".join(table)
-save_table(table, "KL_divergences.tbl")
+save_table(table, "kl_divergences.tbl")
 
 # QQ RMSEs table
 qq_rmses = pd.concat(qq_rmses.values(), axis=1).applymap(str_map, digits=3, factor=100)

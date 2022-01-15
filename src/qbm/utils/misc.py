@@ -221,7 +221,7 @@ def save_artifact(artifact, file_path):
             pickle.dump(artifact, f)
 
 
-def KL_divergence(X_data, X_samples, n_bins=32):
+def kl_divergence(X_data, X_samples, n_bins=32):
     """
     Computes the D_KL(p_data || p_samples).
 

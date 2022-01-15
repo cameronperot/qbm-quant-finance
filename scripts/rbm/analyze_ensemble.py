@@ -17,7 +17,7 @@ from qbm.utils import (
     get_project_dir,
     compute_stats_over_dfs,
     filter_df_on_values,
-    KL_divergence,
+    kl_divergence,
     load_artifact,
     load_log_returns,
     save_artifact,
@@ -61,22 +61,21 @@ def main(model_id):
     samples_ensemble = [df.drop(filter_columns, axis=1) for df in samples_ensemble_raw]
 
     # compute KL divergences
-    KL_divergence_dfs = []
+    dkl_dfs = []
     for samples in samples_ensemble:
-        KL_divergence_dfs.append(
+        dkl_dfs.append(
             pd.DataFrame.from_dict(
                 {
-                    column: KL_divergence(log_returns[column], samples[column])
+                    column: kl_divergence(log_returns[column], samples[column])
                     for column in log_returns.columns
                 },
                 orient="index",
             )
         )
-    KL_divergences = compute_stats_over_dfs(KL_divergence_dfs)
-    KL_divergences = pd.DataFrame({k: v[0] for k, v in KL_divergences.items()})
-    KL_divergences.to_csv(
-        results_dir / "data/KL_divergences.csv", index_label="currency_pair"
-    )
+    dkls = compute_stats_over_dfs(dkl_dfs)
+    dkls = pd.DataFrame({k: v[0] for k, v in dkls.items()})
+    dkls.to_csv(results_dir / "data/kl_divergences.csv", index_label="currency_pair")
+    return
 
     # compute QQ distance
     qq_rmse = {column: [] for column in log_returns.columns}
