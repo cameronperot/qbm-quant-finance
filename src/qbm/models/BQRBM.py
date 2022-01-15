@@ -146,17 +146,21 @@ class BQRBM(QBMBase):
         for epoch in range(1, n_epochs + 1):
             start_time = time()
 
+            # set the effective learning rates
+            self.learning_rate = learning_rate[epoch - 1]
+            self.learning_rate_beta = learning_rate_beta[epoch - 1]
+
             # compute and apply gradient updates for each mini batch
             for mini_batch_indices in self._random_mini_batch_indices(mini_batch_size):
                 V_pos = self.X_train[mini_batch_indices]
                 self._compute_positive_grads(V_pos)
                 self._compute_negative_grads(V_pos.shape[0])
-                self._apply_grads(learning_rate[epoch - 1] / V_pos.shape[0])
+                self._apply_grads(self.learning_rate / V_pos.shape[0])
                 self._clip_weights_and_biases()
 
             # update β and clip the weights and biases into proper range
             samples = self.sample(n_samples)
-            self._update_beta(samples, learning_rate_beta[epoch - 1])
+            self._update_beta(samples)
 
             # callback function
             if callback is not None:
@@ -235,14 +239,14 @@ class BQRBM(QBMBase):
         self.grads["b_pos"] = H_pos.mean(axis=0)
         self.grads["W_pos"] = V_pos.T @ H_pos / V_pos.shape[0]
 
-    def _compute_negative_grads(self, n_samples):
+    def _compute_negative_grads(self, mini_batch_size):
         """
         Computes the gradients for the negative phase, i.e., the expectation values w.r.t.
         the model distribution.
 
-        :param n_samples: Number of samples to obtain from the annealer.
+        :param mini_batch_size: Number of samples to obtain from the annealer.
         """
-        samples = self.sample(n_samples)
+        samples = self.sample(mini_batch_size)
         state_vectors = self._get_state_vectors(samples)
 
         V_neg = state_vectors[:, : self.n_visible]
@@ -362,10 +366,12 @@ class BQRBM(QBMBase):
 
         return samples
 
-    def _update_beta(self, samples, learning_rate):
+    def _update_beta(self, samples):
         """
         Updates the effective β = 1 / kT. Used for scaling the coefficients sent to the
         annealer.
+
+        :param samples: Samples to use for computing the mean energies w.r.t. the model.
         """
         # compute the train energy
         VW_train = self.X_train @ self.W
@@ -383,7 +389,7 @@ class BQRBM(QBMBase):
 
         # update the params
         self.beta = np.clip(
-            self.beta + learning_rate * (E_train - E_model), *self.beta_range
+            self.beta + self.learning_rate_beta * (E_train - E_model), *self.beta_range
         )
         self.beta_history.append(self.beta)
         self._clip_weights_and_biases()
