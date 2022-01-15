@@ -93,7 +93,7 @@ class BQRBM(QBMBase):
         :param answer_mode: "raw" or "histogram".
         :param use_gauge: If True will use a random gauge transformation (recommended for
             more robust sample generation).
-        :param binary: If true will convert the state vector values from {-1, +1} to {0, 1}.
+        :param binary: If true will convert the state vector values from {+1, -1} to {0, 1}.
 
         :returns: Dictionary (exact) or Ocean SDK SampleSet object (annealer).
         """
