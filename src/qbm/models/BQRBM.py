@@ -327,11 +327,11 @@ class BQRBM(QBMBase):
 
         # undo the gauge
         if use_gauge:
-            samples.record.samples *= gauge
+            samples.record.sample *= gauge
 
         # convert to binary if specified
         if binary:
-            samples.record.samples = self._eigen_to_binary(samples.record.samples)
+            samples.record.sample = self._eigen_to_binary(samples.record.sample)
 
         return samples
 
