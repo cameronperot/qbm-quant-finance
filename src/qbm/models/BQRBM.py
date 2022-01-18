@@ -312,11 +312,10 @@ class BQRBM(QBMBase):
                 (
                     max((h.max() / self.h_range.max(), 0)),
                     max((h.min() / self.h_range.min(), 0)),
-                    max((J_nonzero.max() / self.J_range.max(), 0,)),
-                    max((J_nonzero.min() / self.J_range.min(), 0,)),
+                    max((J_nonzero.max() / self.J_range.max(), 0)),
+                    max((J_nonzero.min() / self.J_range.min(), 0)),
                 )
             )
-        )
 
         # get samples from the annealer
         samples = self.sampler.sample_ising(
