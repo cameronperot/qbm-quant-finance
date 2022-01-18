@@ -305,12 +305,16 @@ class BQRBM(QBMBase):
             J *= np.outer(gauge, gauge)
 
         # compute the chain strength
-        chain_strength = self.anneal_params["relative_chain_strength"] * max(
-            (
-                max((h.max() / self.h_range.max(), 0)),
-                max((h.min() / self.h_range.min(), 0)),
-                max((J[: self.n_visible, self.n_visible :].max() / self.J_range.max(), 0)),
-                max((J[: self.n_visible, self.n_visible :].min() / self.J_range.min(), 0)),
+        chain_strength = None
+        if self.anneal_params.get("relative_chain_strength") is not None:
+            J_nonzero = J[: self.n_visible, self.n_visible :]
+            chain_strength = self.anneal_params["relative_chain_strength"] * max(
+                (
+                    max((h.max() / self.h_range.max(), 0)),
+                    max((h.min() / self.h_range.min(), 0)),
+                    max((J_nonzero.max() / self.J_range.max(), 0,)),
+                    max((J_nonzero.min() / self.J_range.min(), 0,)),
+                )
             )
         )
 
