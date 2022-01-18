@@ -205,7 +205,7 @@ class BQRBM(QBMBase):
         """
         model = load_artifact(file_path)
         if model.exact_params is None:
-            model._initialize_sampler()
+            model._initialize_qpu_sampler()
 
         return model
 
