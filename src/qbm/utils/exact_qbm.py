@@ -66,8 +66,12 @@ def compute_ρ(H, β):
 
     :return: Density matrix ρ.
     """
-    Λ, S = eigh(H)
-    exp_βΛ = np.exp(-β * (Λ - Λ.min()))
-    exp_βH = (S * exp_βΛ) @ S.T
+    # if diagonal then compute directly, else use eigen decomposition
+    if (H == np.diag(np.diag(H))).all():
+        Λ = np.diag(H)
+        exp_βH = np.diag(np.exp(-β * (Λ - Λ.min())))
+    else:
+        Λ, S = eigh(H)
+        exp_βH = (S * np.exp(-β * (Λ - Λ.min()))) @ S.T
 
-    return exp_βH / exp_βΛ.sum()
+    return exp_βH / exp_βH.trace()
