@@ -81,22 +81,22 @@ def compute_H(h, J, A, B, n_qubits, pauli_kron):
     return (H + diags(H_diag, format="csr")).toarray()
 
 
-def compute_ρ(H, β, diagonal=False):
+def compute_rho(H, beta, diagonal=False):
     """
-    Computes the trace normalized density matrix ρ.
+    Computes the trace normalized density matrix rho.
 
     :param H: Hamiltonian matrix.
-    :param β: Inverse temperature β = 1 / (k_B * T).
+    :param beta: Inverse temperature beta = 1 / (k_B * T).
     :param diagonal: Flag to indicate whether H is a diagonal matrix or not.
 
-    :return: Density matrix ρ.
+    :return: Density matrix rho.
     """
     # if diagonal then compute directly, else use eigen decomposition
     if diagonal:
-        Λ = H.diagonal()
-        exp_βΛ = np.exp(-β * (Λ - Λ.min()))
-        return np.diag(exp_βΛ / exp_βΛ.sum())
+        Lambda = H.diagonal()
+        exp_beta_Lambda = np.exp(-beta * (Lambda - Lambda.min()))
+        return np.diag(exp_beta_Lambda / exp_beta_Lambda.sum())
     else:
-        Λ, S = eigh(H)
-        exp_βΛ = np.exp(-β * (Λ - Λ.min()))
-        return (S * (exp_βΛ / exp_βΛ.sum())) @ S.T
+        Lambda, S = eigh(H)
+        exp_beta_Lambda = np.exp(-beta * (Lambda - Lambda.min()))
+        return (S * (exp_beta_Lambda / exp_beta_Lambda.sum())) @ S.T

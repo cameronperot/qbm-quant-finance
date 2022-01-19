@@ -6,7 +6,7 @@ from dwave.system import DWaveSampler, FixedEmbeddingComposite
 
 from qbm.models import QBMBase
 from qbm.utils import convert_bin_str_to_list, load_artifact, save_artifact
-from qbm.utils.exact_qbm import compute_H, compute_ρ, get_pauli_kron
+from qbm.utils.exact_qbm import compute_H, compute_rho, get_pauli_kron
 
 
 class BQRBM(QBMBase):
@@ -359,12 +359,12 @@ class BQRBM(QBMBase):
 
         # compute the Hamiltonian and density matrix
         H = compute_H(h, J, self.A, self.B, self.n_qubits, self._pauli_kron)
-        ρ = compute_ρ(H, self.exact_params["beta"], diagonal=(self.A == 0))
+        rho = compute_rho(H, self.exact_params["beta"], diagonal=(self.A == 0))
 
-        # sample using the probabilities on the diagonal of ρ
+        # sample using the probabilities on the diagonal of rho
         samples = {}
         samples["E"] = np.diag(H).copy()
-        samples["p"] = np.diag(ρ).copy()
+        samples["p"] = np.diag(rho).copy()
         samples["states"] = self.rng.choice(self._states, size=n_samples, p=samples["p"])
         samples["state_vectors"] = self._state_vectors[samples["states"]]
 
