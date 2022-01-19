@@ -102,7 +102,7 @@ class QBMBase(ABC):
         """
         self.a = np.zeros(self.n_visible)
         self.b = np.zeros(self.n_hidden)
-        self.W = self.rng.normal(0, 0.01, (self.n_visible, self.n_hidden))
+        self.W = self.rng.normal(0, 0.1, (self.n_visible, self.n_hidden))
 
     def _mean_energy(self, V, H, VW):
         """
