@@ -1,5 +1,5 @@
 \begin{tabular}{l r r r r}
-\multicolumn{5}{c}{\textbf{ \(D_{KL}(p_\text{data} \ || \ p_\text{samples})\) }} \\
+\multicolumn{5}{c}{\(D_{KL}(p_\text{data} \ || \ p_\text{model})\)} \\
 \toprule
 Currency Pair & \textbf{RBM (B)} & \textbf{RBM (V)} & \textbf{RBM (X)} & \textbf{RBM (XV)} \\
 \midrule

@@ -260,7 +260,7 @@ print(dkls)
 prefixes = ("B", "V", "X", "XV")
 table = [
     r"\begin{tabular}{l r r r r}",
-    r"\multicolumn{5}{c}{\textbf{ \(D_{KL}(p_\text{data} \ || \ p_\text{samples})\) }} \\",
+    r"\multicolumn{5}{c}{\(D_{KL}(p_\text{data} \ || \ p_\text{model})\)} \\",
     r"\toprule",
     r"Currency Pair & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} \\"
     % prefixes,
@@ -320,7 +320,7 @@ for i, pair in enumerate(qq_rmses.index):
 table.append(r"\bottomrule")
 table.append(r"\end{tabular}")
 table = "\n".join(table)
-save_table(table, "qq_rmses.tbl")
+# save_table(table, "qq_rmses.tbl")
 
 # correlation coefficients table
 ccs = pd.concat(ccs.values(), axis=1).applymap(str_map, digits=2)
