@@ -209,6 +209,16 @@ class BQRBM(QBMBase):
 
         return model
 
+    @property
+    def h(self):
+        return -np.concatenate((self.a, self.b)) / (self.beta * self.B)
+
+    @property
+    def J(self):
+        J = np.zeros((self.n_qubits, self.n_qubits))
+        J[: self.n_visible, self.n_visible :] = -self.W / (self.beta * self.B)
+        return J
+
     def _clip_weights_and_biases(self):
         """
         Clip the weights and biases so that the corresponding h's and J's passed to the
@@ -294,9 +304,8 @@ class BQRBM(QBMBase):
         :returns: Ocean SDK SampleSet object.
         """
         # compute the h's and J's
-        h = -np.concatenate((self.a, self.b)) / (self.beta * self.B)
-        J = np.zeros((self.n_qubits, self.n_qubits))
-        J[: self.n_visible, self.n_visible :] = -self.W / (self.beta * self.B)
+        h = self.h
+        J = self.J
 
         # apply a random gauge
         if use_gauge:
@@ -348,9 +357,8 @@ class BQRBM(QBMBase):
         :returns: Samples array of shape (n_samples, n_qubits).
         """
         # compute the h's and J's
-        h = -np.concatenate((self.a, self.b)) / (self.beta * self.B)
-        J = np.zeros((self.n_qubits, self.n_qubits))
-        J[: self.n_visible, self.n_visible :] = -self.W / (self.beta * self.B)
+        h = self.h
+        J = self.J
 
         # compute the Hamiltonian and density matrix
         H = compute_H(h, J, self.A, self.B, self.n_qubits, self.σ)
