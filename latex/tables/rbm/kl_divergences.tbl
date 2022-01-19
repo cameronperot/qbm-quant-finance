@@ -1,0 +1,13 @@
+\begin{tabular}{l r r r r}
+\multicolumn{5}{c}{\(D_{KL}(p_\text{data} \ || \ p_\text{model})\)} \\
+\toprule
+Currency Pair & \textbf{RBM (B)} & \textbf{RBM (V)} & \textbf{RBM (X)} & \textbf{RBM (XV)} \\
+\midrule
+EURUSD & 0.010 $\pm$ 0.002 & 0.012 $\pm$ 0.002 & 0.009 $\pm$ 0.002 & 0.010 $\pm$ 0.002 \\
+GBPUSD & 0.007 $\pm$ 0.002 & 0.011 $\pm$ 0.002 & 0.007 $\pm$ 0.001 & 0.007 $\pm$ 0.002 \\
+USDCAD & 0.017 $\pm$ 0.002 & 0.016 $\pm$ 0.002 & 0.008 $\pm$ 0.001 & 0.009 $\pm$ 0.001 \\
+USDJPY & 0.007 $\pm$ 0.002 & 0.011 $\pm$ 0.002 & 0.007 $\pm$ 0.001 & 0.009 $\pm$ 0.002 \\
+\midrule
+Mean & 0.010 $\pm$ 0.001 & 0.012 $\pm$ 0.001 & 0.008 $\pm$ 0.001 & 0.009 $\pm$ 0.001 \\
+\bottomrule
+\end{tabular}

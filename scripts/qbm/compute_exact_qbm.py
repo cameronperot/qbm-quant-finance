@@ -5,7 +5,7 @@ from scipy.constants import h as h_P, k as k_B
 
 
 from qbm.utils import get_project_dir, load_artifact, save_artifact
-from qbm.utils.exact_qbm import sparse_kron, sparse_X, sparse_Z, compute_H, compute_ρ
+from qbm.utils.exact_qbm import get_pauli_kron, compute_H, compute_rho
 
 
 if __name__ == "__main__":
@@ -44,10 +44,7 @@ if __name__ == "__main__":
         n_qubits = config["n_qubits"]
 
         # create Kronecker σ matrices
-        σ = {}
-        for i in range(n_qubits):
-            σ["x", i] = sparse_kron(i, n_qubits, sparse_X)
-            σ["z", i] = sparse_kron(i, n_qubits, sparse_Z)
+        pauli_kron = get_pauli_kron(config["n_visible"], config["n_hidden"])
 
         # load h's and J's
         h = load_artifact(config_dir / "h.pkl")
@@ -60,13 +57,10 @@ if __name__ == "__main__":
             A = anneal_schedule_data.loc[s, "A(s) (GHz)"]
             B = anneal_schedule_data.loc[s, "B(s) (GHz)"]
             for T in T_values:
-                β = 1 / (k_B_GHz_K * T)
-                try:
-                    H = compute_H(h, J, A, B, n_qubits, σ)
-                    ρ = compute_ρ(H, β)
-                    data[s, T] = {"E": np.diag(H).copy(), "p": np.diag(ρ).copy()}
-                except Exception as error:
-                    errors[s, T] = error
+                beta = 1 / (k_B_GHz_K * T)
+                H = compute_H(h, J, A, B, n_qubits, pauli_kron)
+                rho = compute_rho(H, beta)
+                data[s, T] = {"E": np.diag(H).copy(), "p": np.diag(rho).copy()}
 
                 T_bar.update(1)
 

@@ -219,3 +219,26 @@ def save_artifact(artifact, file_path):
     elif file_path.suffix == ".pkl":
         with open(file_path, "wb") as f:
             pickle.dump(artifact, f)
+
+
+def kl_divergence(X_data, X_samples, n_bins=32):
+    """
+    Computes the D_KL(p_data || p_samples).
+
+    :param X_data: Array of data values.
+    :param X_samples: Array of sample values.
+    :param n_bins: Number of bins to use in histograms.
+
+    :returns: D_KL(p_data || p_samples).
+    """
+    hist_data, bin_edges = np.histogram(X_data, bins=n_bins)
+    hist_samples, _ = np.histogram(X_samples, bins=bin_edges)
+
+    p_data = hist_data / X_data.shape[0]
+    p_samples = hist_samples / X_samples.shape[0]
+
+    support = np.logical_and(p_data > 0, p_samples > 0)
+    p_data = p_data[support]
+    p_samples = p_samples[support]
+
+    return (p_data * np.log(p_data / p_samples)).sum()

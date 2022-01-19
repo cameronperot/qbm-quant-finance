@@ -13,7 +13,7 @@ n_qubits = n_visible + n_hidden
 learning_rate = 2e-3
 
 
-def mock_initialize_sampler(model):
+def mock_initialize_qpu_sampler(model):
     setattr(model, "qpu", None)
     setattr(model, "h_range", np.array([-4, 4]))
     setattr(model, "J_range", np.array([-1, 1]))
@@ -21,7 +21,9 @@ def mock_initialize_sampler(model):
 
 @pytest.fixture
 def model(monkeypatch):
-    monkeypatch.setattr("qbm.models.BQRBM._initialize_sampler", mock_initialize_sampler)
+    monkeypatch.setattr(
+        "qbm.models.BQRBM._initialize_qpu_sampler", mock_initialize_qpu_sampler
+    )
 
     anneal_schedule_data = pd.DataFrame.from_dict(
         {0.5: {"A(s) (GHz)": 0.1, "B(s) (GHz)": 1.1}}, orient="index"
@@ -34,22 +36,23 @@ def model(monkeypatch):
     X_train = prepare_training_data(df_binarized)["X_train"]
 
     model = BQRBM(
-        X=X_train,
+        X_train=X_train,
         n_hidden=n_hidden,
         embedding={},
-        anneal_params={"s": 0.5},
-        anneal_schedule_data=anneal_schedule_data,
-        β_initial=1.5,
+        anneal_params={"s": 0.5, "A": 0.1, "B": 1.1},
+        beta_initial=1.5,
         qpu_params={"region": "eu-central-1", "solver": "Advantage_system5.1"},
+        exact_params={"beta": 1.5},
         seed=0,
-        exact=True,
     )
 
     return model
 
 
 def test_init(monkeypatch):
-    monkeypatch.setattr("qbm.models.BQRBM._initialize_sampler", mock_initialize_sampler)
+    monkeypatch.setattr(
+        "qbm.models.BQRBM._initialize_qpu_sampler", mock_initialize_qpu_sampler
+    )
 
     anneal_schedule_data = pd.DataFrame.from_dict(
         {0.5: {"A(s) (GHz)": 0.1, "B(s) (GHz)": 1.1}}, orient="index"
@@ -62,28 +65,26 @@ def test_init(monkeypatch):
     X_train = prepare_training_data(df_binarized)["X_train"]
 
     embedding = {}
-    anneal_params = {"s": 0.5}
-    β_initial = 1.5
-    β_range = (0.1, 10)
+    anneal_params = {"s": 0.5, "A": 0.1, "B": 1.1}
+    beta_initial = 1.5
+    beta_range = (0.1, 10)
     qpu_params = {"region": "eu-central-1", "solver": "Advantage_system5.1"}
+    exact_params = {"beta": 1.5}
     seed = 0
-    exact = True
 
     model = BQRBM(
-        X=X_train,
+        X_train=X_train,
         n_hidden=n_hidden,
         embedding=embedding,
         anneal_params=anneal_params,
-        anneal_schedule_data=anneal_schedule_data,
-        β_initial=β_initial,
-        β_range=β_range,
+        beta_initial=beta_initial,
+        beta_range=beta_range,
         qpu_params=qpu_params,
+        exact_params=exact_params,
         seed=seed,
-        exact=exact,
     )
 
-    assert (model.X == 1 - 2 * X_train).all()
-    assert (model.X_binary == X_train).all()
+    assert (model.X_train == 1 - 2 * X_train).all()
     assert model.n_hidden == n_hidden
     assert model.n_visible == n_visible
     assert model.n_qubits == n_qubits
@@ -91,15 +92,15 @@ def test_init(monkeypatch):
     assert model.anneal_params == anneal_params
     assert model.qpu_params == qpu_params
     assert model.seed == seed
-    assert model.exact == exact
-    assert model.A == anneal_schedule_data.loc[anneal_params["s"], "A(s) (GHz)"]
-    assert model.B == anneal_schedule_data.loc[anneal_params["s"], "B(s) (GHz)"]
-    assert model.β == β_initial
-    assert model.βs == [β_initial]
-    assert model.β_range == β_range
+    assert model.exact_params == exact_params
+    assert model.A == anneal_params["A"]
+    assert model.B == anneal_params["B"]
+    assert model.beta == beta_initial
+    assert model.beta_history == [beta_initial]
+    assert model.beta_range == beta_range
 
 
-def test__compute_mean_energy(model):
+def test__mean_energy(model):
     rng = get_rng(0)
     V = rng.rand(n_samples, n_visible)
     H = rng.rand(n_samples, n_hidden)
@@ -110,7 +111,7 @@ def test__compute_mean_energy(model):
         E += -V[k] @ model.a - H[k] @ model.b - V[k] @ W @ H[k]
     E /= n_samples
 
-    E_model = model._compute_mean_energy(V, H, V @ W)
+    E_model = model._mean_energy(V, H, V @ W)
 
     assert np.isclose(E, E_model)
 
@@ -118,7 +119,7 @@ def test__compute_mean_energy(model):
 def test__compute_positive_grads(model):
     rng = get_rng(0)
     V_pos = rng.rand(n_samples, n_visible)
-    Γ = model.β * model.A
+    Γ = model.beta * model.A
     b_eff = model.b + V_pos @ model.W
     D = np.sqrt(Γ ** 2 + b_eff ** 2)
     H_pos = (b_eff / D) * np.tanh(D)
@@ -146,7 +147,10 @@ def test__compute_negative_grads(monkeypatch, model):
     rng = get_rng(0)
     state_vectors = rng.rand(n_samples, n_qubits)
     V_neg = state_vectors[:, :n_visible]
-    H_neg = state_vectors[:, n_visible:]
+    Γ = model.beta * model.A
+    b_eff = model.b + V_neg @ model.W
+    D = np.sqrt(Γ ** 2 + b_eff ** 2)
+    H_neg = (b_eff / D) * np.tanh(D)
     monkeypatch.setattr(
         "qbm.models.BQRBM.sample", lambda self, n_samples: {"state_vectors": state_vectors}
     )
@@ -167,36 +171,36 @@ def test__compute_negative_grads(monkeypatch, model):
         assert np.isclose(grad, model.grads[grad_name]).all()
 
 
-def test__update_β(monkeypatch, model):
+def test__update_beta(monkeypatch, model):
     rng = get_rng(0)
     state_vectors = rng.rand(n_samples, n_qubits)
     monkeypatch.setattr("qbm.models.BQRBM.sample", lambda self, n_samples: state_vectors)
 
-    β = model.β
+    beta = model.beta
     setattr(model, "learning_rate", learning_rate)
 
-    V_train = model.X
+    V_train = model.X_train
     VW_train = V_train @ model.W
     b_eff = model.b + VW_train
-    D = np.sqrt(model.Γ ** 2 + b_eff ** 2)
+    D = np.sqrt((model.beta * model.A) ** 2 + b_eff ** 2)
     H_train = (b_eff / D) * np.tanh(D)
-    E_train = model._compute_mean_energy(V_train, H_train, VW_train)
+    E_train = model._mean_energy(V_train, H_train, VW_train)
 
     V_model = state_vectors[:, :n_visible]
     H_model = state_vectors[:, n_visible:]
-    E_model = model._compute_mean_energy(V_model, H_model, V_model @ model.W)
+    E_model = model._mean_energy(V_model, H_model, V_model @ model.W)
 
-    Δβ = learning_rate * (E_train - E_model)
+    Δbeta = learning_rate * (E_train - E_model)
 
-    model._update_β({"state_vectors": state_vectors}, learning_rate)
+    model._update_beta({"state_vectors": state_vectors}, learning_rate)
 
-    assert model.β == np.clip(β + Δβ, *model.β_range)
+    assert model.beta == np.clip(beta + Δbeta, *model.beta_range)
 
 
 def test__clip_weights_and_biases(monkeypatch, model):
     rng = get_rng(0)
     μ = 0
-    scaling_factor = model.β * model.B
+    scaling_factor = model.beta * model.B
     setattr(model, "a", rng.normal(μ, model.h_range.max() * scaling_factor, n_visible))
     setattr(model, "b", rng.normal(μ, model.h_range.max() * scaling_factor, n_hidden))
     setattr(
