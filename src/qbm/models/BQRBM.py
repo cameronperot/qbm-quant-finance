@@ -6,7 +6,7 @@ from dwave.system import DWaveSampler, FixedEmbeddingComposite
 
 from qbm.models import QBMBase
 from qbm.utils import convert_bin_str_to_list, load_artifact, save_artifact
-from qbm.utils.exact_qbm import compute_H, compute_ρ, sparse_X, sparse_Z, sparse_kron
+from qbm.utils.exact_qbm import compute_H, compute_ρ, get_pauli_kron
 
 
 class BQRBM(QBMBase):
@@ -64,18 +64,12 @@ class BQRBM(QBMBase):
         if self.exact_params is None:
             self._initialize_qpu_sampler()
         else:
-            # set Kronecker product Pauli matrices
-            self.σ = {}
-            for i in range(self.n_qubits):
-                self.σ["x", i] = sparse_kron(i, self.n_qubits, sparse_X)
-                self.σ["z_diag", i] = sparse_kron(i, self.n_qubits, sparse_Z).diagonal()
-            for i in range(self.n_qubits):
-                for j in range(self.n_visible, self.n_qubits):
-                    self.σ["zz_diag", i, j] = self.σ["z_diag", i] * self.σ["z_diag", j]
+            # initialize Pauli Kronecker matrices for exact H computation
+            self._pauli_kron = get_pauli_kron(self.n_visible, self.n_hidden)
 
             # initialize states and state vectors
-            self.states = np.arange(2 ** self.n_qubits)
-            self.state_vectors = self._binary_to_eigen(
+            self._states = np.arange(2 ** self.n_qubits)
+            self._state_vectors = self._binary_to_eigen(
                 np.vstack(
                     [
                         convert_bin_str_to_list(f"{x:{f'0{self.n_qubits}b'}}")
@@ -364,15 +358,15 @@ class BQRBM(QBMBase):
         J = self.J
 
         # compute the Hamiltonian and density matrix
-        H = compute_H(h, J, self.A, self.B, self.n_qubits, self.σ)
+        H = compute_H(h, J, self.A, self.B, self.n_qubits, self._pauli_kron)
         ρ = compute_ρ(H, self.exact_params["beta"], diagonal=(self.A == 0))
 
         # sample using the probabilities on the diagonal of ρ
         samples = {}
         samples["E"] = np.diag(H).copy()
         samples["p"] = np.diag(ρ).copy()
-        samples["states"] = self.rng.choice(self.states, size=n_samples, p=samples["p"])
-        samples["state_vectors"] = self.state_vectors[samples["states"]]
+        samples["states"] = self.rng.choice(self._states, size=n_samples, p=samples["p"])
+        samples["state_vectors"] = self._state_vectors[samples["states"]]
 
         # convert to binary if specified
         if binary:

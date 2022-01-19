@@ -8,6 +8,24 @@ sparse_X = csr_matrix(([1, 1], ([0, 1], [1, 0])), dtype=np.float64)
 sparse_Z = csr_matrix(([1, -1], ([0, 1], [0, 1])), dtype=np.float64)
 
 
+def get_pauli_kron(n_visible, n_hidden):
+    """
+    Computes the necessary Pauli Kronecker product (sparse) matrices for a n_visible +
+    n_hidden qubit problem.
+    """
+    # set Kronecker product Pauli matrices
+    n_qubits = n_visible + n_hidden
+    pauli_kron = {}
+    for i in range(n_qubits):
+        pauli_kron["x", i] = sparse_kron(i, n_qubits, sparse_X)
+        pauli_kron["z_diag", i] = sparse_kron(i, n_qubits, sparse_Z).diagonal()
+    for i in range(n_qubits):
+        for j in range(n_visible, n_qubits):
+            pauli_kron["zz_diag", i, j] = pauli_kron["z_diag", i] * pauli_kron["z_diag", j]
+
+    return pauli_kron
+
+
 def sparse_kron(i, n_qubits, A):
     """
     Compute I_{2^i} ⊗ A ⊗ I_{2^(n_qubits-i-1)}.
@@ -26,7 +44,7 @@ def sparse_kron(i, n_qubits, A):
         return kron(identity(2 ** (n_qubits - 1)), A)
 
 
-def compute_H(h, J, A, B, n_qubits, σ):
+def compute_H(h, J, A, B, n_qubits, pauli_kron):
     """
     Computes the Hamiltonian of the annealer at relative time s.
 
@@ -35,7 +53,7 @@ def compute_H(h, J, A, B, n_qubits, σ):
     :param A: Coefficient of the off-diagonal terms, e.g. A(s).
     :param B: Coefficient of the diagonal terms, e.g. B(s).
     :param n_qubits: Number of qubits.
-    :param σ: Kronecker product Pauli matrices dict.
+    :param pauli_kron: Kronecker product Pauli matrices dict.
 
     :returns: Hamiltonian matrix H.
     """
@@ -44,12 +62,12 @@ def compute_H(h, J, A, B, n_qubits, σ):
     for i in range(n_qubits):
         # linear terms
         if h[i] != 0:
-            H_diag += (B * h[i]) * σ["z_diag", i]
+            H_diag += (B * h[i]) * pauli_kron["z_diag", i]
 
         # quadratic terms
         for j in range(i + 1, n_qubits):
             if J[i, j] != 0:
-                H_diag += (B * J[i, j]) * σ["zz_diag", i, j]
+                H_diag += (B * J[i, j]) * pauli_kron["zz_diag", i, j]
 
     # return just the diagonal if H is a diagonal matrix
     if A == 0:
@@ -58,7 +76,7 @@ def compute_H(h, J, A, B, n_qubits, σ):
     # off-diagonal terms
     H = csr_matrix((2 ** n_qubits, 2 ** n_qubits), dtype=np.float64)
     for i in range(n_qubits):
-        H -= A * σ["x", i]
+        H -= A * pauli_kron["x", i]
 
     return (H + diags(H_diag, format="csr")).toarray()
 
