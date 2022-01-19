@@ -68,7 +68,10 @@ class BQRBM(QBMBase):
             self.σ = {}
             for i in range(self.n_qubits):
                 self.σ["x", i] = sparse_kron(i, self.n_qubits, sparse_X)
-                self.σ["z", i] = sparse_kron(i, self.n_qubits, sparse_Z)
+                self.σ["z_diag", i] = sparse_kron(i, self.n_qubits, sparse_Z).diagonal()
+            for i in range(self.n_qubits):
+                for j in range(self.n_visible, self.n_qubits):
+                    self.σ["zz_diag", i, j] = self.σ["z_diag", i] * self.σ["z_diag", j]
 
             # initialize states and state vectors
             self.states = np.arange(2 ** self.n_qubits)
@@ -362,7 +365,7 @@ class BQRBM(QBMBase):
 
         # compute the Hamiltonian and density matrix
         H = compute_H(h, J, self.A, self.B, self.n_qubits, self.σ)
-        ρ = compute_ρ(H, self.exact_params["beta"])
+        ρ = compute_ρ(H, self.exact_params["beta"], diagonal=(self.A == 0))
 
         # sample using the probabilities on the diagonal of ρ
         samples = {}

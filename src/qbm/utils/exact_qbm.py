@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.sparse import csr_matrix, kron, identity
+from scipy.sparse import csr_matrix, kron, identity, diags
 from scipy.linalg import eigh
 
 
@@ -39,39 +39,46 @@ def compute_H(h, J, A, B, n_qubits, σ):
 
     :returns: Hamiltonian matrix H.
     """
-    H = csr_matrix((2 ** n_qubits, 2 ** n_qubits), dtype=np.float64)
-
+    # diagonal terms
+    H_diag = np.zeros(2 ** n_qubits)
     for i in range(n_qubits):
-        # off-diagonal terms
-        H -= A * σ["x", i]
-
         # linear terms
         if h[i] != 0:
-            H += (B * h[i]) * σ["z", i]
+            H_diag += (B * h[i]) * σ["z_diag", i]
 
         # quadratic terms
         for j in range(i + 1, n_qubits):
             if J[i, j] != 0:
-                H += (B * J[i, j]) * (σ["z", i] @ σ["z", j])
+                H_diag += (B * J[i, j]) * σ["zz_diag", i, j]
 
-    return H.toarray()
+    # return just the diagonal if H is a diagonal matrix
+    if A == 0:
+        return np.diag(H_diag)
+
+    # off-diagonal terms
+    H = csr_matrix((2 ** n_qubits, 2 ** n_qubits), dtype=np.float64)
+    for i in range(n_qubits):
+        H -= A * σ["x", i]
+
+    return (H + diags(H_diag, format="csr")).toarray()
 
 
-def compute_ρ(H, β):
+def compute_ρ(H, β, diagonal=False):
     """
     Computes the trace normalized density matrix ρ.
 
     :param H: Hamiltonian matrix.
     :param β: Inverse temperature β = 1 / (k_B * T).
+    :param diagonal: Flag to indicate whether H is a diagonal matrix or not.
 
     :return: Density matrix ρ.
     """
     # if diagonal then compute directly, else use eigen decomposition
-    if (H == np.diag(np.diag(H))).all():
-        Λ = np.diag(H)
-        exp_βH = np.diag(np.exp(-β * (Λ - Λ.min())))
+    if diagonal:
+        Λ = H.diagonal()
+        exp_βΛ = np.exp(-β * (Λ - Λ.min()))
+        return np.diag(exp_βΛ / exp_βΛ.sum())
     else:
         Λ, S = eigh(H)
-        exp_βH = (S * np.exp(-β * (Λ - Λ.min()))) @ S.T
-
-    return exp_βH / exp_βH.trace()
+        exp_βΛ = np.exp(-β * (Λ - Λ.min()))
+        return (S * (exp_βΛ / exp_βΛ.sum())) @ S.T
