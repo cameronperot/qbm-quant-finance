@@ -20,7 +20,7 @@ def get_pauli_kron(n_visible, n_hidden):
         pauli_kron["x", i] = sparse_kron(i, n_qubits, sparse_X)
         pauli_kron["z_diag", i] = sparse_kron(i, n_qubits, sparse_Z).diagonal()
     for i in range(n_qubits):
-        for j in range(n_visible, n_qubits):
+        for j in range(i + 1, n_qubits):
             pauli_kron["zz_diag", i, j] = pauli_kron["z_diag", i] * pauli_kron["z_diag", j]
 
     return pauli_kron
