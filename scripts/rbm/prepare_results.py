@@ -63,20 +63,18 @@ for model_name, model_info in models.items():
         model_results_dir / "data/kl_divergences.csv", index_col="currency_pair"
     )
     column_map = {column: f"{prefix}_{column}" for column in dkl.columns}
+    dkl_std = np.sqrt(np.sum(dkl["stds"][:-1] ** 2) / (len(dkl["stds"]) - 1))
     dkl.loc["Mean"] = dkl.mean()
-    dkl.loc["Mean", "stds"] = np.sqrt(np.sum(dkl["stds"][:-1] ** 2)) / (
-        len(dkl["stds"]) - 1
-    )
+    dkl.loc["Mean", "stds"] = dkl_std
     dkl.rename(columns=column_map, inplace=True)
     dkls[prefix] = dkl
 
     # QQ RMSE
     qq_rmse = pd.read_csv(model_results_dir / "data/qq_rmse.csv", index_col="currency_pair")
     column_map = {column: f"{prefix}_{column}" for column in qq_rmse.columns}
+    qq_rmse_std = np.sqrt(np.sum(qq_rmse["std"][:-1] ** 2) / (len(qq_rmse["std"]) - 1))
     qq_rmse.loc["Mean"] = qq_rmse.mean()
-    qq_rmse.loc["Mean", "std"] = np.sqrt(np.sum(qq_rmse["std"][:-1] ** 2)) / (
-        len(qq_rmse["std"]) - 1
-    )
+    qq_rmse.loc["Mean", "std"] = qq_rmse_std
     qq_rmse.rename(columns=column_map, inplace=True)
     qq_rmses[prefix] = qq_rmse
 
