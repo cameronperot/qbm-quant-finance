@@ -77,98 +77,107 @@ def main(h, J, config, anneal_params_dict, qpu, save_dir, embedding_id, gauge_id
 
 
 if __name__ == "__main__":
-    config_id = 3
-    embedding_id = 1
+    for embedding_id in (5,):
+        config_id = 2
 
-    project_dir = get_project_dir()
-    config_dir = project_dir / f"artifacts/exact_analysis/{config_id:02}"
+        project_dir = get_project_dir()
+        config_dir = project_dir / f"artifacts/exact_analysis/{config_id:02}"
 
-    config = load_artifact(config_dir / "config.json")
-    n_visible = config["n_visible"]
-    n_hidden = config["n_hidden"]
-    n_qubits = config["n_qubits"]
+        print(f"Embedding {embedding_id:02}")
 
-    qpu = DWaveSampler(**config["qpu_params"])
+        config = load_artifact(config_dir / "config.json")
+        n_visible = config["n_visible"]
+        n_hidden = config["n_hidden"]
+        n_qubits = config["n_qubits"]
 
-    # configure h's and J's
-    if (config_dir / "h.pkl").exists() and (config_dir / "J.pkl").exists():
-        print(f"Loading h's and J's at {config_dir}")
-        h = load_artifact(config_dir / "h.pkl")
-        J = load_artifact(config_dir / "J.pkl")
-    else:
-        rng = get_rng(config["seed"])
-        if config["distribution"]["type"] == "normal":
-            μ = config["distribution"]["mu"]
-            σ = config["distribution"]["sigma"]
-            a = rng.normal(μ, σ, n_visible)
-            b = rng.normal(μ, σ, n_hidden)
-            W = rng.normal(μ, σ, (n_visible, n_hidden))
-        elif config["distribution"]["type"] == "uniform":
-            low = config["distribution"]["low"]
-            high = config["distribution"]["high"]
-            a = rng.uniform(low, high, n_visible)
-            b = rng.uniform(low, high, n_hidden)
-            W = rng.uniform(low, high, (n_visible, n_hidden))
+        qpu = DWaveSampler(**config["qpu_params"])
 
-        h = np.concatenate((a, b))
-        J = np.zeros((n_qubits, n_qubits))
-        J[:n_visible, n_visible:] = W
+        # configure h's and J's
+        if (config_dir / "h.pkl").exists() and (config_dir / "J.pkl").exists():
+            print(f"Loading h's and J's at {config_dir}")
+            h = load_artifact(config_dir / "h.pkl")
+            J = load_artifact(config_dir / "J.pkl")
+        else:
+            rng = get_rng(config["seed"])
+            if config["distribution"]["type"] == "normal":
+                μ = config["distribution"]["mu"]
+                σ = config["distribution"]["sigma"]
+                a = rng.normal(μ, σ, n_visible)
+                b = rng.normal(μ, σ, n_hidden)
+                W = rng.normal(μ, σ, (n_visible, n_hidden))
+            elif config["distribution"]["type"] == "uniform":
+                low = config["distribution"]["low"]
+                high = config["distribution"]["high"]
+                a = rng.uniform(low, high, n_visible)
+                b = rng.uniform(low, high, n_hidden)
+                W = rng.uniform(low, high, (n_visible, n_hidden))
 
-        h = np.clip(h, *qpu.properties["h_range"])
-        J = np.clip(J, *qpu.properties["j_range"])
+            h = np.concatenate((a, b))
+            J = np.zeros((n_qubits, n_qubits))
+            J[:n_visible, n_visible:] = W
 
-        save_artifact(h, config_dir / "h.pkl")
-        save_artifact(J, config_dir / "J.pkl")
+            h = np.clip(h, *qpu.properties["h_range"])
+            J = np.clip(J, *qpu.properties["j_range"])
 
-    # set anneal schedules and max allowed number of reads
-    anneal_durations = [Decimal(x) for x in (20, 100)]
-    s_pauses = [Decimal(str(round(x, 2))) for x in np.arange(2.5, 8, 0.5) / 10]
-    pause_durations = [Decimal(x) for x in (0, 10, 100, 1_000)]
-    quench_slope = Decimal(1 / min(qpu.properties["annealing_time_range"]))
-    max_problem_duration = 1_000_000 - 1_000  # subtract 1_000 for buffer
-    anneal_params_dict = {}
-    for anneal_duration in anneal_durations:
-        for s_pause in s_pauses:
-            for pause_duration in pause_durations:
-                t_pause = anneal_duration * s_pause
-                quench_duration = (1 - s_pause) / quench_slope
-                if pause_duration > 0:
-                    anneal_schedule = [
-                        (0, 0),
-                        (t_pause, s_pause),
-                        (t_pause + pause_duration, s_pause),
-                        (t_pause + pause_duration + quench_duration, 1),
-                    ]
-                else:
-                    anneal_schedule = [
-                        (0, 0),
-                        (t_pause, s_pause),
-                        (t_pause + quench_duration, 1),
-                    ]
-                anneal_schedule = [(float(t), float(s)) for (t, s) in anneal_schedule]
+            save_artifact(h, config_dir / "h.pkl")
+            save_artifact(J, config_dir / "J.pkl")
 
-                num_reads = min(int(max_problem_duration / anneal_schedule[-1][0]), 10_000)
+        # set anneal schedules and max allowed number of reads
+        anneal_durations = [Decimal(x) for x in (20,)]
+        s_pauses = [Decimal(str(round(x, 3))) for x in np.arange(80, 105, 5) / 100]
+        pause_durations = [Decimal(x) for x in (0,)]
+        quench_slope = Decimal(1 / min(qpu.properties["annealing_time_range"]))
+        max_problem_duration = 1_000_000 - 1_000  # subtract 1_000 for buffer
+        anneal_params_dict = {}
+        for anneal_duration in anneal_durations:
+            for s_pause in s_pauses:
+                for pause_duration in pause_durations:
+                    t_pause = anneal_duration * s_pause
+                    quench_duration = (1 - s_pause) / quench_slope
+                    if pause_duration > 0:
+                        anneal_schedule = [
+                            (0, 0),
+                            (t_pause, s_pause),
+                            (t_pause + pause_duration, s_pause),
+                            (t_pause + pause_duration + quench_duration, 1),
+                        ]
+                    elif quench_duration > 0:
+                        anneal_schedule = [
+                            (0, 0),
+                            (t_pause, s_pause),
+                            (t_pause + quench_duration, 1),
+                        ]
+                    else:
+                        anneal_schedule = [
+                            (0, 0),
+                            (anneal_duration, 1),
+                        ]
+                    anneal_schedule = [(float(t), float(s)) for (t, s) in anneal_schedule]
 
-                name = f"t_pause={float(t_pause)},s_pause={float(s_pause)},pause_duration={float(pause_duration)},quench_slope={float(quench_slope)}"
-                anneal_params_dict[name] = {
-                    "anneal_schedule": anneal_schedule,
-                    "num_reads": num_reads,
-                }
+                    num_reads = min(
+                        int(max_problem_duration / anneal_schedule[-1][0]), 10_000
+                    )
 
-    # sample different gauges for each anneal schedule
-    gauge_ids = range(1, 11)
-    for gauge_id in gauge_ids:
-        print(f"Gauge {gauge_id} / {len(gauge_ids)}")
-        rng = get_rng(gauge_id)
-        gauge = rng.choice([-1, 1], n_qubits)
-        main(
-            h=h.copy(),
-            J=J.copy(),
-            config=config,
-            anneal_params_dict=anneal_params_dict,
-            qpu=qpu,
-            save_dir=config_dir,
-            embedding_id=embedding_id,
-            gauge_id=gauge_id,
-            gauge=gauge,
-        )
+                    name = f"t_pause={float(t_pause)}-s_pause={float(s_pause)}-pause_duration={float(pause_duration)}-quench_slope={float(quench_slope)}"
+                    anneal_params_dict[name] = {
+                        "anneal_schedule": anneal_schedule,
+                        "num_reads": num_reads,
+                    }
+
+        # sample different gauges for each anneal schedule
+        gauge_ids = range(1, 11)
+        for gauge_id in gauge_ids:
+            print(f"Gauge {gauge_id} / {len(gauge_ids)}")
+            rng = get_rng(gauge_id)
+            gauge = rng.choice([-1, 1], n_qubits)
+            main(
+                h=h.copy(),
+                J=J.copy(),
+                config=config,
+                anneal_params_dict=anneal_params_dict,
+                qpu=qpu,
+                save_dir=config_dir,
+                embedding_id=embedding_id,
+                gauge_id=gauge_id,
+                gauge=gauge,
+            )

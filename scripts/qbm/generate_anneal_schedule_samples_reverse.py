@@ -150,7 +150,7 @@ if __name__ == "__main__":
 
                 num_reads = min(int(max_problem_duration / anneal_schedule[-1][0]), 10_000)
 
-                name = f"t_pause={float(t_pause)},s_pause={float(s_pause)},pause_duration={float(pause_duration)},quench_slope={float(quench_slope)},reverse=True,reinit=True"
+                name = f"t_pause={float(t_pause)}-s_pause={float(s_pause)}-pause_duration={float(pause_duration)}-quench_slope={float(quench_slope)}-reverse=True-reinit=True"
                 anneal_params_dict[name] = {
                     "anneal_schedule": anneal_schedule,
                     "num_reads": num_reads,
