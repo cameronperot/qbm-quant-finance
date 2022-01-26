@@ -192,7 +192,8 @@ def test__update_beta(monkeypatch, model):
 
     Δbeta = learning_rate * (E_train - E_model)
 
-    model._update_beta({"state_vectors": state_vectors}, learning_rate)
+    model.learning_rate_beta = learning_rate
+    model._update_beta({"state_vectors": state_vectors})
 
     assert model.beta == np.clip(beta + Δbeta, *model.beta_range)
 
