@@ -20,7 +20,7 @@
 \usepackage{bbm}
 \usepackage{mathtools}
 
-\graphicspath{ {../../../artifacts/exact_analysis/}{../../../artifacts/plots/anneal_schedules/}{../../../results/plots/qbm/exact/}{../../../results/plots/data_analysis/}{../../images/} }
+\graphicspath{ {../../../artifacts/exact_analysis/}{../../../artifacts/plots/anneal_schedules/}{../../../results/plots/qbm/}{../../../results/plots/data_analysis/}{../../images/} }
 
 % new commands
 \input{../../newcommands.tex}
@@ -49,7 +49,7 @@
 
 \begin{frame}
     \frametitle{Quantum Boltzmann Machine (QBM)}
-    QBM has Hamiltonian given by
+    QBM has the Hamiltonian given by
     \[
         H = -\sum_i \Gamma_i \sigma_i^x -\sum_i c_i \sigma_i^z - \sum_{i,j} w_{ij} \sigma_i^z \sigma_j^z
     \]
@@ -107,7 +107,7 @@
 \begin{frame}
     \frametitle{Anneal Schedules}
     Multiple different annealing schedules were tested.
-    Namely the form of the anneal schedules is of the form of \( (t, s) \) tuples
+    Namely, anneal schedules are in the form of \( (t, s) \) tuples
     \[
         [(0, 0), \ (\tpause, \spause), \ (\tpause + \Deltapause, \spause), \ (\tpause + \Deltapause + \Deltaquench, 1)]
     \]
@@ -136,9 +136,9 @@
 
 \begin{frame}
     \frametitle{A Toy Problem}
-    In essence we would like to match the samples we obtain from the annealer to a theoretical distribution, namely that of the QBM.
+    In essence we would like to match the samples we obtain from the annealer to a theoretical distribution, in particular that of the QBM.
     For this purpose, a small 12 qubit (BQRBM) problem was studied, with 8 visible units and 4 hidden units.
-    Three different subproblems were studied, namely the weights and biases being normally distributed at different scales, i.e.,
+    Three different subproblems were studied with the weights and biases being normally distributed at different scales, i.e.,
     \begin{align*}
         h_i, J_{ij} &\sim \mathcal{N}(0, 0.01) \\
         h_i, J_{ij} &\sim \mathcal{N}(0, 0.1) \\
@@ -149,8 +149,7 @@
 
 \begin{frame}
     \frametitle{Sampling the Annealer}
-    The D-Wave Advantage 5.1 system was sampled using the \texttt{sample\_ising(h, J, auto\_scale=False, anneal\_schedule=anneal\_schedule, num\_reads=num\_reads)}
-    where \texttt{anneal\_schedule} is a list of \( (t, s) \) tuples, and \texttt{num\_reads} is the max allowed for the provided anneal schedule.
+    The D-Wave Advantage 5.1 system was sampled using \texttt{sample\_ising()} with the defined anneal schedule and auto scaling disabled.
 
     To generate more robust statistics, 10 random gauges were used in order to reduce any readout bias of the qubits.
     For a random vector \( \vec{r} \in \{-1,+1\}^{N} \) we can take
@@ -164,83 +163,46 @@
 \begin{frame}
     \frametitle{KL Divergence}
     The exact QBM distributions were computed and compared to the samples obtained from the annealer.
-    A discrete form of the KL divergence was computed through the use of binning with smoothing, as a metric to help determine how much information is lost using the samples from the annealer to approximate the theoretical distribution.
-    For each anneal schedule a heatmap of the KL divergence was generated for \( T = 2, 4, \dots, 100 \) mK and \( s = 0, 0.01, \dots, 1 \), thus there is a lot of visual data to sort through.
-    To get a rough metric we take a look at the minimum KL divergence over \( s, T \).
+    A discrete approximation of the KL divergence was computed through the use of binning (32 bins) with smoothing, as a metric to help determine how much information is lost using the samples from the annealer to approximate the theoretical distribution.
+    For each anneal schedule a heatmap of the KL divergence was generated for \( T = 0.001, 2, 4, \dots, 100 \) mK and \( s = 0, 0.01, \dots, 1 \), thus there is a lot of visual data to sort through.
 \end{frame}
 
 \begin{frame}
     \frametitle{\( h_i, J_{ij} \sim \mathcal{N}(0, 0.01) \)}
     \begin{figure}
-        \includegraphics[width=1\linewidth]{01/plots/DKL_mins/embedding_01/t_a=20.0,quench_slope=2.0.png}
+        \includegraphics[width=1\linewidth]{8x4/exact_analysis/01/embedding_01/kl_divergence_mins.png}
     \end{figure}
 \end{frame}
 \begin{frame}
     \frametitle{\( h_i, J_{ij} \sim \mathcal{N}(0, 0.01) \)}
     \begin{figure}
-        \includegraphics[width=0.85\linewidth]{01/plots/heatmaps/embedding_01/t_pause=9.0,s_pause=0.45,pause_duration=0.0,quench_slope=2.0.png}
-    \end{figure}
-\end{frame}
-\begin{frame}
-    \frametitle{\( h_i, J_{ij} \sim \mathcal{N}(0, 0.01) \)}
-    \begin{figure}
-        \includegraphics[width=0.85\linewidth]{01/plots/heatmaps/embedding_01/t_pause=9.0,s_pause=0.45,pause_duration=10.0,quench_slope=2.0.png}
-    \end{figure}
-\end{frame}
-\begin{frame}
-    \frametitle{\( h_i, J_{ij} \sim \mathcal{N}(0, 0.01) \)}
-    \begin{figure}
-        \includegraphics[width=0.85\linewidth]{01/plots/heatmaps/embedding_01/t_pause=9.0,s_pause=0.45,pause_duration=100.0,quench_slope=2.0.png}
+        \includegraphics[width=0.85\linewidth]{01/plots/heatmaps/embedding_01/t_pause=10.0,s_pause=0.5,pause_duration=0.0,quench_slope=2.0.png}
     \end{figure}
 \end{frame}
 
 \begin{frame}
     \frametitle{\( h_i, J_{ij} \sim \mathcal{N}(0, 0.1) \)}
     \begin{figure}
-        \includegraphics[width=1\linewidth]{02/plots/DKL_mins/embedding_01/t_a=20.0,quench_slope=2.0.png}
+        \includegraphics[width=1\linewidth]{8x4/exact_analysis/02/embedding_01/kl_divergence_mins.png}
     \end{figure}
 \end{frame}
 \begin{frame}
     \frametitle{\( h_i, J_{ij} \sim \mathcal{N}(0, 0.1) \)}
     \begin{figure}
-        \includegraphics[width=0.85\linewidth]{02/plots/heatmaps/embedding_01/t_pause=9.0,s_pause=0.45,pause_duration=0.0,quench_slope=2.0.png}
-    \end{figure}
-\end{frame}
-\begin{frame}
-    \frametitle{\( h_i, J_{ij} \sim \mathcal{N}(0, 0.1) \)}
-    \begin{figure}
-        \includegraphics[width=0.85\linewidth]{02/plots/heatmaps/embedding_01/t_pause=9.0,s_pause=0.45,pause_duration=10.0,quench_slope=2.0.png}
-    \end{figure}
-\end{frame}
-\begin{frame}
-    \frametitle{\( h_i, J_{ij} \sim \mathcal{N}(0, 0.1) \)}
-    \begin{figure}
-        \includegraphics[width=0.85\linewidth]{02/plots/heatmaps/embedding_01/t_pause=9.0,s_pause=0.45,pause_duration=100.0,quench_slope=2.0.png}
+        \includegraphics[width=0.85\linewidth]{02/plots/heatmaps/embedding_01/t_pause=10.0,s_pause=0.5,pause_duration=0.0,quench_slope=2.0.png}
     \end{figure}
 \end{frame}
 
 \begin{frame}
     \frametitle{\( h_i, J_{ij} \sim \mathcal{N}(0, 1) \)}
     \begin{figure}
-        \includegraphics[width=1\linewidth]{03/plots/DKL_mins/embedding_01/t_a=20.0,quench_slope=2.0.png}
+        \includegraphics[width=1\linewidth]{8x4/exact_analysis/03/embedding_01/kl_divergence_mins.png}
     \end{figure}
 \end{frame}
 \begin{frame}
     \frametitle{\( h_i, J_{ij} \sim \mathcal{N}(0, 1) \)}
     \begin{figure}
-        \includegraphics[width=0.85\linewidth]{03/plots/heatmaps/embedding_01/t_pause=9.0,s_pause=0.45,pause_duration=0.0,quench_slope=2.0.png}
-    \end{figure}
-\end{frame}
-\begin{frame}
-    \frametitle{\( h_i, J_{ij} \sim \mathcal{N}(0, 1) \)}
-    \begin{figure}
-        \includegraphics[width=0.85\linewidth]{03/plots/heatmaps/embedding_01/t_pause=9.0,s_pause=0.45,pause_duration=10.0,quench_slope=2.0.png}
-    \end{figure}
-\end{frame}
-\begin{frame}
-    \frametitle{\( h_i, J_{ij} \sim \mathcal{N}(0, 1) \)}
-    \begin{figure}
-        \includegraphics[width=0.85\linewidth]{03/plots/heatmaps/embedding_01/t_pause=9.0,s_pause=0.45,pause_duration=100.0,quench_slope=2.0.png}
+        \includegraphics[width=0.85\linewidth]{03/plots/heatmaps/embedding_01/t_pause=10.0,s_pause=0.5,pause_duration=0.0,quench_slope=2.0.png}
     \end{figure}
 \end{frame}
 
@@ -251,36 +213,59 @@
 \section{Exact QBM Tests}
 \begin{frame}
     \frametitle{Exact BQRBM Training}
-    To verify that the BQRBM works we train a network with 7 visible and 3 hidden units (smaller for computational reasons) to use as an autoencoder to generate samples from a specified nontrivial distribution.
+    To verify that the BQRBM works properly, we train a network with 8 visible and 4 hidden units to use as an autoencoder to generate samples from a specified nontrivial distribution at \( s^* = 1.0 \).
     We train the model on 1500 samples from the Gaussian mixture distribution
     \[
-        p(x) = \frac{2}{3} \mathcal{N}(-2, 1) + \frac{1}{3} \mathcal{N}(3, 1)
+        p(x) = \frac{2}{3} \mathcal{N}(x \ | \ -2, 1) + \frac{1}{3} \mathcal{N}(x \ | \ 3, 1)
     \]
-    We set the exact sampler to use a specified value of \( \beta \), i.e., the effective inverse temperature.
     The model allows for the effective inverse temperature to be learned with iterative updates of the form
     \[
         \Delta\beta = \eta (\overline{\braket{E}_\vec{v}} - \braket{E})
     \]
+    We set the exact sampler to use an inverse temperature value of \( \beta_{\text{effective}} = 0.5 \) with an initial \( \beta \) to verify that the \( \beta \) parameter can be learned.
 \end{frame}
 
 \begin{frame}
+    \frametitle{Decreasing KL Divergence}
+    \begin{figure}
+        \includegraphics[width=1\linewidth]{8x4/dkl_exact.png}
+    \end{figure}
+\end{frame}
+\begin{frame}
+    \frametitle{Learning \( \beta \)}
+    \begin{figure}
+        \includegraphics[width=1\linewidth]{8x4/beta_exact.png}
+    \end{figure}
+\end{frame}
+\begin{frame}
     \frametitle{Learning an Arbitrary Distribution}
     \begin{figure}
-        \includegraphics[width=1\linewidth]{hist_comparision_beta_learned.png}
+        \includegraphics[width=1\linewidth]{8x4/hist_comparison_exact.png}
     \end{figure}
 \end{frame}
 
 \begin{frame}
     \frametitle{Decreasing KL Divergence}
     \begin{figure}
-        \includegraphics[width=1\linewidth]{DKL_beta_learned.png}
+        \includegraphics[width=1\linewidth]{8x4/dkl_exact_annealer_comparison.png}
     \end{figure}
 \end{frame}
-
 \begin{frame}
-    \frametitle{\( \beta \) Tending Towards True Effective \( \beta \)}
+    \frametitle{Learning \( \beta \)}
     \begin{figure}
-        \includegraphics[width=1\linewidth]{beta_beta_learned.png}
+        \includegraphics[width=1\linewidth]{8x4/beta_annealer.png}
+    \end{figure}
+\end{frame}
+\begin{frame}
+    \frametitle{Learning T}
+    \begin{figure}
+        \includegraphics[width=1\linewidth]{8x4/temperature_annealer.png}
+    \end{figure}
+\end{frame}
+\begin{frame}
+    \frametitle{Learning an Arbitrary Distribution}
+    \begin{figure}
+        \includegraphics[width=1\linewidth]{8x4/hist_comparison_annealer.png}
     \end{figure}
 \end{frame}
 
@@ -294,7 +279,6 @@
 \begin{frame}
     \frametitle{To Do}
     \begin{itemize}
-        \item Train the same QBM used in the exact modeling on the annealer.
         \item Determine a method to choose an embedding and chain strength for the larger model.
     \end{itemize}
 \end{frame}

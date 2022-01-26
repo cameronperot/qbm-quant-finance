@@ -3,26 +3,31 @@
 The Quantum Boltzmann Machine (QBM) detailed in this section is based on the work first presented in~\cite{amin_2018}.
 The main change we make is that we start by detailing a restricted version of the QBM (QRBM), since having the restrictions as in the classical RBM simplifies the mathematics and allows for a more straight forward direct comparison.
 
-We can start with the idea of a classical Boltzmann machine and transform it to the language of quantum mechanics by converting the energy function to an Ising spin Hamiltonian (here we separate the terms of the visible and hidden layers to make it closer resemble the form of the classical RBM's energy)
+We start with the idea of a classical Boltzmann machine and transform it to the language of quantum mechanics by converting the energy function to an Ising spin Hamiltonian with the first (last) \( n_v \ (n_h) \) qubits corresponding to the visible (hidden) units
 \begin{align}
-    H = -\sum_i a_i \sigma_i^z - \sum_j b_j \sigma_j^z - \sum_{i,j} w_{ij} \sigma_i^z \sigma_j^z
+    H = -\sum_k c_k \sigma_k^z - \sum_{i,j} w_{ij} \sigma_i^z \sigma_j^z
 \end{align}
 where
 \begin{align}
-    \sigma_i^z
-        &= I^{\otimes i-1} \otimes \sigma_z \otimes I^{\otimes N-i}
+    \sigma_k^z
+        &= I^{\otimes k-1} \otimes \sigma_z \otimes I^{\otimes N-k}
 \end{align}
 with \( \sigma_z \) being the Pauli \( z \) matrix, and \( I \) being the \( 2 \times 2 \) identity matrix.
-For convenience we use similar notation as in the classical RBM case, where \( i \) indices correspond to visible units and \( j \) indices correspond to hidden units.
-Therefore, one must take note that \( \sigma_j \) actually has an index offset of \( n_v \) since the preceding visible units need to be accounted for in the tensor product.
-
-Because the language of quantum mechanics deals in the values \( -1 \) and \( +1 \) (stemming from the eigenvalues of the Pauli matrices) rather than \( 0 \) and \( 1 \), we will keep the vectors \( \vec{v} \in \binset^{n_v} \) and \( \vec{h} \in \binset^{n_h} \) and define the vectors \( \tilde{\vec{v}} = 2\vec{v} - \vec{1} \in \{-1,+1\}^{n_v} \) and \( \tilde{\vec{h}} = 2\vec{h} - \vec{1} \in \{-1,+1\}^{n_h} \) to represent the binary vectors in the quantum realm.
+To keep notation simple and easy to understand, we use the indices \( i = 1, \dots, n_v \) to represent visible units, \( j = n_v + 1, \dots, N \) to represent hidden units, and \( k = 1, \dots, N \) to represent all units.
+We use the concatenated bias vector
+\begin{align}
+    \vec{c} = \begin{bmatrix}
+        \vec{a} \\
+        \vec{b}
+    \end{bmatrix}
+\end{align}
+where \( \vec{a} \) and \( \vec{b} \) are the bias vectors of the visible and hidden units, respectively.
 
 To model the probabilities of the states we use the density operator
 \begin{align}
     \rho = \frac{1}{Z} e^{-H}
 \end{align}
-where \( e^{-H} = \sum_k \frac{1}{k!} (-H)^k \) is the matrix exponential, and the partition function is given by \( Z = \tr(e^{-H}) \).
+where \( e^{-H} = \sum_n \frac{1}{n!} (-H)^n \) is the matrix exponential, and the partition function is given by \( Z = \tr(e^{-H}) \).
 The probability to find the system in state \( \ket{\vec{v},\vec{h}} \) is given by
 \begin{align}
     p(\vec{v},\vec{h})
@@ -48,7 +53,7 @@ The lower bound of the log-likelihood is given by (see \cref{app:qbm_log_likelih
 \begin{align}
     \tilde{\ell}(\theta) = \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \tr(\Lambda_\vec{v}\rho_\vec{v})
 \end{align}
-where what is referred to as the "clamped" Hamiltonian, which for a given visible vector \( \vec{v} \) is
+where we have what is referred to as the "clamped" Hamiltonian, which for a given visible vector \( \vec{v} \) is
 \begin{align}
     H_\vec{v}
         &= \braket{\vec{v}|H|\vec{v}}
@@ -64,21 +69,19 @@ The associated derivatives w.r.t.\ the parameters of the lower bound are given b
 \begin{align}
     \partial_{w_{ij}} \tilde{\ell}(\theta)
         &= \overline{\langle \sigma_i^z \sigma_j^z \rangle_\vec{v}} - \langle \sigma_i^z \sigma_j^z \rangle \\
-    \partial_{a_i} \tilde{\ell}(\theta)
-        &= \overline{\langle \sigma_i^z \rangle_\vec{v}} - \langle \sigma_i^z \rangle \\
-    \partial_{b_j} \tilde{\ell}(\theta)
-        &= \overline{\langle \sigma_j^z \rangle_\vec{v}} - \langle \sigma_j^z \rangle
+    \partial_{c_k} \tilde{\ell}(\theta)
+        &= \overline{\langle \sigma_k^z \rangle_\vec{v}} - \langle \sigma_k^z \rangle
 \end{align}
 where \( \langle \ \cdot \ \rangle_\vec{v} = \tr(\cdot \rho_\vec{v}) \) is the expectation value w.r.t.\ the clamped density matrix and \( \langle \ \cdot \ \rangle = \tr(\cdot \rho) \) is the expectation value w.r.t\ the regular density matrix.
 \begin{align}
-    \langle \sigma_j^z \rangle_\vec{v}
-        &= \frac{b_j'(\tilde{\vec{v}})}{D_j(\tilde{\vec{v}})} \tanh(D_j) \\
     \langle \sigma_i^z \rangle_\vec{v}
-        &= \tilde{v}_i \\
+        &= v_i \\
+    \langle \sigma_j^z \rangle_\vec{v}
+        &= \frac{c_j'(\vec{v})}{D_j(\vec{v})} \tanh\big(D_j(\vec{v})\big) \\
     \langle \sigma_i^z \sigma_j^z \rangle_{\vec{v}}
-        &= \tilde{v}_i \frac{b_j'(\tilde{\vec{v}})}{D_j(\tilde{\vec{v}})} \tanh(D_j)
+        &= v_i \frac{c_j'(\vec{v})}{D_j(\vec{v})} \tanh\big(D_j(\vec{v})\big)
 \end{align}
-where \( D_j(\tilde{\vec{v}}) = \sqrt{\Gamma_j^2 + \big(b_j'(\tilde{\vec{v}})\big)^2} \).
+where \( D_j(\vec{v}) = \sqrt{\Gamma_j^2 + \big(c_j'(\vec{v})\big)^2} \).
 
 
 \todo{Quantum annealing theory}
