@@ -13,6 +13,7 @@ def main(analyze_ensemble_bool, analyze_autocorrelation_bool):
 
     for model_name, model_info in models.items():
         if analyze_ensemble_bool:
+            print(model_info)
             analyze_ensemble(model_info["id"])
         if analyze_autocorrelation_bool:
             analyze_autocorrelation(model_info["id"])

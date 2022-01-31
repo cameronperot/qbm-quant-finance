@@ -123,9 +123,9 @@ if __name__ == "__main__":
             save_artifact(J, config_dir / "J.pkl")
 
         # set anneal schedules and max allowed number of reads
-        anneal_durations = [Decimal(x) for x in (20,)]
-        s_pauses = [Decimal(str(round(x, 3))) for x in np.arange(80, 105, 5) / 100]
-        pause_durations = [Decimal(x) for x in (0,)]
+        anneal_durations = [Decimal(x) for x in (20, 100)]
+        s_pauses = [Decimal(str(round(x, 3))) for x in np.arange(25, 105, 5) / 100]
+        pause_durations = [Decimal(x) for x in (0, 10, 100)]
         quench_slope = Decimal(1 / min(qpu.properties["annealing_time_range"]))
         max_problem_duration = 1_000_000 - 1_000  # subtract 1_000 for buffer
         anneal_params_dict = {}
@@ -134,25 +134,33 @@ if __name__ == "__main__":
                 for pause_duration in pause_durations:
                     t_pause = anneal_duration * s_pause
                     quench_duration = (1 - s_pause) / quench_slope
-                    if pause_duration > 0:
+                    if pause_duration > 0 and quench_duration > 0:
                         anneal_schedule = [
                             (0, 0),
                             (t_pause, s_pause),
                             (t_pause + pause_duration, s_pause),
                             (t_pause + pause_duration + quench_duration, 1),
                         ]
-                    elif quench_duration > 0:
+                    elif pause_duration == 0 and quench_duration > 0:
                         anneal_schedule = [
                             (0, 0),
                             (t_pause, s_pause),
                             (t_pause + quench_duration, 1),
                         ]
-                    else:
+                    elif pause_duration == 0 and quench_duration == 0:
                         anneal_schedule = [
                             (0, 0),
                             (anneal_duration, 1),
                         ]
+                    elif t_pause == anneal_duration:
+                        anneal_schedule = [
+                            (0, 0),
+                            (t_pause, 1),
+                            (t_pause + pause_duration, 1),
+                        ]
+
                     anneal_schedule = [(float(t), float(s)) for (t, s) in anneal_schedule]
+                    print(anneal_schedule)
 
                     num_reads = min(
                         int(max_problem_duration / anneal_schedule[-1][0]), 10_000
