@@ -183,12 +183,14 @@ class BQRBM(QBMBase):
 
         :param file_path: Path to save the model to.
         """
-        if hasattr(self, "qpu"):
+        if self.exact_params is None:
             self.qpu = None
-        if hasattr(self, "sampler"):
             self.sampler = None
 
         save_artifact(self, file_path)
+
+        if self.exact_params is None:
+            self._initialize_qpu_sampler()
 
     @staticmethod
     def load(file_path):
