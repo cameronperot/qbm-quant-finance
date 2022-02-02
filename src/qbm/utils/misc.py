@@ -225,6 +225,8 @@ def kl_divergence(X_data, X_samples, n_bins=32):
     """
     Computes the D_KL(p_data || p_samples).
 
+    Note: this is a crude approximation of the KL divergence.
+
     :param X_data: Array of data values.
     :param X_samples: Array of sample values.
     :param n_bins: Number of bins to use in histograms.
@@ -236,6 +238,9 @@ def kl_divergence(X_data, X_samples, n_bins=32):
 
     p_data = hist_data / X_data.shape[0]
     p_samples = hist_samples / X_samples.shape[0]
+
+    assert np.isclose(p_data.sum(), 1)
+    assert np.isclose(p_samples.sum(), 1)
 
     support = np.logical_and(p_data > 0, p_samples > 0)
     p_data = p_data[support]
