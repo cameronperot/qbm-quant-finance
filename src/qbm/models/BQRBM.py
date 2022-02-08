@@ -313,16 +313,10 @@ class BQRBM(QBMBase):
             J *= np.outer(gauge, gauge)
 
         # compute the chain strength
-        chain_strength = None
-        if self.anneal_params.get("relative_chain_strength") is not None:
-            J_nonzero = J[: self.n_visible, self.n_visible :]
-            chain_strength = self.anneal_params["relative_chain_strength"] * max(
-                (
-                    max((h.max() / self.h_range.max(), 0)),
-                    max((h.min() / self.h_range.min(), 0)),
-                    max((J_nonzero.max() / self.J_range.max(), 0)),
-                    max((J_nonzero.min() / self.J_range.min(), 0)),
-                )
+        chain_strength = self.anneal_params.get("relative_chain_strength")
+        if chain_strength is not None:
+            chain_strength *= max(
+                (np.abs(h).max() / self.h_range.max(), np.abs(J).max() / self.J_range.max())
             )
 
         # get samples from the annealer
@@ -330,7 +324,7 @@ class BQRBM(QBMBase):
             h,
             J,
             num_reads=n_samples,
-            anneal_schedule=self.anneal_params["schedule"],
+            anneal_schedule=self.anneal_params.get("schedule"),
             chain_strength=chain_strength,
             answer_mode=answer_mode,
             auto_scale=False,
