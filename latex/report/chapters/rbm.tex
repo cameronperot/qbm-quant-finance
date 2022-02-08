@@ -1,5 +1,5 @@
 \section{Theory}
-The Restricted Boltzmann Machine (RBM) is an energy-based model defined by the energy function
+The Restricted Boltzmann Machine (RBM) is an energy-based model defined by the energy function~\cite{goodfellow_deep_learning}
 \begin{align}
     E(\vec{v}, \vec{h})
         &= -\sum_i a_i v_i - \sum_j b_j h_j - \sum_{i,j} v_i w_{ij} h_j \label{eq:rbm_energy} \\
@@ -20,9 +20,9 @@ where
     \label{fig:rbm_diagram}
 \end{figure}
 
-It is termed "restricted" due to the fact that intra-layer connections are not allowed, i.e., visible units are only connected to hidden units, and vice versa.
+It is termed "restricted" due to the fact that there are no intra-layer, i.e., visible units are only connected to hidden units, and vice versa.
 An example is depicted in \cref{fig:rbm_diagram}.
-We also Note that in this case we use RBM to refer to what one mig!htb call a Bernoulli RBM, due to the fact that the visible and hidden units are Bernoulli random variables.
+We also Note that in this case we use RBM to refer to what one might call a Bernoulli RBM, due to the fact that the visible and hidden units are Bernoulli random variables.
 
 The probability to find the system in the configuration \( \{\vec{v},\vec{h}\} \) is given by the Boltzmann distribution (with \( \beta = \frac{1}{k_BT} = 1 \) )
 \begin{align}
@@ -33,7 +33,7 @@ with intractable~\cite{long_servedio_2010} partition function
     Z = \sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})}
 \end{align}
 
-Due to the independence of units in the same layer, the conditional probabilities of the layers are given by~\footnote{Here \( \sigma(x) \) is the logistic sigmoid function and \( \odot \) denotes element-wise multiplication.} (see \cref{app:conditional_probabilities_derivation} for full derivation)
+Because the independence of units in the same layer, the conditional probabilities of the layers are given by~\footnote{Here \( \sigma(x) \) is the logistic sigmoid function and \( \odot \) denotes element-wise multiplication.} (see \cref{app:conditional_probabilities_derivation} for full derivation)
 \begin{align}
     p(\vec{h} | \vec{v})
         &= \prod_j \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j \\
@@ -41,7 +41,7 @@ Due to the independence of units in the same layer, the conditional probabilitie
         &= \prod_i \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i
 \end{align}
 
-Due to the partition function being intractable, the model able to be solved analytically, thus one must resort to other methods to optimize it such as likelihood maximization.
+Due to the partition function being intractable, the model is not able to be solved analytically, thus one must resort to other methods to optimize it such as likelihood maximization.
 Rather than maximizing the likelihood function itself, it is common to minimize the negative log-likelihood.
 For data distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W}, \vec{a}, \vec{b}) \) the average log-likelihood is given by
 \begin{align}
@@ -68,7 +68,7 @@ Therefore, the parameters at step \( t \) are given by
 where \( \eta \) is the learning rate hyperparameter.
 
 Since \( p(\vec{v}) \) can not be sampled directly, it must be sampled using a Markov chain Monte Carlo (MCMC) method.
-The way to do so is through Gibbs sampling, which uses the conditional probabilities \( p(\vec{h}|\vec{v}) \) and \( p(\vec{v}|\vec{h}) \).
+The way to do so is through Gibbs sampling~\cite{hinton_rbm_training}, which uses the conditional probabilities \( p(\vec{h}|\vec{v}) \) and \( p(\vec{v}|\vec{h}) \).
 One starts with a visible vector and then samples the hidden units, followed by sampling the visible units, and so forth until a desired thermalization threshold is reached.
 How many steps it requires to reach thermalization is model dependent, and can be estimated by analyzing the autocorrelations of a Markov chain.
 The algorithm for Gibbs sampling is given in \cref{alg:Gibbs} and illustrated in \cref{fig:gibbs_sampling_diagram}.
@@ -103,7 +103,7 @@ The Uniform$(a, b, n)$ function in \cref{alg:Gibbs} produces a length \( n \) ve
     \label{fig:gibbs_sampling_diagram}
 \end{figure}
 
-The standard procedure for training an RBM is called \( n \)-step contrastive divergence (CD-\( n \)), with \( n \) often taken as 1 in practice.
+The standard procedure for training an RBM is called \( n \)-step contrastive divergence (CD-\( n \)), with \( n \) often taken to be one in practice~\cite{hinton_rbm_training}.
 The algorithm is detailed in \cref{alg:CDn}, where one can see that \( n \) corresponds to how many Gibbs sampling steps are between the positive and negative phase gradient estimates.
 Applying the algorithm to a mini-batch is essentially the same except except that one divides the learning rate by the size of the mini-batch to get a mini-batch averaged gradient estimate.
 
@@ -137,13 +137,14 @@ In this section we will compare four different RBM models, denoted as:
     \item (X): using a transformed feature space.
     \item (XV): using a transformed feature space and volatility indicators.
 \end{itemize}
+The analysis follows along the lines of that in~\cite{kondratyev_2019}.
 
 \begin{table}[!htb]
     \centering
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/rbm/correlation_coefficients.tbl}
     \end{adjustbox}
-    \caption{Correlation coefficients of the data vs. samples generated by the RBM models. The RBM numbers are shown in the format average \(\pm\) 1 standard deviation from an ensemble of size 100.}
+    \caption{Correlation coefficients of the data vs. samples generated by the RBM models. The RBM numbers are shown in the format average \(\pm\) one standard deviation from an ensemble of size 100.}
     \label{tbl:rbm_correlation_coefficients}
 \end{table}
 
@@ -152,7 +153,7 @@ In this section we will compare four different RBM models, denoted as:
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/rbm/kl_divergences.tbl}
     \end{adjustbox}
-    \caption{KL divergences of the RBM models. All numbers are shown in the format average \(\pm\) 1 standard deviation from an ensemble of size 100.}
+    \caption{KL divergences of the RBM models. All numbers are shown in the format average \(\pm\) one standard deviation from an ensemble of size 100.}
     \label{tbl:rbm_KL_divergences}
 \end{table}
 
@@ -161,7 +162,7 @@ In this section we will compare four different RBM models, denoted as:
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/rbm/volatilities.tbl}
     \end{adjustbox}
-    \caption{Historical volatilities of the data vs. samples generated by the RBM models. All numbers are shown in the format average \(\pm\) 1 standard deviation from an ensemble of size 100.}
+    \caption{Historical volatilities of the data vs. samples generated by the RBM models. All numbers are shown in the format average \(\pm\) one standard deviation from an ensemble of size 100.}
     \label{tbl:rbm_volatilities}
 \end{table}
 
@@ -170,7 +171,7 @@ In this section we will compare four different RBM models, denoted as:
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/rbm/conditional_volatilities.tbl}
     \end{adjustbox}
-    \caption{Conditional historical volatilities of the data vs. samples generated by the RBM models. All numbers are shown in the format average \(\pm\) 1 standard deviation from an ensemble of size 100.}
+    \caption{Conditional historical volatilities of the data vs. samples generated by the RBM models. All numbers are shown in the format average \(\pm\) one standard deviation from an ensemble of size 100.}
     \label{tbl:rbm_conditional_volatilities}
 \end{table}
 
@@ -188,7 +189,7 @@ In this section we will compare four different RBM models, denoted as:
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/rbm/tails.tbl}
     \end{adjustbox}
-    \caption{Lower and upper tails, i.e., 1st and 99th percentiles, of the data vs. samples generated by the RBM models. All numbers are shown in the format average \(\pm\) 1 standard deviation from an ensemble of size 100.}
+    \caption{Lower and upper tails, i.e., 1st and 99th percentiles, of the data vs. samples generated by the RBM models. All numbers are shown in the format average \(\pm\) one standard deviation from an ensemble of size 100.}
     \label{tbl:rbm_tails}
 \end{table}
 
