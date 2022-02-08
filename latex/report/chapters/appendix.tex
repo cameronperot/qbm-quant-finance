@@ -1,6 +1,7 @@
 \section{RBM}
 
 \subsection{Conditional Probabilities}\label{app:conditional_probabilities_derivation}
+This derivation follows along the lines of that found on p. 658-659 of~\cite{goodfellow_deep_learning}.
 We start by noting
 \begin{align}
     p(\vec{v}) = \frac{1}{Z} \sum_\vec{h} e^{-E(\vec{v},\vec{h})}
@@ -64,6 +65,7 @@ This gives us
 
 \section{QBM}
 \subsection{Log-Likelihood}\label{app:qbm_log_likelihood_derivation}
+This derivation follows along the lines of that laid out in~\cite{amin_2018}.
 We start with the data-averaged log-likelihood
 \begin{align}
     \ell(\theta)
@@ -113,20 +115,21 @@ Unfortunately, due to the additional factor of \( \Lambda_\vec{v} \) in the firs
 which is nontrivial to compute in practice.
 
 \subsection{Log-Likelihood Lower Bound}\label{app:qbm_log_likelihood_lower_bound}
+This derivation follows along the lines of that laid out in~\cite{amin_2018}.
 The Golden-Thompson inequality that \( \tr(e^{A}e^{B}) \ge \tr(e^{A+B}) \) allows one to write (for small \( \epsilon > 0 \))
 \begin{align}
     \tr(e^{-H} e^{\log(\Lambda_\vec{v}+\epsilon)}) \ge \tr(e^{-H+\log(\Lambda_\vec{v}+\epsilon)})
 \end{align}
-Taking the limit \( \epsilon \rightarrow 0 \) yield
+Taking the limit \( \epsilon \rightarrow 0 \) yields
 \begin{align}
-    \lim_{\epsilon\rightarrow 0} \tr(e^{-H+\log(\Lambda_\vec{v}+\epsilon)})
-        &= \tr(e^{-H_\vec{v}})
+    \tr(\Lambda_\vec{v}e^{-H}) \ge \tr(e^{-H_\vec{v}})
 \end{align}
 where
 \begin{align}
     H_\vec{v} &= \braket{\vec{v} | H | \vec{v}}
 \end{align}
 with \( H_\vec{v} \) being the "clamped" Hamiltonian.
+This is called clamped because the visible qubits are held to the classical state of the visible vector \( \vec{v} \) due to an infinite energy penalty imposed by the \( \log(\Lambda_\vec{v} + \epsilon) \) term.
 Using this we can write the inequality
 \begin{align}
     p(\vec{v})
@@ -143,6 +146,7 @@ where
         &\equiv \sum_\vec{v} p_\text{data}(\vec{v}) \log\frac{\tr(e^{-H_\vec{v}})}{\tr(e^{-H})}
 \end{align}
 \subsection{Log-Likelihood Lower Bound Derivative}\label{app:qbm_log_likelihood_lower_bound_derivative}
+This derivation follows along the lines of that laid out in~\cite{amin_2018}.
 Taking the partial derivative yields
 \begin{align}
     \label{eq:qbm_log_likelihood_derivative_lower_bound}
@@ -157,32 +161,88 @@ Plugging in our parameters we get
 \begin{align}
     \partial_{w_{ij}} \tilde{\ell}(\theta)
         &= \overline{\langle \sigma_i^z \sigma_j^z \rangle_\vec{v}} - \langle \sigma_i^z \sigma_j^z \rangle \\
-    \partial_{c_k} \tilde{\ell}(\theta)
-        &= \overline{\langle \sigma_k^z \rangle_\vec{v}} - \langle \sigma_k^z \rangle
+    \partial_{b_i} \tilde{\ell}(\theta)
+        &= \overline{\langle \sigma_i^z \rangle_\vec{v}} - \langle \sigma_i^z \rangle
 \end{align}
-When restrictions are imposed on connections within the hidden layer, the clamped Hamiltonian becomes
+When restrictions are imposed on connections within the hidden layer, the clamped Hamiltonian reduces to
 \begin{align}
     H_\vec{v}
-        &= -\sum_i a_i v_i -\sum_j \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big)
+        &= -\sum_i \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big)
 \end{align}
-where \( c_j'(\vec{v}) = c_j + (\mat{W}^\intercal\vec{v})_j \).
+where \( b_i'(\vec{v}) = b_i + (\mat{W}^\intercal\vec{v})_i \).
 This allows one to rewrite the clamped density matrix as
 \begin{align}
     \rho_\vec{v}
-        &= \frac{1}{Z} \exp\bigg( \sum_i a_i v_i + \sum_j \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big) \bigg) \\
-        &= \frac{1}{Z} \exp\bigg( \sum_i a_i v_i \bigg) \prod_j \exp \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big)
+        &= \frac{1}{Z_\vec{v}} \exp\bigg( \sum_i \big(\Gamma_i \sigma_i^x + h_i'(\vec{v}) \sigma_i^z\big) \bigg) \\
+        &= \frac{1}{Z_\vec{v}} \prod_i \exp \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big) \\
+        &= \prod_i \rho_\vec{v}^{(i)}
 \end{align}
-Therefore, we can see that the clamped density matrix is proportional to the product of the exponentials of the hidden unit factors.
-This allows us to compute the expectation values values
+With this we can compute the expectation values as
 \begin{align}
     \langle \sigma_i^z \rangle_\vec{v}
-        &= v_i \\
-    \langle \sigma_j^z \rangle_\vec{v}
-        &= \tr(\rho_\vec{v}\sigma_j^z) \\
-        &= \frac{\tr\bigg[ \exp\bigg( \sum_i a_i v_i \bigg) \exp \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big) \sigma_j^z \bigg]}{\tr\bigg[ \exp\bigg( \sum_i a_i v_i \bigg) \exp \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big) \bigg) \bigg]} \\
-        &= \frac{\tr\bigg[ \exp \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big) \sigma_j^z \bigg]}{\tr\bigg[ \exp \big(\Gamma_j \sigma_j^x + c_j'(\vec{v}) \sigma_j^z\big) \bigg]} \\
-        &= \frac{c_j'(\vec{v})}{D_j(\vec{v})} \tanh\big(D_j(\vec{v})\big) \\
-    \langle \sigma_i^z \sigma_j^z \rangle_{\vec{v}}
-        &= v_i \frac{c_j'(\vec{v})}{D_j(\vec{v})} \tanh\big(D_j(\vec{v})\big)
+        &= \tr(\rho_\vec{v}^{(i)}\sigma_i^z) \\
+        &= \frac{\tr\bigg[ \exp \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big) \sigma_i^z \bigg]}{\tr\bigg[ \exp \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big) \bigg]} \\
+        &= \frac{b_i'(\vec{v})}{D_i(\vec{v})} \tanh\big(D_i(\vec{v})\big)
 \end{align}
-where \( D_j(\vec{v}) = \sqrt{\Gamma_j^2 + \big(c_j'(\vec{v})\big)^2} \).
+where \( D_i(\vec{v}) = \sqrt{\Gamma_i^2 + b_i'(\vec{v})^2} \).
+
+The last equality above is obtained by letting \( A = \Gamma_i \sigma_i^x + b_i'(\vec{v})\sigma_i^z \), \( \det A = -b_i'(\vec{v})^2 - \Gamma_i^2 = -D_i(\vec{v})^2 < 0 \), and using
+\begin{align}
+    \exp(A) = \cosh\Big(\sqrt{\abs{\det A}}\Big) I + \frac{1}{\sqrt{\abs{\det A}}}\sinh\Big(\sqrt{\abs{\det A}}\Big) A
+\end{align}
+
+\subsection{Learning The Effective Inverse Temperature \( \beta \)}\label{app:learning_beta}
+Following along the lines of~\cite{xu_2021} we have
+\begin{align}
+    p_\text{DW}
+        &= \frac{1}{Z_\text{DW}} e^{-E_\text{DW}} \\
+        &= \frac{1}{Z_\text{DW}} e^{-E / \betahat} \\
+\end{align}
+which leads to a negative log-likelihood derivative of
+\begin{align}
+    -\frac{\partial \log p_\text{DW}}{\partial\betahat}
+        &= -\frac{1}{\betahat^2} (E - \langle E \rangle)
+\end{align}
+and after averaging over the training data configurations we have
+\begin{align}
+    \Delta\betahat
+        &= \frac{\eta}{\betahat^2}\big(\overline{\langle E \rangle_\vec{v}} - \langle E \rangle\big)
+\end{align}
+
+\subsection{KL Divergence in Practice}\label{app:kl_divergence_in_practice}
+If we wish to compare the distribution \( \psample \) obtained from real world sampling to that of the reference distribution \( \pexact \) computed exactly, we need to first do some preprocessing to ensure that our comparison carries some sort of meaning.
+Since \( \psample \) is derived from a finite number of observations we will not always be able to get a full read of the true distribution.
+Therefore, it is ideal to take a histogram approach to better approximate the shape of the distribution and compare it to the same binned shape of the reference distribution.
+In practice this depends on how many samples ones has, and how many samples there are in comparison to the total number of states of the distribution.
+
+For the problem of comparing the distribution obtained by sampling the D-Wave annealer (maximum \( 10^4 \) sample size) in relation to \( 2^{12} = 4096 \) total possible configurations, we chose the number of bins in the histogram to be 32, since this is close to the number of bins computed using the Freedman-Diaconis rule on some of the sample sets.
+
+An issue we run into in practice is that \( \psample \) computed via the histogram approach might contain zeros, which leads to issues when computing the KL divergence since it would diverge to \( \infty \) due to the zero in the denominator of the log argument of
+\begin{align}
+    D_{KL}(\pexact \ || \ \psample) = \sum_i \pexact^{(i)} \log\frac{\pexact^{(i)}}{\psample^{(i)}}
+\end{align}
+The way around this is the concept of smoothing, i.e., adding a small probability to the zeros in the case where we know the true probability to be nonzero.
+In this case, given the quantum nature of the problem and the distribution we know that no state has a truly zero probability (although they can be infinitesimally small).
+The real question is what probability do we add here so that the numbers still carry some meaning.
+For this we chose to take the following approach: if \( \psample^{(i)} = 0 \) and \( \pexact^{(i)} > 0 \), then we take \( \psample^{(i)} = \pexact^{(i)} \cdot 10^{-6} \), which means that the term \( \pexact^{(i)} \log \frac{\pexact^{(i)}}{\psample^{(i)}} = \pexact^{(i)} \log 10^6 \).
+Thus, any zeros in the sample distribution that are nonzero in the exact distribution will impose a \( \pexact \) scaled constant penalty to the KL divergence.
+The sum of the terms of the sample probabilities that used to be zero are then evenly subtracted from the rest of the probabilities to ensure that the distribution remains normalized.
+
+Even though this is not the true KL divergence as intended by theory, it provides a decent approximation for which we can use to compare distributions generated by real world processes with limited sample size.
+
+\subsection{Exact Computation of \( \rho \)}\label{app:exact_rho_computation}
+For the density matrix
+\begin{align}
+    \rho = \frac{1}{Z} e^{-\beta H}
+\end{align}
+we can compute this as
+\begin{align}
+    \rho
+        &= \frac{1}{\tr(A)} S A S^{-1}
+\end{align}
+where
+\begin{align}
+    A = \text{diag}\Big(\exp\big(-\beta(\lambda_1 - \lambda_{\min})\big), \dots, \exp\big(-\beta(\lambda_{2^n} - \lambda_{\min})\big)\Big)
+\end{align}
+with \( \lambda_i \) being the eigenvalues of \( H \), and \( S \) is the matrix of eigenvectors that transforms \( H \) to and from its eigenspace.
+The reason why we subtract \( \lambda_{\min} \) from the eigenvalues in practice is to avoid computing the exponential of a large number which can lead to divergence in floating point calculations.
