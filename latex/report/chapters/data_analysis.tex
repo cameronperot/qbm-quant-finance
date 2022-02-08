@@ -1,5 +1,5 @@
 \section{Data Analysis}
-We start with the daily open, high, low, close (OHLC) data for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs
+We start with the daily open, high, low, close (OHLC) data for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs (data obtained from Dukascopy historical data feed~\cite{dukascopy})
 \begin{itemize}
     \item EURUSD - Euro € / U.S. Dollar \$
     \item GBPUSD - British Pound Sterling £ / U.S. Dollar \$
@@ -64,7 +64,7 @@ This \( 8.3\sigma \) event occurred right in midst of the financial crisis when 
 Next we would like to analyze the correlations between the currency pairs to get an idea of the interdependencies between them.
 This is visualized in~\cref{fig:scatters} where we see that there is a clear positive correlation between EURUSD/GBPUSD, and clear negative correlations between EURUSD/USDCAD and GBPUSD/USDCAD.
 We verify this by examining the Pearson \( r \), Spearman \( \rho \), and Kendall \( \tau \) correlation coefficients laid out in~\cref{tbl:data_correlation_coefficients}.
-The correlation coefficients are positive when the pairs are of the form \( X \)USD/\( Y \)USD and negative when the pairs are of the form \( X \)USD/USD\( Y \), for \( X,Y \in \) \{EUR, GBP, CAD, JPY\}.
+The correlation coefficients are positive when the pairs are of the form \( X \)USD/\( Y \)USD, and negative when the pairs are of the form \( X \)USD/USD\( Y \), for \( X,Y \in \) \{EUR, GBP, CAD, JPY\}.
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/scatters.png}
@@ -94,7 +94,7 @@ When binarizing the data, we first rescale the entries of \( \mat{X} \) to integ
 where \( \lfloor \ \cdot \ \rceil \) denotes rounding to the nearest integer.
 
 After we have the integer values we create a new matrix \( \mat{V} \in \binset^{4\cdot n_\text{bits} \times N} \) where the columns of \( \mat{V} \) are the \( n_\text{bits} \)-length binary representation vectors of the entries of the columns of \( \mat{X}' \) concatenated together.
-For example, if \( \vec{x} = (x_1,x_2,x_3,x_4) \) is a column of \( \mat{X} \), and the function \( \text{bin}(x) \) takes in an integer \( x \) and returns a binary vector, then the corresponding column in \( \mat{V} \) would be
+For example, if \( \vec{x} = (x_1,x_2,x_3,x_4) \) is a column of \( \mat{X} \), and the function \( \text{bin}(x) \) takes in an integer \( x \) and returns a binary column vector, then the corresponding column in \( \mat{V} \) would be
 \begin{align}
     \vec{v} = \begin{bmatrix}
         \text{bin}(x_1) \\
@@ -104,6 +104,44 @@ For example, if \( \vec{x} = (x_1,x_2,x_3,x_4) \) is a column of \( \mat{X} \), 
     \end{bmatrix}
 \end{align}
 
+\subsection{Data Transformation}
+Due to the way that the data is converted to a binary form, data with outliers can have a "gap" between large outliers and the next closest value.
+We create a transformation to reduce this gap by scaling outliers beyond a certain threshold \( \tau \), as detailed in~\cref{alg:transformation}.
+In practice we take \( \tau = 1 \) and \( \alpha = 0.5 \), thus the standardized data points above one standard deviation are mapped to their square root, this case is illustrated in~\cref{fig:data_transformation}.
+\begin{algorithm}
+    \caption{Outlier Power Transformation}
+\begin{algorithmic}[1]
+    \Procedure{Transform}{$\vec{x}, \alpha, \tau$}
+            \Comment $\alpha$ is the power, $\tau$ is the threshold
+        \State $\overline{x} \gets \text{mean}(\vec{x})$
+        \State $\sigma_{x} \gets \text{std}(\vec{x})$
+        \State $\delta \gets \tau - \tau^\alpha$
+            \Comment ensures the transformation is reversible
+        \For {$i$ in 1 to length($\vec{x}$)}
+            \State $x_i \gets (x_i - \overline{x}) / \sigma_x$
+                \Comment standardize
+            \State $x_i \gets (\abs{x_i}^\alpha + \delta) \cdot \text{sign}(x_i)$
+                \Comment scale
+            \State $x_i \gets x_i \cdot \sigma_x + \overline{x}$
+                \Comment undo standardization
+        \EndFor
+    \EndProcedure
+\end{algorithmic}
+\label{alg:transformation}
+\end{algorithm}
+
+\begin{figure}[!htb]
+    \begin{center}
+        \includegraphics[width=1\linewidth]{data_analysis/data_transformation.png}
+    \end{center}
+    \caption{Transformation applied to the data before training, for the purpose of reducing large "gaps" in the binarized data by scaling outliers above one standard deviation by taking the square root of their standardized value.}
+    \label{fig:data_transformation}
+\end{figure}
+
+In~\cref{fig:data_transformation} we see the outlier power transformation applied to the log returns training data.
+This brings in the outliers and creates "shoulders" on the Gaussian shaped histograms.
+The violin and box plot in~\cref{fig:violin_transformed} shows the transformed data has significantly less outliers, and \cref{tbl:data_log_returns_transformed_stats} shows that the standard deviations have been decreased relative to the originals given in~\cref{tbl:data_log_returns_raw_stats}.
+
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/histograms_transformed.png}
@@ -111,7 +149,13 @@ For example, if \( \vec{x} = (x_1,x_2,x_3,x_4) \) is a column of \( \mat{X} \), 
     \caption{Histograms of the transformed log returns of currency pairs.}
     \label{fig:histograms_transformed}
 \end{figure}
-
+\begin{figure}[!htb]
+    \begin{center}
+        \includegraphics[width=1\linewidth]{data_analysis/violin_transformed.png}
+    \end{center}
+    \caption{Violin/box plot of the log returns for currency pairs.}
+    \label{fig:violin_transformed}
+\end{figure}
 \begin{table}[!htb]
     \centering
     \begin{adjustbox}{max width=\textwidth}
@@ -121,37 +165,15 @@ For example, if \( \vec{x} = (x_1,x_2,x_3,x_4) \) is a column of \( \mat{X} \), 
     \label{tbl:data_log_returns_transformed_stats}
 \end{table}
 
+\subsection{Additional Information}
+We can increase the information content of the training data by adding additional variables.
+One such bit of information is the rolling volatility relative to the historical median.
+We can encode this data as additional binary indicators that are one when above the historical median, and zero when below.
+This can then be concatenated onto the training data and fed to the model to make it more robust by allowing for the results to be conditioned on a specific volatility regime.
 \begin{figure}[!htb]
     \begin{center}
-        \includegraphics[width=1\linewidth]{data_analysis/violin_transformed.png}
+        \includegraphics[width=1\linewidth]{data_analysis/rolling_volatility.png}
     \end{center}
-    \caption{Violin/box plot of the transformed log returns for currency pairs.}
-    \label{fig:violin_transformed}
+    \caption{3-month rolling volatility of the log returns for currency pairs.}
+    \label{fig:rolling_volatility}
 \end{figure}
-
-
-\todo{Algorithm for transformation}
-
-%\begin{figure}[!htb]
-    %\begin{center}
-        %\includegraphics[width=1\linewidth]{data_analysis/data_transformation.png}
-    %\end{center}
-    %\caption{Transformation function applied to the data before training, for the purpose of reducing large "gaps" in the binarized data by scaling outliers above one standard deviation by taking the square root of the standardized value.}
-    %\label{fig:data_transformation}
-%\end{figure}
-
-%\begin{figure}[!htb]
-    %\begin{center}
-        %\includegraphics[width=1\linewidth]{data_analysis/violin_transformed.png}
-    %\end{center}
-    %\caption{Violin/box plot of the log returns for currency pairs.}
-    %\label{fig:violin_transformed}
-%\end{figure}
-
-%\begin{figure}[!htb]
-    %\begin{center}
-        %\includegraphics[width=1\linewidth]{data_analysis/rolling_volatility.png}
-    %\end{center}
-    %\caption{3-month rolling volatility of the log returns for currency pairs.}
-    %\label{fig:rolling_volatility}
-%\end{figure}
