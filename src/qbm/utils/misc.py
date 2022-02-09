@@ -221,7 +221,7 @@ def save_artifact(artifact, file_path):
             pickle.dump(artifact, f)
 
 
-def kl_divergence(X_data, X_samples, n_bins=32):
+def kl_divergence(X_data, X_samples, n_bins=32, smooth=None):
     """
     Computes the D_KL(p_data || p_samples).
 
@@ -230,20 +230,27 @@ def kl_divergence(X_data, X_samples, n_bins=32):
     :param X_data: Array of data values.
     :param X_samples: Array of sample values.
     :param n_bins: Number of bins to use in histograms.
+    :param smooth: Value to use with q distribution smoothing.
 
     :returns: D_KL(p_data || p_samples).
     """
     hist_data, bin_edges = np.histogram(X_data, bins=n_bins)
     hist_samples, _ = np.histogram(X_samples, bins=bin_edges)
 
-    p_data = hist_data / X_data.shape[0]
-    p_samples = hist_samples / X_samples.shape[0]
+    p = hist_data / X_data.shape[0]
+    q = hist_samples / X_samples.shape[0]
 
-    assert np.isclose(p_data.sum(), 1)
-    assert np.isclose(p_samples.sum(), 1)
+    if smooth is not None:
+        smooth_mask = np.logical_and(p > 0, q == 0)
+        not_smooth_mask = np.logical_not(smooth_mask)
+        q[smooth_mask] = smooth
+        q[not_smooth_mask] -= q[smooth_mask].sum() / not_smooth_mask.sum()
 
-    support = np.logical_and(p_data > 0, p_samples > 0)
-    p_data = p_data[support]
-    p_samples = p_samples[support]
+    assert np.isclose(p.sum(), 1, atol=1e-3)
+    assert np.isclose(q.sum(), 1, atol=1e-3)
 
-    return (p_data * np.log(p_data / p_samples)).sum()
+    support = np.logical_and(p > 0, q > 0)
+    p = p[support]
+    q = q[support]
+
+    return (p * np.log(p / q)).sum()
