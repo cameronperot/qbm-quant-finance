@@ -174,7 +174,7 @@ class BQRBM(QBMBase):
                 f"epoch duration = {timedelta(seconds=end_time - start_time)}",
             )
             if callback is not None:
-                print("\t" + callback_output["print"])
+                print(callback_output["print"])
 
     def save(self, file_path):
         """
