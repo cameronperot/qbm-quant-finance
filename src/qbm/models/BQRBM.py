@@ -103,10 +103,10 @@ class BQRBM(QBMBase):
 
     def train(
         self,
-        n_epochs=1000,
+        n_epochs=100,
         learning_rate=1e-1,
         learning_rate_beta=1e-1,
-        mini_batch_size=16,
+        mini_batch_size=10,
         n_samples=10_000,
         callback=None,
     ):
