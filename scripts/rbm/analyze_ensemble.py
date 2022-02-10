@@ -66,7 +66,7 @@ def main(model_id):
         dkl_dfs.append(
             pd.DataFrame.from_dict(
                 {
-                    column: kl_divergence(log_returns[column], samples[column])
+                    column: kl_divergence(log_returns[column], samples[column], smooth=1e-6)
                     for column in log_returns.columns
                 },
                 orient="index",
