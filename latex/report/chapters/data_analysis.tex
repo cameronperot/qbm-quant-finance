@@ -1,11 +1,12 @@
 \section{Data Analysis}
-We start with the daily open, high, low, close (OHLC) data for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs (data obtained from Dukascopy historical data feed~\cite{dukascopy})
+Our dataset consists of the daily open, high, low, close (OHLC) data for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs
 \begin{itemize}
     \item EURUSD - Euro € / U.S. Dollar \$
     \item GBPUSD - British Pound Sterling £ / U.S. Dollar \$
     \item USDCAD - U.S. Dollar \$ / Canadian Dollar \$
     \item USDJPY - U.S. Dollar \$ / Japanese Yen ¥
 \end{itemize}
+obtained from Dukascopy historical data feed~\cite{dukascopy}.
 We will use the notation \( x_\text{open} \), \( x_\text{high} \), \( x_\text{low} \), and \( x_\text{close} \) to denote the open, high, low, and close values of a currency pair on a particular day.
 
 Given that the values are on an absolute basis, we would like to convert them to relative terms in order to be able to compare data from different time periods on a more equal footing.
@@ -28,13 +29,13 @@ due to several advantages~\cite{quantivity_2012}
 \end{itemize}
 
 The first thing we need to do is to get an idea of how the log returns are distributed.
-To get a visual overview we can analyze the histograms, depicted in~\cref{fig:histograms_raw}.
-From visual examination we see that the log returns are roughly normally distributed with sample statistics shown in~\cref{tbl:data_log_returns_raw_stats}.
+To get a visual overview we can analyze the histograms depicted in~\cref{fig:histograms_raw}.
+From visual examination we see that the log returns are roughly normally distributed with the sample statistics given in~\cref{tbl:data_log_returns_raw_stats}.
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/histograms.png}
     \end{center}
-    \caption{Histograms of the log returns of currency pairs.}
+    \caption{Histograms of the log returns of individual currency pairs exhibit Gaussian-like shapes around zero.}
     \label{fig:histograms_raw}
 \end{figure}
 
@@ -57,7 +58,7 @@ This \( 8.3\sigma \) event occurred right in midst of the financial crisis when 
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/violin.png}
     \end{center}
-    \caption{Violin/box plot of the log returns for currency pairs.}
+    \caption{Violin/box plot of the log returns for currency pairs show that there are two major outliers, one to the downside of GBPUSD and another to the upside of USDJPY.}
     \label{fig:violin_raw}
 \end{figure}
 
@@ -69,7 +70,7 @@ The correlation coefficients are positive when the pairs are of the form \( X \)
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/scatters.png}
     \end{center}
-    \caption{Scatter matrix of the currency pairs.}
+    \caption{The scatter matrix of the currency pairs shows a clear positive correlation between EURUSD/GBPUSD, and clear negative correlations between EURUSD/USDCAD and GBPUSD/USDCAD.}
     \label{fig:scatters}
 \end{figure}
 
@@ -84,12 +85,12 @@ The correlation coefficients are positive when the pairs are of the form \( X \)
 
 
 \section{Data Preprocessing}
-In order to feed the data to the models in the following sections, we first need to binarize the data.
+In order to feed the data to the models in the following sections, we first need to convert the data to a form in which it is represented by binary vectors.
 Let \( \mat{X} \in \R^{4 \times N} \) represent the training dataset of log returns, where training examples are vectors in the column space, thus element \( x_{ij} \) represents the \( i \)th currency pair log return for the \( j \)th training example.
 
 When binarizing the data, we first rescale the entries of \( \mat{X} \) to integer values in \( \{0, 1, \dots, 2^{n_\text{bits}} - 1\} \), represented by the matrix \( \mat{X}' \in \N^{4 \times N} \) with entries
 \begin{align}
-    x_{ij}' = \bigg\lfloor \frac{x_{ij} - \min_k x_{kj}}{\max_k x_{kj} - \min_k x_{kj}} \cdot (2^{n_\text{bits}} - 1) \bigg\rceil
+    x_{ij}' = \bigg\lfloor \frac{x_{ij} - \min_k x_{ik}}{\max_k x_{ik} - \min_k x_{ik}} \cdot (2^{n_\text{bits}} - 1) \bigg\rceil
 \end{align}
 where \( \lfloor \ \cdot \ \rceil \) denotes rounding to the nearest integer.
 
@@ -104,10 +105,17 @@ For example, if \( \vec{x} = (x_1,x_2,x_3,x_4) \) is a column of \( \mat{X} \), 
     \end{bmatrix}
 \end{align}
 
+For the dataset at hand we use \( n_\text{bits} = 16 \), which gives us a training set \( \mat{V} \in \binset^{64 \times N} \), thus our training examples are binary vectors of length 64.
+The discretization errors associated with this conversion and dataset are on the order \( 10^{-7} \), which is within the desired tolerance for this purpose.
+
 \subsection{Data Transformation}
-Due to the way that the data is converted to a binary form, data with outliers can have a "gap" between large outliers and the next closest value.
-We create a transformation to reduce this gap by scaling outliers beyond a certain threshold \( \tau \), as detailed in~\cref{alg:transformation}.
+Due to how the data is converted linearly to a binary form, data with outliers can have a "gap" between large outliers and the next closest value, which can lead to difficulties in training.
+To mitigate this, we create a transformation to reduce this gap by scaling outliers beyond a certain threshold \( \tau \), as detailed in~\cref{alg:transformation}.
 In practice we take \( \tau = 1 \) and \( \alpha = 0.5 \), thus the standardized data points above one standard deviation are mapped to their square root, this case is illustrated in~\cref{fig:data_transformation}.
+This transformation is reversible if we save \( \overline{x} \), \( \sigma_x \), and \( \delta \).
+
+Of course this transformation doesn't necessarily have an inherent meaning, and the transformed data isn't necessarily representative of anything, but this was found to improve some of the model results as we will see in the next chapter.
+
 \begin{algorithm}
     \caption{Outlier Power Transformation}
 \begin{algorithmic}[1]
@@ -120,8 +128,10 @@ In practice we take \( \tau = 1 \) and \( \alpha = 0.5 \), thus the standardized
         \For {$i$ in 1 to length($\vec{x}$)}
             \State $x_i \gets (x_i - \overline{x}) / \sigma_x$
                 \Comment standardize
-            \State $x_i \gets (\abs{x_i}^\alpha + \delta) \cdot \text{sign}(x_i)$
-                \Comment scale
+            \If {$x_i \ge \tau$}
+                \State $x_i \gets (\abs{x_i}^\alpha + \delta) \cdot \text{sign}(x_i)$
+                    \Comment scale standardized values beyond $\tau$
+            \EndIf
             \State $x_i \gets x_i \cdot \sigma_x + \overline{x}$
                 \Comment undo standardization
         \EndFor
@@ -134,26 +144,26 @@ In practice we take \( \tau = 1 \) and \( \alpha = 0.5 \), thus the standardized
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/data_transformation.png}
     \end{center}
-    \caption{Transformation applied to the data before training, for the purpose of reducing large "gaps" in the binarized data by scaling outliers above one standard deviation by taking the square root of their standardized value.}
+    \caption{Transformation applied to the data before training using \( \tau = 1 \) and \( \alpha = 0.5 \), for the purpose of reducing large "gaps" in the binarized data by scaling outliers above one standard deviation by taking the square root of their standardized value.}
     \label{fig:data_transformation}
 \end{figure}
 
 In~\cref{fig:data_transformation} we see the outlier power transformation applied to the log returns training data.
 This brings in the outliers and creates "shoulders" on the Gaussian shaped histograms.
-The violin and box plot in~\cref{fig:violin_transformed} shows the transformed data has significantly less outliers, and \cref{tbl:data_log_returns_transformed_stats} shows that the standard deviations have been decreased relative to the originals given in~\cref{tbl:data_log_returns_raw_stats}.
+As expected, the violin and box plot in~\cref{fig:violin_transformed} shows the transformed data has significantly less outliers, and \cref{tbl:data_log_returns_transformed_stats} shows that the standard deviations have been decreased relative to the originals given in~\cref{tbl:data_log_returns_raw_stats}.
 
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/histograms_transformed.png}
     \end{center}
-    \caption{Histograms of the transformed log returns of currency pairs.}
+    \caption{Histograms of the transformed log returns of currency pairs have shoulders around the threshold \( \tau \) which do not appear in the original.}
     \label{fig:histograms_transformed}
 \end{figure}
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/violin_transformed.png}
     \end{center}
-    \caption{Violin/box plot of the log returns for currency pairs.}
+    \caption{Violin/box plot of the transformed log returns for currency pairs shows how the outliers have been scaled closer to the mean.}
     \label{fig:violin_transformed}
 \end{figure}
 \begin{table}[!htb]
@@ -168,12 +178,21 @@ The violin and box plot in~\cref{fig:violin_transformed} shows the transformed d
 \subsection{Additional Information}
 We can increase the information content of the training data by adding additional variables.
 One such bit of information is the rolling volatility relative to the historical median.
+In finance we compute the annualized volatility of a time series vector \( \vec{x} \) as
+\begin{align}
+    \text{vol}(\vec{x}) = \sqrt{252} \cdot \text{std}(\vec{x})
+\end{align}
+where the factor of \( \sqrt{252} \) comes from the square root of the number of trading days in a year, i.e., it's the annualization factor.
+In \cref{fig:rolling_volatility} we show the 3-month rolling volatility versus its historical median which indicates whether it's in the low or high volatility regime.
+
 We can encode this data as additional binary indicators that are one when above the historical median, and zero when below.
-This can then be concatenated onto the training data and fed to the model to make it more robust by allowing for the results to be conditioned on a specific volatility regime.
+This can then be concatenated onto the training data and fed to the model to make it more flexible by allowing for the results to be conditioned on a specific volatility regime.
+Adding one such indicator for each currency increases the number of rows in our training dataset by four, thus the concatenated dataset lies in the space \( \binset^{68 \times N} \).
+
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/rolling_volatility.png}
     \end{center}
-    \caption{3-month rolling volatility of the log returns for currency pairs.}
+    \caption{3-month rolling volatility of the log returns for currency pairs compared to the historical median.}
     \label{fig:rolling_volatility}
 \end{figure}
