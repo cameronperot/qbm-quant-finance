@@ -7,6 +7,8 @@ Our dataset consists of the daily open, high, low, close (OHLC) data for the tim
     \item USDJPY - U.S. Dollar \$ / Japanese Yen ¥
 \end{itemize}
 obtained from Dukascopy historical data feed~\cite{dukascopy}.
+The data was filtered to remove days where any of the currencies had zero volume, as well as NYSE and LSE holidays.
+This results in a dataset of 5165 training examples.
 We will use the notation \( x_\text{open} \), \( x_\text{high} \), \( x_\text{low} \), and \( x_\text{close} \) to denote the open, high, low, and close values of a currency pair on a particular day.
 
 Given that the values are on an absolute basis, we would like to convert them to relative terms in order to be able to compare data from different time periods on a more equal footing.
@@ -65,6 +67,7 @@ This \( 8.3\sigma \) event occurred right in midst of the financial crisis when 
 Next we would like to analyze the correlations between the currency pairs to get an idea of the interdependencies between them.
 This is visualized in~\cref{fig:scatters} where we see that there is a clear positive correlation between EURUSD/GBPUSD, and clear negative correlations between EURUSD/USDCAD and GBPUSD/USDCAD.
 We verify this by examining the Pearson \( r \), Spearman \( \rho \), and Kendall \( \tau \) correlation coefficients laid out in~\cref{tbl:data_correlation_coefficients}.
+\cref{app:correlation_coefficients} contains further information on how to compute and interpret the correlation coefficients.
 The correlation coefficients are positive when the pairs are of the form \( X \)USD/\( Y \)USD, and negative when the pairs are of the form \( X \)USD/USD\( Y \), for \( X,Y \in \) \{EUR, GBP, CAD, JPY\}.
 \begin{figure}[!htb]
     \begin{center}
