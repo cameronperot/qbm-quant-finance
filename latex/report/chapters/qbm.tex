@@ -1,6 +1,6 @@
 \section{Theory}
 \subsection{The Quantum Boltzmann Machine}
-The Quantum Boltzmann Machine (QBM) detailed in this section is based on the work by Amin et al. in~\cite{amin_2018}.
+The Quantum Boltzmann Machine (QBM) detailed in this section is based on the work in \textit{Quantum Boltzmann Machine}~\cite{amin_2018} by Amin et al.
 In this section we will use spin eigenvalues \( +1 \) and \( -1 \) rather than binary values \( 0 \) and \( 1 \), respectively, in order to maintain consistency with the language of quantum mechanics.
 We start with the Hamiltonian
 \begin{align}
@@ -215,7 +215,7 @@ The learning rate for the parameter \( \betahat \) follows a similar schedule, e
 
 \subsubsection{Training Results}
 In~\cref{fig:train_results_exact} we see the results of training the model on the aforementioned data.
-We chose to use the KL divergence \( D_{KL}(\pdata \ || \ \pmodel) \) as a way to track the progress of the training and get a read on how well the model is learning the data distribution.
+We chose to use the KL divergence \( \DKL{\pdata}{\pmodel} \) as a way to track the progress of the training and get a read on how well the model is learning the data distribution.
 This is computed using a 32-bin histogram approach of the visible states, with \( \pmodel \) computed from a sample set of size \( 10^4 \).
 We notice a clear trend of the KL divergence being minimized, which in practice is equivalent to the log likelihood being maximized.
 The learning curve reaches an optimal value after about 80 epochs, and stays steady for the next 20 epochs until the end of training.
@@ -254,7 +254,7 @@ All embeddings used here were direct, i.e., each logical qubit was only mapped t
 
 To this end we randomly generate \( h_i \) and \( J_{ij} \) from a normal distribution with \( \mu = 0 \) and \( \sigma = 0.1 \), which is in line with the \( h \)'s and \( J \)'s optimized in the simulation.
 With these we can generate samples using the annealer to compare to the theoretical distributions obtained by exact computation of the density matrix \( \rho \).
-In order to compare distributions we use the Kullback-Leibler divergence \( D_{KL}(\pexact \ || \ \psample) \) to compare the probabilities computed from the samples returned by the annealer to the reference distribution \( \pexact \) computed by exact computation of \( \rho \).
+In order to compare distributions we use the Kullback-Leibler divergence \( \DKL{\pexact}{\psample} \) to compare the probabilities computed from the samples returned by the annealer to the reference distribution \( \pexact \) computed by exact computation of \( \rho \).
 The KL divergence essentially tells us how much information we lose if we use \( \psample \) to approximate \( \pexact \), thus we want it to be as small as possible.
 There are some caveats when using the KL divergence for this application, \cref{app:kl_divergence_in_practice} details how the values in this section are computed.
 
