@@ -120,7 +120,8 @@ for model_name, model_info in models.items():
     # conditional volatilities
     if "V" in prefix:
         volatility_low = pd.read_csv(
-            model_results_dir / "data/volatilities_low.csv", index_col="currency_pair",
+            model_results_dir / "data/volatilities_low.csv",
+            index_col="currency_pair",
         )
         column_map = {
             column: f"{prefix}_{column.lower().replace(' ', '_')}"
@@ -130,7 +131,8 @@ for model_name, model_info in models.items():
         volatilities_low[prefix] = volatility_low
 
         volatility_high = pd.read_csv(
-            model_results_dir / "data/volatilities_high.csv", index_col="currency_pair",
+            model_results_dir / "data/volatilities_high.csv",
+            index_col="currency_pair",
         )
         column_map = {
             column: f"{prefix}_{column.lower().replace(' ', '_')}"
@@ -157,7 +159,8 @@ for model_name, model_info in models.items():
 
     # tails sample stds
     tails_sample_stds = pd.read_csv(
-        model_results_dir / "data/tails_sample_stds.csv", index_col="currency_pair",
+        model_results_dir / "data/tails_sample_stds.csv",
+        index_col="currency_pair",
     )
     column_map = {column: f"{prefix}_{column}_std" for column in tails_sample_stds.columns}
     tails_sample_stds.rename(columns=column_map, inplace=True)
@@ -168,7 +171,8 @@ for model_name, model_info in models.items():
 
     # autocorrelation times
     ac_times[prefix] = pd.read_csv(
-        model_results_dir / "data/autocorrelation_times.csv", index_col="currency_pair",
+        model_results_dir / "data/autocorrelation_times.csv",
+        index_col="currency_pair",
     )
     column_map = {column: f"{prefix}_ac_time" for column in ac_times[prefix].columns}
     ac_times[prefix].rename(columns=column_map, inplace=True)
@@ -258,7 +262,7 @@ print(dkls)
 prefixes = ("B", "V", "X", "XV")
 table = [
     r"\begin{tabular}{l r r r r}",
-    r"\multicolumn{5}{c}{\(D_{KL}(p_\text{data} \ || \ p_\text{model})\)} \\",
+    r"\multicolumn{5}{c}{\(D_{\text{KL}}(p_\text{data} \ || \ p_\text{model})\)} \\",
     r"\toprule",
     r"Currency Pair & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} \\"
     % prefixes,
