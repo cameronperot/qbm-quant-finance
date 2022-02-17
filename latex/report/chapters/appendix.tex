@@ -210,8 +210,10 @@ and after averaging over the training data configurations we have
 \end{align}
 
 \section{Model Implementation in Python}
+A Python package named \texttt{qbm} was developed to house all of the reusable code for this project.
 The code implementing the quantum restricted Boltzmann machine, trained by minimizing the upper bound of the negative log-likelihood, is implemented as an easy to use Python class titled \texttt{BQRBM}.
 All code is commented and broken down into easy to understand methods and blocks.
+
 \subsection{Initialization}
 The object can be initialized as follows
 \begin{python}
@@ -262,6 +264,30 @@ where
     \item \texttt{callback (function)}: function which takes the arguments \texttt{(model, sample\_state\_vectors)} to call at the end of every epoch for the purpose of getting a read on the model's training progress. The \texttt{model} argument is the BQRBM object, and the \texttt{sample\_state\_vectors} are the sampled state vectors returned by the sampler, of shape \texttt{(n\_samples, n\_qubits)} with the first \texttt{n\_visible} qubits corresponding to the visible units. If \texttt{None} then no callback function will be used.
 \end{itemize}
 
+\subsubsection{Training Loop}
+Below we have a code snippet from the core of the \texttt{train} method
+\begin{python}[breaklines=true]
+for epoch in range(1, n_epochs + 1):
+    # loop over the mini-batches and compute and apply grads for each
+    for mini_batch_indices in self._random_mini_batch_indices(mini_batch_size):
+        V_pos = self.X_train[mini_batch_indices]
+        self._compute_positive_grads(V_pos)
+        self._compute_negative_grads(V_pos.shape[0])
+        self._apply_grads(self.learning_rate / V_pos.shape[0])
+        self._clip_weights_and_biases()
+
+    # generate samples after every epoch to update beta
+    samples = self.sample(n_samples)
+    self._update_beta(samples)
+
+    # pass samples to the callback function to track performance
+    if callback is not None:
+        callback_output = callback(self, self._get_state_vectors(samples))
+        self.callback_outputs.append(callback_output)
+\end{python}
+In the above training loop we see the \texttt{\_clip\_weights\_and\_biases()} method being called.
+This method clips the weights and biases so that the corresponding \( h_i \) and \( J_{ij} \) values fall within the allowed ranges for the annealer, which for the Advantage 5.1 is \( h_i \in [-4, 4] \) and \( J_{ij} \in [-1, 1] \).
+
 \subsection{Sampling}
 After the model is trained it can be sampled via the \texttt{sample()} method
 \begin{python}
@@ -280,7 +306,16 @@ where
     \item \texttt{binary (bool)}: if \texttt{True} will return the sampled state vectors in binary values rather than spin eigenvalues.
 \end{itemize}
 
-\subsection{Things to Note}
+\subsection{Saving and Loading}
+Models can easily be saved and loaded via the corresponding \texttt{save} and \texttt{load} methods.
+A model can be saved using
+\begin{python}
+model.save(file_path)
+\end{python}
+and loaded again using
+\begin{python}
+model = BQRBM.load(file_path)
+\end{python}
 
 \section{Miscellaneous}
 \subsection{KL Divergence}\label{app:kl_divergence}
