@@ -200,6 +200,14 @@ This results in iterative updates to the estimated effective inverse temperature
 \end{align}
 In practice, we forego the factor of \( \betahat^2 \) downstairs for simplicity and to keep a similar form to the other gradient updates, as mentioned in~\cite{xu_2021}.
 
+\subsubsection{Previous Work in This Field}
+In recent years a number of researchers have dabbled in using D-Wave annealers to train Boltzmann machines~\cite{adachi_2015,benedetti_2016,anschuetz_2019,wiebe_2019,rocutto_2020,dixit_2021,ilmo_2021,wilson_2021}.
+The most common approach is to train a classical RBM with quantum assistance, i.e., using the annealer to generate the samples in the negative phase rather than using contrastive divergence.
+This isn't necessarily a true quantum Boltzmann machine as per~\cite{amin_2018}, but as we will see there are still advantages for using an RBM trained using quantum assistance over that of contrastive divergence.
+
+One thing that stands out the most about a lot of the previous research is the fact most does not talk about the embeddings or anneal schedules, which as we will see in the next section are extremely important for getting the best possible performance out of the annealer.
+Therefore, we wish to create a basic framework with which one can use to approach the problem of using a D-Wave annealer to sample from a (quantum) Boltzmann distribution.
+
 \section{12-Qubit Problem}
 In order to get a better understanding of how the QBM works, we turn our attention towards a small 12-qubit problem we can solve exactly.
 For this purpose we take a QBM with restrictions in both the visible and hidden layers trained using the log-likelihood lower bound (for short we call this BQRBM) with 8 visible and 4 hidden units to act as an autoencoder to generate samples similar to the training data.
@@ -402,7 +410,7 @@ It can also be seen that the QQ plot~\cref{fig:qq_comparison} produced by the Ad
     \begin{center}
         \includegraphics[width=1\linewidth]{qbm/8x4/model_comparison_test.png}
     \end{center}
-    \caption{Comparison of the models trained using the D-Wave Advantage 5.1 with \( s^* = 1 \) for various pause points. The data represents an ensemble average over 10 random gauges with \( 10^4 \) sample each, and error bars represent one standard deviation. The minimum values represent one of the random gauge sample sets.}
+    \caption{Comparison of the models trained using the D-Wave Advantage 5.1 with \( s^* = 1 \) for various pause points. The data represents an ensemble average over 10 random gauges with \( 10^4 \) samples each, and error bars represent one standard deviation. The minimum values represent the minimum over the ensemble.}
     \label{fig:model_comparison_test}
 \end{figure}
 \begin{figure}[!htb]
@@ -415,6 +423,9 @@ It can also be seen that the QQ plot~\cref{fig:qq_comparison} produced by the Ad
 
 The results in this section show that a BQRBM trained with \( s^* = 1 \) (which reduces to a classical RBM using the quantum-based model to approximate the Boltzmann distribution) works reasonably well, but still underperforms the simulation by a good margin, and the classical RBM by a smaller margin.
 This does not mean that the annealer will always underperform, rather that it was not able to with the embeddings and anneal schedules tested here.
+
+\section{The Quantum Market Generator}
+lorem ipsum
 
 \section{Challenges of Using a D-Wave Annealer to Train QBMs}
 Using a D-Wave quantum annealer to train quantum Boltzmann machines is a difficult task, and there are many challenges which need to be overcome in order to do so.
