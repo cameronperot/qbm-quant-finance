@@ -193,17 +193,19 @@ class BQRBM(QBMBase):
             self._initialize_qpu_sampler()
 
     @staticmethod
-    def load(file_path):
+    def load(file_path, initialize_qpu_sampler=True):
         """
         Loads the BQRBM model at file_path. Necessary because of pickling issues with the
         qpu and sampler objects.
 
         :param file_path: Path to the model to load.
+        :param initialize_qpu_sampler: If True and self.exact_params is None, then will
+            call self._initialize_qpu_sampler().
 
         :returns: BQRBM instance.
         """
         model = load_artifact(file_path)
-        if model.exact_params is None:
+        if model.exact_params is None and initialize_qpu_sampler:
             model._initialize_qpu_sampler()
 
         return model
