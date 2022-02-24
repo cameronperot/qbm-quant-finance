@@ -78,9 +78,9 @@ class BQRBM(QBMBase):
                 )
             )
 
-            # set h and J ranges (these values are for Advantage_system5.1)
-            self.h_range = np.array([-4, 4])
-            self.J_range = np.array([-1, 1])
+            # set h and J ranges (these default values are for Advantage_system5.1)
+            self.h_range = np.array(self.exact_params.get("h_range", [-4, 4]))
+            self.J_range = np.array(self.exact_params.get("J_range", [-1, 1]))
 
     def sample(self, n_samples, answer_mode="raw", use_gauge=True, binary=False):
         """
