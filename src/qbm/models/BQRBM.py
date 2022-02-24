@@ -315,9 +315,8 @@ class BQRBM(QBMBase):
         # compute the chain strength
         chain_strength = self.anneal_params.get("relative_chain_strength")
         if chain_strength is not None:
-            chain_strength *= max(
-                (np.abs(h).max() / self.h_range.max(), np.abs(J).max() / self.J_range.max())
-            )
+            max_strength = max(np.abs(h).max(), np.abs(J).max())
+            chain_strength *= max_strength
 
         # get samples from the annealer
         samples = self.sampler.sample_ising(
