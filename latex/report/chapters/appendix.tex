@@ -160,8 +160,10 @@ Plugging in our parameters we get
 \begin{align}
     \partial_{w_{ij}} \tilde{\ell}(\theta)
         &= \overline{\langle \sigma_i^z \sigma_j^z \rangle_\vec{v}} - \langle \sigma_i^z \sigma_j^z \rangle \\
+        &= \langle \sigma_i^z \sigma_j^z \rangle_\text{data} - \langle \sigma_i^z \sigma_j^z \rangle_\text{model} \\
     \partial_{b_i} \tilde{\ell}(\theta)
-        &= \overline{\langle \sigma_i^z \rangle_\vec{v}} - \langle \sigma_i^z \rangle
+        &= \overline{\langle \sigma_i^z \rangle_\vec{v}} - \langle \sigma_i^z \rangle \\
+        &= \langle \sigma_i^z \rangle_\text{data} - \langle \sigma_i^z \rangle_\text{model}
 \end{align}
 When restrictions are imposed on connections within the hidden layer, the clamped Hamiltonian reduces to
 \begin{align}
@@ -224,7 +226,7 @@ model = BQRBM(
     anneal_params,
     beta_initial=1.5,
     beta_range=(0.1, 10),
-    qpu_params={"region": "eu-central-1", "solver": "Advantage_system5.1"},
+    qpu_params={"region": "na-west-1", "solver": "Advantage_system4.1"},
     exact_params=None,
     seed=0,
 )
@@ -286,7 +288,7 @@ for epoch in range(1, n_epochs + 1):
         self.callback_outputs.append(callback_output)
 \end{python}
 In the above training loop we see the \texttt{\_clip\_weights\_and\_biases()} method being called.
-This method clips the weights and biases so that the corresponding \( h_i \) and \( J_{ij} \) values fall within the allowed ranges for the annealer, which for the Advantage 5.1 is \( h_i \in [-4, 4] \) and \( J_{ij} \in [-1, 1] \).
+This method clips the weights and biases so that the corresponding \( h_i \) and \( J_{ij} \) values fall within the allowed ranges for the annealer, which for the Advantage 4.1 is \( h_i \in [-4, 4] \) and \( J_{ij} \in [-1, 1] \).
 
 \subsection{Sampling}
 After the model is trained it can be sampled via the \texttt{sample()} method
@@ -300,7 +302,7 @@ model.sample(
 \end{python}
 where
 \begin{itemize}
-    \item \texttt{n\_samples (int)}: size of the sample set to be generated. The D-Wave Advantage 5.1 annealer is limited to a maximum of \( 10^4 \).
+    \item \texttt{n\_samples (int)}: size of the sample set to be generated. The D-Wave Advantage 4.1 annealer is limited to a maximum of \( 10^4 \).
     \item \texttt{answer\_mode (str)}: either \texttt{"raw"} or \texttt{"histogram"}, see the corresponding D-Wave documentation~\cite{dwave_solver_parameters} for more information.
     \item \texttt{use\_gauge (bool)}: if \texttt{True} will use a random gauge transformation, the results will be automatically transformed back to the original space. This is usually recommended to mitigate any readout biases the QPU might have.
     \item \texttt{binary (bool)}: if \texttt{True} will return the sampled state vectors in binary values rather than spin eigenvalues.
