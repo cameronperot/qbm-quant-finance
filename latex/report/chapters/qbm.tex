@@ -1,17 +1,19 @@
 \section{Theory}
 \subsection{The Quantum Boltzmann Machine}
-The Quantum Boltzmann Machine (QBM) detailed in this section is based on the work in \textit{Quantum Boltzmann Machine}~\cite{amin_2018} by Amin et al.
+The Quantum Boltzmann Machine (QBM) detailed here is based on the work in \textit{Quantum Boltzmann Machine}~\cite{amin_2018} by Amin et al.
 In this section we will use spin eigenvalues \( +1 \) and \( -1 \) rather than binary values \( 0 \) and \( 1 \), respectively, in order to maintain consistency with the language of quantum mechanics.
 We start with the Hamiltonian
 \begin{align}
-    H = -\sum_i b_i \sigma_i^z - \sum_{i,j} w_{ij} \sigma_i^z \sigma_j^z
+    H = -\sum_i \Gamma_i \sigma_i^x -\sum_i b_i \sigma_i^z - \sum_{i,j} w_{ij} \sigma_i^z \sigma_j^z
 \end{align}
 where
 \begin{align}
+    \sigma_i^x
+        &= I^{\otimes i-1} \otimes \sigma_x \otimes I^{\otimes N-i} \\
     \sigma_i^z
         &= I^{\otimes i-1} \otimes \sigma_z \otimes I^{\otimes N-i}
 \end{align}
-with \( \sigma_z \) being the Pauli \( z \) matrix, and \( I \) being the \( 2 \times 2 \) identity matrix.
+with \( \sigma_x \) and \( \sigma_z \) being the Pauli \( x \) and \( z \) matrices, and \( I \) being the \( 2 \times 2 \) identity matrix.
 We denote the first \( n_v \) qubits as the visible units, and the last \( n_h \) qubits as the hidden units, thus we have a total of \( n_v + n_h = n \) qubits.
 
 The system's distribution is modeled by the density matrix
@@ -61,12 +63,11 @@ and \( Z_\vec{v} = \tr(e^{-H_\vec{v}}) \).
 The associated derivatives with respect to the parameters of the lower bound are given by (see \cref{app:qbm_log_likelihood_lower_bound_derivative} for derivation)
 \begin{align}
     \partial_{w_{ij}} \tilde{\ell}(\theta)
-        &= \overline{\langle \sigma_i^z \sigma_j^z \rangle_\vec{v}} - \langle \sigma_i^z \sigma_j^z \rangle \\
+        &= \langle \sigma_i^z \sigma_j^z \rangle_\text{data} - \langle \sigma_i^z \sigma_j^z \rangle_\text{model} \\
     \partial_{b_i} \tilde{\ell}(\theta)
-        &= \overline{\langle \sigma_i^z \rangle_\vec{v}} - \langle \sigma_i^z \rangle
+        &= \langle \sigma_i^z \rangle_\text{data} - \langle \sigma_i^z \rangle_\text{model}
 \end{align}
-where \( \langle \ \cdot \ \rangle_\vec{v} = \tr(\cdot \rho_\vec{v}) \) is the expectation value with respect to the clamped density matrix and \( \langle \ \cdot \ \rangle = \tr(\cdot \rho) \) is the expectation value with respect to the original density matrix (i.e., the model).
-Here \( \overline{\langle \ \cdot \ \rangle_\vec{v}} \) denotes the average over the training data.
+where \( \langle \ \cdot \ \rangle_\text{data} = \tr(\cdot \rho_\vec{v}) \) is the expectation value with respect to the clamped density matrix and \( \langle \ \cdot \ \rangle_\text{model} = \tr(\cdot \rho) \) is the expectation value with respect to the original density matrix (i.e., the model).
 
 If connections are restricted within the hidden layer, then the hidden unit probabilities are independent in the positive phase and can be computed easily (see \cref{app:qbm_log_likelihood_lower_bound_derivative} for derivation).
 This leads to positive phase expectation values of
@@ -123,7 +124,7 @@ The final Hamiltonian corresponds to the Ising model described by the \( h_i \) 
 
 The system is made up of superconducting qubits under the influence of external magnetic fluxes~\cite{qc_lecture_notes} which change the Hamiltonian from the initial to the final over the duration of the annealing process.
 These qubits are arranged in a graph structure similar to that seen in~\cref{fig:p4_unitcells}
-The default anneal schedule for the D-Wave Advantage 5.1 is shown in~\cref{fig:anneal_schedule_default}
+The default anneal schedule for the D-Wave Advantage 4.1 is shown in~\cref{fig:anneal_schedule_default}
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=0.7\linewidth]{p4_unitcells.png}
@@ -133,9 +134,9 @@ The default anneal schedule for the D-Wave Advantage 5.1 is shown in~\cref{fig:a
 \end{figure}
 \begin{figure}[!htb]
     \begin{center}
-        \includegraphics[width=1\linewidth]{qbm/anneal_schedule_default.png}
+        \includegraphics[width=1\linewidth]{qbm/anneal_schedules/Advantage_system4.1-s_pause=1.00-pause_duration=0.png}
     \end{center}
-    \caption{Default anneal schedule for the D-Wave Advantage 5.1~\cite{dwave_anneal_schedules}.}
+    \caption{Default anneal schedule for the D-Wave Advantage 4.1~\cite{dwave_anneal_schedules}.}
     \label{fig:anneal_schedule_default}
 \end{figure}
 
@@ -144,7 +145,15 @@ As stated in~\cite{amin_2018}, in order to get the D-Wave quantum annealer to sa
 It goes on to say that this can be done in practice using a nonuniform \( s(t) \) that anneals slowly in the beginning, then quench (i.e., finish the annealing as fast as possible) at the freeze out point \( s^* \) if \( s^* \) is in the quasistatic regime.
 In an earlier paper~\cite{amin_2015}, Amin showed that the quasistatic regime begins around 1 \si{\micro\second} for the D-Wave 2000Q, so for longer annealing times (>10 \si{\micro\second}) it shouldn't be an issue to reach the quasistatic regime.
 
-If we compare the Hamiltonian for the QBM to that of the quantum annealer, we can see
+Since a quantum annealer is a real-world physical device, samples generated with it have an associated temperature which we call the effective temperature.
+To be more specific, the corresponding density operator is of the form
+\begin{align}
+    \rho = \frac{1}{Z} e^{-\beta H(s)}
+\end{align}
+where \( \beta = \frac{1}{k_B T} \) is the effective inverse temperature.
+In principle, this is an unknown quantity and must be determined in order to effectively use the annealer to generate samples from a quantum Boltzmann distribution.
+
+Comparing the density operator of the QBM to that of the quantum annealer, we find
 \begin{align}
     \Gamma_i
         &= \beta A(s^*) \\
@@ -158,7 +167,7 @@ thus we can map the QBM to the annealer given that one can effectively estimate 
 \subsubsection{D-Wave Ocean SDK}
 D-Wave offers an easy to use Python package called Ocean SDK to interact with their cloud based quantum annealing platform.
 This interacts with D-Wave's Leap~\cite{dwave_leap} service, which allows users to access various quantum annealers and other solvers across the globe.
-In 2022, D-Wave's first quantum annealer in Europe was released, the Advantage 5.1 located at Forschungszentrum Jülich.
+In 2022, D-Wave's first quantum annealer in Europe was released, the Advantage 4.1 located at Forschungszentrum Jülich.
 
 One of the most important first steps to solving a problem on a D-Wave is finding an embedding, and the SDK offers a heuristic method to map the logical qubits to the physical ones.
 In the instances where the problem cannot be directly embedded (1:1 logical:physical qubits), then a chain (cluster of physical qubits) is created to represent one logical qubit.
@@ -211,8 +220,16 @@ Therefore, we wish to create a basic framework with which one can use to approac
 \section{12-Qubit Problem}
 In order to get a better understanding of how the QBM works, we turn our attention towards a small 12-qubit problem we can solve exactly.
 For this purpose we take a QBM with restrictions in both the visible and hidden layers trained using the log-likelihood lower bound (for short we call this BQRBM) with 8 visible and 4 hidden units to act as an autoencoder to generate samples similar to the training data.
-We take 1500 training examples, 1000 from a \( \mathcal{N}(-2, 1) \) distribution and 500 from a \( \mathcal{N}(3, 1) \) distribution (depicted in~\cref{fig:hist_comparison_exact}).
 Thus, our training data is binarized into \( 2^8 = 256 \) possible visible states.
+We take 1500 training examples, 1000 from a \( \mathcal{N}(-2, 1) \) distribution and 500 from a \( \mathcal{N}(3, 1) \) distribution (depicted in~\cref{fig:hist_data}).
+
+\begin{figure}[!htb]
+    \begin{center}
+        \includegraphics[width=1\linewidth]{qbm/8x4/Advantage_system4.1/hist_data.png}
+    \end{center}
+    \caption{Histogram of the training data.}
+    \label{fig:hist_data}
+\end{figure}
 
 \subsection{Simulation-based Model}
 The first step is training the model using a simulation in which the samples are generated using the probabilities obtained from computing \( \rho \) exactly, which is only feasible for small problems since the problem size grows exponentially in the number of qubits.
@@ -229,27 +246,20 @@ We notice a clear trend of the KL divergence being minimized, which in practice 
 The learning curve reaches an optimal value after about 80 epochs, and stays steady for the next 20 epochs until the end of training.
 
 In the simulation we have the ability to set the effective \( \beta \), i.e., the value of \( \beta \) at which the samples are being generated.
-To verify that the model can learn the estimator \( \betahat \), we set the simulation to sample at an effective value of \( \beta = 0.5 \) and start the model off with a value of \( \betahat = 1 \), and the results in~\cref{fig:train_results_exact} confirm that it learns the proper value.
+To verify that the model can learn the estimator \( \betahat \), we set the simulation to sample at an effective value of \( \beta = 0.5 \ \si{\giga\hertz}^{-1} \ (T \approx 96 \ \si{\milli\kelvin}) \) and start the model off with a value of \( \betahat = 1 \ \si{\giga\hertz}^{-1} \ (\hat{T} \approx 48 \ \si{\milli\kelvin}) \), and the results in~\cref{fig:train_results_exact} confirm that it learns the proper value.
 
 \begin{figure}[!htb]
     \begin{center}
-        \includegraphics[width=1\linewidth]{qbm/8x4/train_results_exact.png}
+        \includegraphics[width=1\linewidth]{qbm/8x4/Advantage_system4.1/train_results_exact.png}
     \end{center}
-    \caption{Training results of the model using samples generated via simulation. On the left we see that the KL divergence is being minimized. On the right we see that the model learns a value of \( \betahat \) quite close to the true effective \( \beta \).}
+    \caption{Training results of the model using samples generated via simulation. On the left we see that the KL divergence is being minimized. On the right we see that the model learns a value of \( \hat{T} \) quite close to the true effective temperature.}
     \label{fig:train_results_exact}
-\end{figure}
-\begin{figure}[!htb]
-    \begin{center}
-        \includegraphics[width=1\linewidth]{qbm/8x4/hist_comparison_exact.png}
-    \end{center}
-    \caption{Histogram comparing the training data to a sample distribution generated by the model trained via simulation.}
-    \label{fig:hist_comparison_exact}
 \end{figure}
 
 Overall, the results show that the model learns to generate samples from the training distribution reasonably well when trained using a simulation, i.e., the best case scenario.
 We will use the results of this model as a baseline for comparison when training models using the annealer in the next subsection.
 
-\subsection{D-Wave Advantage 5.1-based Model}
+\subsection{D-Wave Advantage 4.1-based Model}
 Having shown that the BQRBM model works when trained using samples generated via exact simulation, we now move to switching the sample generation part to the annealer.
 
 \subsubsection{Choosing an Embedding}
@@ -272,7 +282,7 @@ The anneal schedules are of the following form:
     \item Start at \( s(t = 0) = 0 \).
     \item Anneal as if it were going along with a normal \( t_a = 20 \ \si{\micro\second} \) anneal schedule until the point \( \tpause = \spause \cdot 20 \ \si{\micro\second} = \squench \cdot 20 \ \si{\micro\second} \).
     \item Quench the system at \( \tquench = \tpause + \Deltapause \) (for now \( \Deltapause = 0 \)) as fast as possible to \( s = 1 \).
-        How fast the system can be quenched is restricted, and for Advantage 5.1 we have \( \alphaquench = 2 \), which determines the quench duration
+        How fast the system can be quenched is restricted, and for Advantage 4.1 we have \( \alphaquench = 2 \), which determines the quench duration
         \[
             \Deltaquench = \frac{1 - \squench}{\alphaquench}
         \]
@@ -282,14 +292,14 @@ We first compute the theoretical quantum Boltzmann distributions for \( s = 0, 0
 Next we generate 10 sample sets of size \( 10^4 \) using random gauges for each of the embeddings and anneal schedules.
 With this we compute the KL divergences for each embedding and each anneal schedule against all of the exact computed distributions.
 This results in data which can be visualized in a heatmap as shown in~\cref{fig:dkl_min_heatmap}.
-We see that there is a narrow band at which the annealer can sample close to a quantum boltzmann distribution, and can in fact approximate multiple distributions, depending on the effective temperature.
-For this example, if one wanted to sample from a distribution with \( s^* = 0.5 \) then they would need effective temperature of roughly 35 \si{\milli\kelvin}, and if they wanted to sample from a distribution with \( s^* = 1 \) they would need a higher effective temperature of around 100 \si{\milli\kelvin}.
+We see that there is a narrow band at which the annealer can sample close to a quantum Boltzmann distribution, and can in fact approximate multiple distributions, depending on the effective temperature.
+For this example, if one wanted to sample from a distribution with \( s^* = 0.5 \) then they would need effective temperature of roughly 35 \si{\milli\kelvin}, and if they wanted to sample from a distribution with \( s^* = 1 \) they would need a higher effective temperature of around 90 \si{\milli\kelvin}.
 
 \begin{figure}[!htb]
     \begin{center}
-        \includegraphics[width=1\linewidth]{qbm/8x4/dkl_min_heatmap.png}
+        \includegraphics[width=1\linewidth]{qbm/8x4/embedding_comparison/config_05/dkl_min_heatmap-embedding=10.png}
     \end{center}
-    \caption{Selected heatmap of the KL divergence from the samples returned by the annealer to the exact computed QBM distribution. This used the anneal schedule depicted in~\cref{fig:anneal_schedule_example}. Data represents an ensemble average over 10 random gauges with \( 10^4 \) sample each.}
+    \caption{Selected heatmap of the KL divergence from the samples returned by the annealer to the exact computed QBM distribution. This used the anneal schedule depicted in~\cref{fig:anneal_schedule_example}. Data represents an ensemble average over 10 random gauges with \( 10^4 \) sample each. This was generated using an anneal schedule which quenches at \( s = 0.55 \). The dashed line represents the optimal value of \( B(s) / T = \text{const.} \)}
     \label{fig:dkl_min_heatmap}
 \end{figure}
 
@@ -309,20 +319,9 @@ It is not entirely clear exactly why the effective temperature of the distributi
 Nevertheless, the higher effective temperature does not appear to play a role in the ability to train our model since we have the ability to learn the effective temperature.
 
 Given that the heatmaps all have similar shapes for the various pause points and durations, the evidence points to nontrivial dynamics occurring after the pause point, i.e., the system is unable to quench fast enough.
-It is difficult to compare directly since the D-Wave 2000Q is a different system than the Advantage 5.1 studied here, but in~\cite{marshall_2019} they alluded to this as well that the system might not be able to quench fast enough.
-The 2000Q allowed for quenching with \( \alphaquench = 1 \), which is only a factor of two smaller than what we're allowed by the Advantage 5.1.
+It is difficult to compare directly since the D-Wave 2000Q is a different system than the Advantage 4.1 studied here, but in~\cite{marshall_2019} they alluded to this as well that the system might not be able to quench fast enough.
+The 2000Q allowed for quenching with \( \alphaquench = 1 \), which is only a factor of two smaller than what we're allowed by the Advantage 4.1.
 Therefore, if as supposed in~\cite{marshall_2019} that the quench isn't fast enough, then likely such a small difference in how fast the system can be quenched wouldn't drastically change the results.
-
-With the above information, we take a quick look back to simulation (this time of a 10-qubit problem, 7 visible and 3 hidden units, chosen for computational time reasons) to see if the allowed values of \( s^* \) with the Advantage 5.1 anneal schedule can show any advantage over the classical case \( s^* = 1 \).
-As suspected, \cref{fig:s_sweep_exact} paints the picture in which the allowed values of \( s^* \) do not show any improvement over \( s^* = 1 \), which makes sense given that all of the distributions aren't too different from a classical Boltzmann distribution.
-It must be noted that this does not mean that the QBM does not have an advantage, rather that the advantage is not able to be realized with the allowed values of \( A(s^*) \) and \( B(s^*) \) defined in the Advantage 5.1 anneal schedule when \( s^* \ge 0.45 \).
-\begin{figure}[!htb]
-    \begin{center}
-        \includegraphics[width=1\linewidth]{qbm/7x3/dkl_exact_s_sweep.png}
-    \end{center}
-    \caption{For the specified problem (run on a network with 7 visible and 3 hidden units for computational reasons) we do not see any advantage using \( 0.45 \le s^* < 1 \) as opposed to \( s^* = 1 \) with the D-Wave Advantage 5.1's anneal schedule.}
-    \label{fig:s_sweep_exact}
-\end{figure}
 
 Therefore, with the capabilities of the current system, we are unable to realize a truly quantum Boltzmann machine.
 We will thus proceed using \( s^* = 1 \), which is equivalent to the classical Boltzmann machine, except we use the annealer to generate samples and train the model as opposed to the inefficient Gibbs sampling and contrastive divergence used to train classical RBMs.
@@ -338,7 +337,7 @@ Therefore, this is something that would be interesting to verify via simulation,
 
 \begin{figure}[!htb]
     \begin{center}
-        \includegraphics[width=1\linewidth]{qbm/8x4/embedding_comparison/kl_divergence_mins.png}
+        \includegraphics[width=1\linewidth]{qbm/8x4/embedding_comparison/config_05/kl_divergence_mins.png}
     \end{center}
     \caption{Comparison between the Minimum KL divergences from the samples returned by the annealer to the exact computed QBM distribution for 10 different direct embeddings. Data represents an ensemble average over 10 random gauges with \( 10^4 \) sample each, with the shaded regions representing one standard deviation.}
     \label{fig:dkl_mins_embeddings}
@@ -346,7 +345,7 @@ Therefore, this is something that would be interesting to verify via simulation,
 
 \begin{figure}[!htb]
     \begin{center}
-        \includegraphics[width=1\linewidth]{qbm/8x4/embedding_comparison/optimal_distribution_temp.png}
+        \includegraphics[width=1\linewidth]{qbm/8x4/embedding_comparison/config_05/optimal_distribution_temp.png}
     \end{center}
     \caption{Comparing the effective temperatures which produce the best distribution for \( s^* = 1 \), we observe a trend that the later the pause point is, the lower the effective temperature is. We also see that the embeddings can have quite different effective temperatures. Note that the temperatures were only computed in 2 \si{\milli\kelvin} intervals.}
     \label{fig:optimal_distribution_temp}
@@ -365,7 +364,7 @@ We start with the same formula as before, except we introduce pausing at \( \spa
 An example of such an anneal schedule is depicted in~\cref{fig:anneal_schedule_example}.
 \begin{figure}[!htb]
     \begin{center}
-        \includegraphics[width=1\linewidth]{qbm/anneal_schedule_example.png}
+        \includegraphics[width=1\linewidth]{qbm/anneal_schedules/Advantage_system4.1-s_pause=0.55-pause_duration=0.png}
     \end{center}
     \caption{Example anneal schedule where the annealing is quenched at \( s(t = 11) = 0.55 \) with a quench duration of \( \Deltaquench = 225 \ \si{\nano\second} \).}
     \label{fig:anneal_schedule_example}
@@ -377,7 +376,7 @@ It might be slightly more optimal to use a larger annealing time, but with the e
 
 \begin{figure}[!htb]
     \begin{center}
-        \includegraphics[width=1\linewidth]{qbm/8x4/exact_analysis/02/embedding_05/kl_divergence_mins.png}
+        \includegraphics[width=1\linewidth]{qbm/8x4/exact_analysis/config_05/embedding_10/kl_divergence_mins.png}
     \end{center}
     \caption{Comparison between the Minimum KL divergences from the samples returned by the annealer to the exact computed QBM distribution for selected anneal schedules. We notice that longer annealing and pausing has a minimal effect on reducing the KL divergence.}
     \label{fig:dkl_mins_embedding_05}
@@ -388,36 +387,31 @@ Therefore, we will try to gain more clarity by testing different anneal schedule
 
 \subsubsection{Training Results}
 We train the annealer model in a similar fashion as the simulation, with the same batch size and learning rates.
-We see from~\cref{fig:optimal_distribution_temp} that embedding 5 has an optimal temperature of around 100 \si{\milli\kelvin} for \( s^* = 1 \), thus we take \( \betahat = 0.45 \) as our initial guess for the effective \( \beta \), and let the model learn from there.
+We see from~\cref{fig:optimal_distribution_temp} that embedding 5 has an optimal temperature of around 100 \si{\milli\kelvin} for \( s^* = 1 \), thus we take \( \betahat = 0.5 \ \si{\giga\hertz}^{-1} \ (\hat{T} \approx 96 \ \si{\milli\kelvin}) \) as our initial guess for the effective \( \beta \), and let the model learn from there.
 We train six models, all the same except for when in the anneal schedule the quench is initiated.
 \cref{fig:train_results_annealer} shows the results that the models trained using the annealer perform reasonably well, but still underperform when compared to theory.
 This is possibly due to the information loss associated with using the D-Wave to approximate the distribution, which likely arises due to noise and errors, because after all this is a real-world system governed by quantum mechanics and thus is highly sensitive to the environment around it.
 \begin{figure}[!htb]
     \begin{center}
-        \includegraphics[width=1\linewidth]{qbm/8x4/train_results_annealer.png}
+        \includegraphics[width=1\linewidth]{qbm/8x4/Advantage_system4.1/train_results_annealer.png}
     \end{center}
-    \caption{Training results of the model using the D-Wave Advantage 5.1 annealer vs. that of the exact computation of \( \rho \). On the left we see that the KL divergence is being minimized (equivalent to log-likelihood being maximized). On the right we see the effective \( \beta \).}
+    \caption{Training results of the model using the D-Wave Advantage 4.1 annealer vs. that of the exact computation of \( \rho \). On the left we see that the KL divergence is being minimized (equivalent to log-likelihood being maximized). On the right we see the effective \( \beta \).}
     \label{fig:train_results_annealer}
 \end{figure}
-
-In~\cref{fig:model_comparison_test} we see how well the final trained models stack up against each other.
-There is no clear winner due to the large standard deviations, but if one had to pick then the model trained with the anneal schedule that quenches at \( s = 0.55 \) seems to produce slightly better average results.
-Additionally, we compare this to a classical RBM trained using CD-1 for \( 10^4 \) epochs with a learning rate of \( 10^{-3} \), mini-batch size of 10, and sampled \( 10^6 \) times with \( 10^3 \) Gibbs sampling steps (to mitigate autocorrelations).
-Unfortunately, the BQRBM trained on the annealer underperforms the classical RBM as well.
-
-It can also be seen that the QQ plot~\cref{fig:qq_comparison} produced by the Advantage 5.1 trained model has a slight deviation from linear in the middle, which is not nearly as pronounced as in the one produce by the simulation trained model.
 \begin{figure}[!htb]
     \begin{center}
-        \includegraphics[width=1\linewidth]{qbm/8x4/model_comparison_test.png}
+        \includegraphics[width=0.8\linewidth]{qbm/8x4/Advantage_system4.1/effective_temperature.png}
     \end{center}
-    \caption{Comparison of the models trained using the D-Wave Advantage 5.1 with \( s^* = 1 \) for various pause points. The data represents an ensemble average over 10 random gauges with \( 10^4 \) samples each, and error bars represent one standard deviation. The minimum values represent the minimum over the ensemble.}
-    \label{fig:model_comparison_test}
+    \caption{An optimal effective temperature would be around 95.7 \si{\milli\kelvin}.}
+    \label{fig:learned_effective_temperature}
 \end{figure}
+
+It can also be seen that the QQ plot~\cref{fig:qq_comparison} produced by the Advantage 4.1 trained model has a slight deviation from linear in the middle, which is not nearly as pronounced as in the one produce by the simulation trained model.
 \begin{figure}[!htb]
     \begin{center}
-        \includegraphics[width=1\linewidth]{qbm/8x4/qq_comparison.png}
+        \includegraphics[width=1\linewidth]{qbm/8x4/Advantage_system4.1/qq_comparison.png}
     \end{center}
-    \caption{QQ plots show the exact model (left) learns the distribution reasonably better than the D-Wave Advantage (right). There were samples from the Advantage 5.1 model that showed better and worse QQ plots, thus this one was chosen to illustrate results in the middle.}
+    \caption{QQ plots show the exact model (left) learns the distribution reasonably better than the D-Wave Advantage (right). There were samples from the Advantage 4.1 model that showed better and worse QQ plots, thus this one was chosen to illustrate results in the middle.}
     \label{fig:qq_comparison}
 \end{figure}
 
@@ -425,7 +419,42 @@ The results in this section show that a BQRBM trained with \( s^* = 1 \) (which 
 This does not mean that the annealer will always underperform, rather that it was not able to with the embeddings and anneal schedules tested here.
 
 \section{The Quantum Market Generator}
-lorem ipsum
+\subsection{Setting the Annealer's Hyperparameters}
+\subsubsection{Choosing a Relative Chain Strength}
+\begin{figure}[!htb]
+    \begin{center}
+        \includegraphics[width=1\linewidth]{qbm/log_returns/rcs_comparison.png}
+    \end{center}
+    \caption{lorem ipsum}
+    \label{fig:qbm_log_returns_rcs_comparison}
+\end{figure}
+
+\subsubsection{Choosing an Anneal Schedule}
+\begin{figure}[!htb]
+    \begin{center}
+        \includegraphics[width=1\linewidth]{qbm/log_returns/s_quench_comparison.png}
+    \end{center}
+    \caption{lorem ipsum}
+    \label{fig:qbm_log_returns_s_quench_comparison}
+\end{figure}
+
+\subsubsection{Choosing an Embedding}
+\begin{figure}[!htb]
+    \begin{center}
+        \includegraphics[width=1\linewidth]{qbm/log_returns/embedding_comparison.png}
+    \end{center}
+    \caption{lorem ipsum}
+    \label{fig:qbm_log_returns_embedding_comparison}
+\end{figure}
+
+\subsection{Results}
+\begin{figure}[!htb]
+    \begin{center}
+        \includegraphics[width=1\linewidth]{qbm/log_returns/full_run.png}
+    \end{center}
+    \caption{lorem ipsum}
+    \label{fig:qbm_log_returns_full_run}
+\end{figure}
 
 \section{Challenges of Using a D-Wave Annealer to Train QBMs}
 Using a D-Wave quantum annealer to train quantum Boltzmann machines is a difficult task, and there are many challenges which need to be overcome in order to do so.
@@ -437,6 +466,7 @@ Mapping the logical qubits to physical qubits is a nontrivial task.
 D-Wave provides a heuristic method to find embeddings, but in practice it can't be guaranteed that the returned embedding is optimal.
 As we saw first hand, different embeddings can produce quite different results.
 Therefore, it is recommended to generate multiple embeddings and compare them against each other, and choose the one that performs the best going forward.
+Additionally, it is worth noting that an optimal embedding on one QPU might not be optimal on another of the same generation, e.g. between the Advantage 4.1 and 4.1.
 
 \subsubsection{Chain Strength}
 Depending on how large the problem is, one will likely need to use an embedding that is not direct, i.e., one that requires chains of physical qubits to represent single logical qubits due to limited connectivity.
