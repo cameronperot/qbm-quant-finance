@@ -10,20 +10,8 @@ from qbm.utils.exact_qbm import get_pauli_kron, compute_H, compute_rho
 
 if __name__ == "__main__":
     # compute exact data for all specified configs
-    config_ids = (3, 2, 1)
+    config_ids = (5,)
     project_dir = get_project_dir()
-
-    # load the anneal schedule data
-    anneal_schedule_data = pd.read_csv(
-        project_dir
-        / "data/anneal_schedules/csv/09-1265A-A_Advantage_system5_1_annealing_schedule.csv",
-        index_col="s",
-    )
-    # for some reason 0.5 is missing for Advantage_system5.1 so we need to interpolate
-    if 0.5 not in anneal_schedule_data.index:
-        anneal_schedule_data.loc[0.5] = (
-            anneal_schedule_data.loc[0.499] + anneal_schedule_data.loc[0.501]
-        ) / 2
 
     # set s and T values
     T_values = np.concatenate(([1e-6], np.round(np.arange(2e-3, 202e-3, 2e-3), 3)))  # [K]
@@ -42,6 +30,25 @@ if __name__ == "__main__":
         config_dir = project_dir / f"artifacts/exact_analysis/{config_id:02}"
         config = load_artifact(config_dir / "config.json")
         n_qubits = config["n_qubits"]
+
+        # load the anneal schedule data
+        if config["qpu_params"]["solver"] == "Advantage_system5.1":
+            anneal_schedule_data = pd.read_csv(
+                project_dir
+                / "data/anneal_schedules/csv/09-1265A-A_Advantage_system5_1_annealing_schedule.csv",
+                index_col="s",
+            )
+        elif config["qpu_params"]["solver"] == "Advantage_system4.1":
+            anneal_schedule_data = pd.read_csv(
+                project_dir
+                / "data/anneal_schedules/csv/09-1263A-A_Advantage_system4_1_annealing_schedule.csv",
+                index_col="s",
+            )
+        # for some reason 0.5 is missing for Advantage_system5.1 so we need to interpolate
+        if 0.5 not in anneal_schedule_data.index:
+            anneal_schedule_data.loc[0.5] = (
+                anneal_schedule_data.loc[0.499] + anneal_schedule_data.loc[0.501]
+            ) / 2
 
         # create Kronecker σ matrices
         pauli_kron = get_pauli_kron(config["n_visible"], config["n_hidden"])
