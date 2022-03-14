@@ -77,8 +77,8 @@ def main(h, J, config, anneal_params_dict, qpu, save_dir, embedding_id, gauge_id
 
 
 if __name__ == "__main__":
-    for embedding_id in (5,):
-        config_id = 2
+    for embedding_id in range(1, 11):
+        config_id = 5
 
         project_dir = get_project_dir()
         config_dir = project_dir / f"artifacts/exact_analysis/{config_id:02}"
