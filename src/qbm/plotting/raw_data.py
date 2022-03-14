@@ -35,7 +35,7 @@ def plot_violin(df, params, **kwargs):
 
     :returns: Matplotlib figure and axis.
     """
-    fig, ax = plt.subplots(figsize=(9, 6), dpi=300)
+    fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
     ax.violinplot(df, showextrema=False)
     ax.boxplot(
         df,

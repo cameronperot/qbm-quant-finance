@@ -1,5 +1,6 @@
 import itertools
 import json
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -22,6 +23,8 @@ from qbm.utils import (
     load_log_returns,
     save_artifact,
 )
+
+matplotlib.rcParams.update({"font.size": 14})
 
 
 def main(model_id):
@@ -324,14 +327,14 @@ def main(model_id):
     plt.close(fig)
 
     # plot the tail concentration functions
-    for extrema, i in qq_extrema.items():
-        fig, axs = plot_tail_concentrations_grid(
-            {"Data": log_returns, "Generated": samples_ensemble[i]},
-            combinations,
-            {"Data": "tab:cyan", "Generated": "tab:blue"},
-        )
-        plt.savefig(results_dir / f"plots/tail_concentration_functions_{extrema}.png")
-        plt.close(fig)
+    # for extrema, i in qq_extrema.items():
+    # fig, axs = plot_tail_concentrations_grid(
+    # {"Data": log_returns, "Generated": samples_ensemble[i]},
+    # combinations,
+    # {"Data": "tab:cyan", "Generated": "tab:blue"},
+    # )
+    # plt.savefig(results_dir / f"plots/tail_concentration_functions_{extrema}.png")
+    # plt.close(fig)
 
 
 if __name__ == "__main__":

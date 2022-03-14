@@ -1,5 +1,6 @@
 import emcee
 import json
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -7,6 +8,8 @@ import statsmodels.api as sm  # use statsmodels' acf because it's faster and smo
 
 from qbm.plotting import plot_autocorrelation_grid
 from qbm.utils import get_project_dir, load_artifact, load_log_returns
+
+matplotlib.rcParams.update({"font.size": 14})
 
 
 def main(model_id):
@@ -59,7 +62,9 @@ def main(model_id):
     integrated_times = pd.DataFrame.from_dict(integrated_times, orient="index")
     print(integrated_times)
     print("--------------------------------")
+    print(acfs)
     acfs = pd.DataFrame(acfs)
+    print(acfs)
     acfs.index.rename("lag", inplace=True)
     acfs.to_csv(results_dir / "data/autocorrelation_functions.csv", index_label="lag")
     integrated_times.to_csv(
@@ -67,9 +72,9 @@ def main(model_id):
     )
 
     # plot the acfs
-    fig, ax = plot_autocorrelation_grid(acfs)
-    plt.savefig(results_dir / "plots/autocorrelations.png")
-    plt.close(fig)
+    # fig, ax = plot_autocorrelation_grid(acfs)
+    # plt.savefig(results_dir / "plots/autocorrelations.png")
+    # plt.close(fig)
 
 
 if __name__ == "__main__":

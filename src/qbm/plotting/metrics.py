@@ -40,7 +40,7 @@ def plot_autocorrelation_grid(acfs, colors=None):
 
     :returns: Matplotlib figure and axes.
     """
-    fig, axs = plt.subplots(2, 2, figsize=(10, 6), dpi=300)
+    fig, axs = plt.subplots(2, 2, figsize=(10, 7), dpi=300)
 
     if isinstance(acfs, pd.DataFrame):
         for column, ax in zip(acfs.columns, axs.flatten()):
@@ -62,9 +62,12 @@ def plot_autocorrelation_grid(acfs, colors=None):
                         title=column,
                         label=label,
                         color=colors[label],
+                        linewidth=2,
                     )
                 else:
-                    ax.plot(lags, acfs[column], label=label, color=colors[label])
+                    ax.plot(
+                        lags, acfs[column], label=label, color=colors[label], linewidth=2
+                    )
 
             if i == 0:
                 ax.legend(loc="lower left")
@@ -183,7 +186,7 @@ def plot_volatility_comparison(data, sample, params):
 
     :returns: Matplotlib figure and axes.
     """
-    fig, ax = plt.subplots(figsize=(9, 6), dpi=300)
+    fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
     ax.set_title("Annualized Volatility")
     ax.errorbar(
         range(len(data)),
@@ -233,7 +236,8 @@ def plot_volatility(ax, dates, volatility, title, params):
         dates.max() + timedelta(weeks=100),
         label="Median",
         linewidth=2,
-        color="tab:red",
+        linestyle="--",
+        color="k",
         zorder=1,
     )
     ax.set_title(title)
@@ -277,9 +281,9 @@ def plot_tail_concentrations_grid(dfs, combinations, colors, interval_size=1e-3)
             x = np.concatenate([z_lower, z_upper])
             y = np.concatenate([lower_concentration, upper_concentration])
 
-            ax.plot(x, y, label=label, color=colors[label])
+            ax.plot(x, y, label=label, color=colors[label], linewidth=2)
             ax.set_title(f"{pair_X}/{pair_Y}")
-            ax.grid(True)
+            ax.grid(True, alpha=0.7)
 
         if i == 0:
             ax.legend(loc="lower center")
@@ -304,7 +308,7 @@ def plot_volatility_grid(volatility, params):
         plot_volatility(
             ax, volatility.index, volatility[column], column.split("_")[0], params
         )
-    axs[0, 0].legend()
+    axs[0, 0].legend(loc="upper left")
     plt.tight_layout()
 
     return fig, axs

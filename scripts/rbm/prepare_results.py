@@ -1,4 +1,5 @@
 import itertools
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -7,6 +8,7 @@ from qbm.utils import get_project_dir, load_artifact, save_artifact
 from qbm.plotting import plot_autocorrelation_grid, plot_tail_concentrations_grid, plot_qq
 
 # pd.set_option("display.max_columns", None)
+matplotlib.rcParams.update({"font.size": 14})
 
 project_dir = get_project_dir()
 results_dir = project_dir / "results/data/rbm"
@@ -120,8 +122,7 @@ for model_name, model_info in models.items():
     # conditional volatilities
     if "V" in prefix:
         volatility_low = pd.read_csv(
-            model_results_dir / "data/volatilities_low.csv",
-            index_col="currency_pair",
+            model_results_dir / "data/volatilities_low.csv", index_col="currency_pair",
         )
         column_map = {
             column: f"{prefix}_{column.lower().replace(' ', '_')}"
@@ -131,8 +132,7 @@ for model_name, model_info in models.items():
         volatilities_low[prefix] = volatility_low
 
         volatility_high = pd.read_csv(
-            model_results_dir / "data/volatilities_high.csv",
-            index_col="currency_pair",
+            model_results_dir / "data/volatilities_high.csv", index_col="currency_pair",
         )
         column_map = {
             column: f"{prefix}_{column.lower().replace(' ', '_')}"
@@ -159,8 +159,7 @@ for model_name, model_info in models.items():
 
     # tails sample stds
     tails_sample_stds = pd.read_csv(
-        model_results_dir / "data/tails_sample_stds.csv",
-        index_col="currency_pair",
+        model_results_dir / "data/tails_sample_stds.csv", index_col="currency_pair",
     )
     column_map = {column: f"{prefix}_{column}_std" for column in tails_sample_stds.columns}
     tails_sample_stds.rename(columns=column_map, inplace=True)
@@ -171,8 +170,7 @@ for model_name, model_info in models.items():
 
     # autocorrelation times
     ac_times[prefix] = pd.read_csv(
-        model_results_dir / "data/autocorrelation_times.csv",
-        index_col="currency_pair",
+        model_results_dir / "data/autocorrelation_times.csv", index_col="currency_pair",
     )
     column_map = {column: f"{prefix}_ac_time" for column in ac_times[prefix].columns}
     ac_times[prefix].rename(columns=column_map, inplace=True)
@@ -182,10 +180,11 @@ qq_plot_params = {
     "title": "test",
     "xlims": (-0.045, 0.045),
     "ylims": (-0.045, 0.045),
-    "xticks": np.linspace(-0.04, 0.04, 9),
-    "yticks": np.linspace(-0.04, 0.04, 9),
+    "xticks": np.linspace(-0.04, 0.04, 5),
+    "yticks": np.linspace(-0.04, 0.04, 5),
 }
 fig, axs = plt.subplots(4, 4, figsize=(12, 12), dpi=300)
+matplotlib.rcParams.update({"font.size": 12})
 for j, (model_name, model_info) in enumerate(models.items()):
     model_id = model_info["id"]
     prefix = model_info["prefix"]
@@ -204,6 +203,7 @@ for j, (model_name, model_info) in enumerate(models.items()):
 
 plt.tight_layout()
 plt.savefig(plots_dir / "qq.png")
+matplotlib.rcParams.update({"font.size": 14})
 
 """
 Plotting
