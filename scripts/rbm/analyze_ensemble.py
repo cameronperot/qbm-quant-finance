@@ -78,37 +78,6 @@ def main(model_id):
     dkls = compute_stats_over_dfs(dkl_dfs)
     dkls = pd.DataFrame({k: v[0] for k, v in dkls.items()})
     dkls.to_csv(results_dir / "data/kl_divergences.csv", index_label="currency_pair")
-    return
-
-    # compute QQ distance
-    qq_rmse = {column: [] for column in log_returns.columns}
-    qq_rmse = np.zeros((len(samples_ensemble), len(log_returns.columns)))
-    for i, samples in enumerate(samples_ensemble):
-        for j, column in enumerate(log_returns.columns):
-            qq_rmse[i, j] = mean_squared_error(
-                np.sort(samples[column]), np.sort(log_returns[column]), squared=False
-            )
-
-    qq_rmse_means = qq_rmse.mean(axis=0)
-    qq_rmse_stds = qq_rmse.std(axis=0)
-    qq_extrema = {
-        "min": int(np.argmin(qq_rmse.mean(axis=1))),
-        "max": int(np.argmax(qq_rmse.mean(axis=1))),
-    }
-    save_artifact(qq_extrema, results_dir / "data/qq_extrema.json")
-
-    qq_rmse = {
-        column: {"mean": qq_rmse_means[j], "std": qq_rmse_stds[j]}
-        for j, column in enumerate(log_returns.columns)
-    }
-    qq_rmse = pd.DataFrame.from_dict(qq_rmse, orient="index")
-    qq_rmse.to_csv(results_dir / "data/qq_rmse.csv", index_label="currency_pair")
-
-    print("--------------------------------")
-    print("QQ RMSE")
-    print("--------------------------------")
-    print(qq_rmse)
-    print("--------------------------------\n\n")
 
     # compute the correlation coefficients
     combinations = list(itertools.combinations(log_returns.columns, 2))
@@ -293,20 +262,6 @@ def main(model_id):
     print(tails_sample["stds"])
     print("--------------------------------\n\n")
 
-    # QQ plots
-    qq_plot_params = {
-        "title": "test",
-        "xlims": (-0.045, 0.045),
-        "ylims": (-0.045, 0.045),
-        "xticks": np.linspace(-0.04, 0.04, 9),
-        "yticks": np.linspace(-0.04, 0.04, 9),
-    }
-    for extrema, i in qq_extrema.items():
-        fig, axs = plot_qq_grid(log_returns, samples_ensemble[i], qq_plot_params)
-        save_artifact((fig, axs), results_dir / f"plots/qq_{extrema}.pkl")
-        plt.savefig(results_dir / f"plots/qq_{extrema}.png")
-        plt.close(fig)
-
     # plot the correlation coefficients
     fig, axs = plot_correlation_coefficients(
         correlation_coefficients_data, correlation_coefficients_sample
@@ -325,16 +280,6 @@ def main(model_id):
     )
     plt.savefig(results_dir / "plots/volatilities.png")
     plt.close(fig)
-
-    # plot the tail concentration functions
-    # for extrema, i in qq_extrema.items():
-    # fig, axs = plot_tail_concentrations_grid(
-    # {"Data": log_returns, "Generated": samples_ensemble[i]},
-    # combinations,
-    # {"Data": "tab:cyan", "Generated": "tab:blue"},
-    # )
-    # plt.savefig(results_dir / f"plots/tail_concentration_functions_{extrema}.png")
-    # plt.close(fig)
 
 
 if __name__ == "__main__":
