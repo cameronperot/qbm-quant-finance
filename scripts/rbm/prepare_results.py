@@ -178,16 +178,19 @@ matplotlib.rcParams.update({"font.size": 12})
 for j, (model_name, model_info) in enumerate(models.items()):
     model_id = model_info["id"]
     prefix = model_info["prefix"]
-    qq_extrema = load_artifact(artifacts_dir / f"{model_id}/results/data/qq_extrema.json")
-    samples = load_artifact(
-        artifacts_dir / f"{model_id}/samples_ensemble/{qq_extrema['min'] + 1:03}.pkl"
-    )
+    samples = load_artifact(artifacts_dir / f"{model_id}/samples_ensemble/{1:03}.pkl")
     for i, column in enumerate(log_returns.columns):
         if i == 0:
             title = f"RBM ({prefix})\n{column}"
         else:
             title = column
-        plot_qq(axs[i, j], log_returns[column], samples[column], title, qq_plot_params)
+        plot_qq(
+            axs[i, j],
+            log_returns[column],
+            samples[column][: len(log_returns[column])],
+            title,
+            qq_plot_params,
+        )
         axs[i, j].ticklabel_format(axis="x", style="sci", scilimits=(0, 0))
         axs[i, j].ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
 
@@ -230,11 +233,8 @@ for model_name, model_info in models.items():
         )
 
     model_id = model_info["id"]
-    qq_extrema = load_artifact(
-        project_dir / f"artifacts/{model_id}/results/data/qq_extrema.json"
-    )
     tail_concentration_dfs[f"RBM ({model_info['prefix']})"] = pd.read_pickle(
-        project_dir / f"artifacts/{model_id}/samples_ensemble/{qq_extrema['min']+1:03}.pkl"
+        project_dir / f"artifacts/{model_id}/samples_ensemble/{1:03}.pkl"
     )
 
 fig, axs = plot_tail_concentrations_grid(tail_concentration_dfs, combinations, colors)
