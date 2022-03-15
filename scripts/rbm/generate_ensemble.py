@@ -29,6 +29,7 @@ def main(config_path):
     ensemble_params = config["ensemble"]
     model_id = config["model"]["id"]
     ensemble_size = int(ensemble_params["size"])
+    n_samples = int(ensemble_params["n_samples"])
     n_steps = int(ensemble_params["n_steps"])
     n_jobs = int(ensemble_params["n_jobs"])
     seed = int(ensemble_params["seed"])
@@ -62,13 +63,15 @@ def main(config_path):
         # copy the model and give it a new rng, otherwise it will always use the same random
         # number chain, which ends up as an attractor
         model_i = deepcopy(model)
-        model_i.random_state = get_rng(i)
+        rng = get_rng(i)
+        v = rng.choice([0, 1], (n_samples, model_params["X_train_shape"][1]))
+        model_i.random_state = rng
 
         # generate the samples
         samples, _ = generate_rbm_samples_df(
             model=model_i,
-            v=V[i],
-            n_samples=model_params["X_train_shape"][0],
+            v=v,
+            n_samples=n_samples,
             n_steps=n_steps,
             model_params=model_params,
         )
@@ -94,9 +97,8 @@ def main(config_path):
 
     # run the jobs in parallel
     start_time = time()
-    Parallel(n_jobs=n_jobs)(
-        delayed(generate_rbm_samples_df_wrapper)(i) for i in range(ensemble_size)
-    )
+    for i in range(ensemble_size):
+        generate_rbm_samples_df_wrapper(i)
 
     print(
         f"Completed {ensemble_size} iterations in {timedelta(seconds=time() - start_time)}"
