@@ -1,0 +1,10 @@
+\begin{tabular}{l r r r}
+\multicolumn{4}{c}{\textbf{Historical Volatilities}} \\
+\toprule
+Currency Pair & \textbf{Data} & \textbf{BQRBM} & \textbf{RBM}\\\midrule
+EURUSD & 9.78\% & 10.17\% $\pm$ 0.79\% & 9.98\% $\pm$ 0.11\% \\
+GBPUSD & 8.98\% & 8.86\% $\pm$ 0.47\% & 9.34\% $\pm$ 0.11\% \\
+USDCAD & 8.56\% & 8.44\% $\pm$ 0.39\% & 8.98\% $\pm$ 0.13\% \\
+USDJPY & 10.02\% & 11.58\% $\pm$ 1.44\% & 10.26\% $\pm$ 0.13\% \\
+\bottomrule
+\end{tabular}
