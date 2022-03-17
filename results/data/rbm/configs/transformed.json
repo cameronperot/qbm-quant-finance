@@ -66,6 +66,7 @@
         "ensemble": {
             "size": 100,
             "n_steps": 10000,
+            "n_samples": 10000,
             "n_jobs": 6,
             "seed": 42
         },
