@@ -1,5 +1,5 @@
 \section{Data Analysis}
-Our dataset consisted of the daily open, high, low, close (OHLC) data for the time period 1999-01-01 through 2019-12-31, similar to that in~\cite{kondratyev_2019}, of the following major currency pairs
+Our data set consisted of the daily open, high, low, close (OHLC) values for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs
 \begin{itemize}
     \item EURUSD - Euro € / U.S. Dollar \$
     \item GBPUSD - British Pound Sterling £ / U.S. Dollar \$
@@ -7,8 +7,8 @@ Our dataset consisted of the daily open, high, low, close (OHLC) data for the ti
     \item USDJPY - U.S. Dollar \$ / Japanese Yen ¥
 \end{itemize}
 obtained from Dukascopy historical data feed~\cite{dukascopy}.
-The data was filtered to remove days where any of the currencies had zero volume, as well as NYSE and LSE holidays.
-This resulted in a dataset of 5165 training examples.
+The data set was filtered to remove days where any of the currencies had zero volume, as well as NYSE and LSE holidays.
+This resulted in a data set of 5165 training examples.
 Here we use the notation \( x_\text{open} \), \( x_\text{high} \), \( x_\text{low} \), and \( x_\text{close} \) to denote the open, high, low, and close values of a currency pair on a particular day.
 
 Given that the values were on an absolute basis, we needed to convert them to relative terms in order to be able to compare data from different time periods on a more equal footing.
@@ -27,7 +27,7 @@ due to several advantages~\cite{quantivity_2012}
 \begin{itemize}
     \item Log-normality: if \( r \sim \mathcal{N}(\mu, \sigma^2) \) then \( \tilde{r} \sim \mathcal{N}(\tilde{\mu}, \tilde{\sigma}^2) \).
     \item Small \( r \) approximation: the expansion \( \log (1 + r) = r + \mathcal{O}(r^2) \approx r \) for \( r \ll 1 \).
-    \item Time-additivity: instead of having to multiply one plus the returns to compound them, using log returns allows us to simply add them.
+    \item Time-additivity: instead of having to multiply one plus the returns to compound them, using log returns allows one to simply add them.
 \end{itemize}
 
 We began our analysis by taking a look at the histograms depicted in~\cref{fig:histograms_raw}.
@@ -45,7 +45,7 @@ From visual examination we saw that the log returns were roughly normally distri
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/data/log_returns_raw_stats.tbl}
     \end{adjustbox}
-    \caption{Sample statistics of the log returns.}
+    \caption{Sample statistics of the log returns of the currency pairs.}
     \label{tbl:data_log_returns_raw_stats}
 \end{table}
 
@@ -54,7 +54,7 @@ Immediately we saw that there was one major outlier to the downside for the GBPU
 Further analysis indicated that this was an \( 11.1\sigma \) event that occurred on 2016-06-24, which corresponded to the results of the Brexit referendum in the UK~\cite{brexit_gov_uk}.
 The other outlier that really stood out was to the upside for the USDJPY currency pair on 2008-10-28.
 This \( 8.3\sigma \) event occurred right in midst of the financial crisis when people were talking about the end of the Yen carry trade~\cite{jpy_carry_trade_nyt}.
-In the final training dataset we chose to remove outliers greater than \( 10\sigma \) from the mean.
+In the final training data set we chose to remove outliers greater than \( 10\sigma \) from the mean.
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/violin.png}
@@ -66,13 +66,13 @@ In the final training dataset we chose to remove outliers greater than \( 10\sig
 Next we examined the correlations between the currency pairs to get an idea of the interdependencies between them.
 We visualized this with scatter plots in~\cref{fig:scatters} where we observed a clear positive correlation between EURUSD/GBPUSD, and clear negative correlations between EURUSD/USDCAD and GBPUSD/USDCAD.
 We verified this by examining the Pearson \( r \), Spearman \( \rho \), and Kendall \( \tau \) correlation coefficients laid out in~\cref{tbl:data_correlation_coefficients}.
-\cref{app:correlation_coefficients} contains further information on how to compute and interpret the correlation coefficients.
 We found the correlation coefficients to be positive when the pairs were of the form \( X \)USD/\( Y \)USD, and negative when the pairs were of the form \( X \)USD/USD\( Y \), for \( X,Y \in \) \{EUR, GBP, CAD, JPY\}, as expected.
+Details on how the correlation coefficients were computed and how to interpret them can be found in~\cref{app:correlation_coefficients}.
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/scatters.png}
     \end{center}
-    \caption{Scatter plots of the currency pairs against each other.}
+    \caption{Scatter plots of the log returns of the currency pairs against each other.}
     \label{fig:scatters}
 \end{figure}
 
@@ -81,45 +81,44 @@ We found the correlation coefficients to be positive when the pairs were of the 
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/data/correlation_coefficients.tbl}
     \end{adjustbox}
-    \caption{Correlation coefficients of the currency pairs.}
+    \caption{Correlation coefficients of the log returns of the currency pairs.}
     \label{tbl:data_correlation_coefficients}
 \end{table}
 
 
 \section{Data Preprocessing}
-The models used in this thesis required the data be in the form of binary vectors, so we had to first convert our dataset to such a form.
-Let \( \mat{X} \in \R^{4 \times N} \) represent the training dataset of log returns, where training examples are vectors in the column space, thus element \( x_{ij} \) represents the \( i \)th currency pair log return for the \( j \)th training example.
+The models used in this thesis required the training data to be in the form of bit vectors, so we had to first convert our data set to such a form.
+Let \( \mat{X} \in \R^{4 \times N} \) represent the training data set of log returns with \( N \) examples, where training examples are vectors in the column space, thus element \( x_{ij} \) represents the \( i \)th currency pair log return for the \( j \)th training example.
 
 To discretize the data, we rescaled and rounded the entries of \( \mat{X} \) to integer values in \( \{0, 1, \dots, 2^{n_\text{bits}} - 1\} \), represented by the matrix \( \mat{X}' \in \N^{4 \times N} \) with entries
 \begin{align}
-    x_{ij}' = \bigg\lfloor \frac{x_{ij} - \min_k x_{ik}}{\max_k x_{ik} - \min_k x_{ik}} \cdot (2^{n_\text{bits}} - 1) \bigg\rceil
+    x_{ij}' = \bigg\lfloor \frac{x_{ij} - \min_k \{x_{ik}\}}{\max_k \{x_{ik}\} - \min_k \{x_{ik}\}} \cdot (2^{n_\text{bits}} - 1) \bigg\rceil
 \end{align}
 where \( \lfloor \ \cdot \ \rceil \) denotes rounding to the nearest integer.
 
-A new matrix \( \mat{V} \in \binset^{4\cdot n_\text{bits} \times N} \) was then created with the columns being \( n_\text{bits} \)-length binary representation vectors of the entries of the columns of \( \mat{X}' \) concatenated together.
-For example, if \( \vec{x} = (x_1,x_2,x_3,x_4) \) was a column of \( \mat{X} \) and the function \( \text{bin}(x) \) takes in an integer \( x \) and returns a binary column vector, then the corresponding column in \( \mat{V} \) was
+A new matrix \( \mat{V} \in \binset^{4\cdot n_\text{bits} \times N} \) was then created with the columns being the \( n_\text{bits} \)-length bit vectors corresponding to the binary representation of the entries of the columns of \( \mat{X}' \) concatenated together.
+For example, if \( \vec{x}' = (x_1',x_2',x_3',x_4') \) was a column of \( \mat{X}' \) and the function \( \text{bin}(x') \) takes in an integer \( x' \) and returns an \( n_\text{bits} \)-bit binary representation bit vector, then the corresponding column in \( \mat{V} \) would be
 \begin{align}
     \vec{v} = \begin{bmatrix}
-        \text{bin}(x_1) \\
-        \text{bin}(x_2) \\
-        \text{bin}(x_3) \\
-        \text{bin}(x_4) \\
+        \text{bin}(x_1') \\
+        \text{bin}(x_2') \\
+        \text{bin}(x_3') \\
+        \text{bin}(x_4') \\
     \end{bmatrix}
+    \in \binset^{4\cdot n_\text{bits}}
 \end{align}
 
-For this research we took \( n_\text{bits} = 16 \), which gave us a training set \( \mat{V} \in \binset^{64 \times N} \), thus our training examples were binary vectors of length 64.
-The discretization errors associated with this conversion and dataset were on the order \( 10^{-7} \), within the desired tolerance for this purpose.
+For this research we took \( n_\text{bits} = 16 \), which gave us a training set \( \mat{V} \in \binset^{64 \times N} \), thus our training examples were bit vectors of length 64.
+The discretization errors associated with this conversion and data set were on the order of \( 10^{-7} \), well within the desired tolerance for this purpose.
 
 \subsection{Data Transformation}
-Due to how the data was linearly converted to a discrete form (before rounding), it opened up the possibility of the data being clustered in the mid-range values if large outliers were present.
+Due to how the data was linearly converted to a discrete form before rounding, it opened up the possibility of the discretized data being clustered in the mid-range values if large outliers were present.
 To mitigate this, we came up with a transformation to reduce the gap between outliers by scaling outliers beyond a certain threshold \( \tau \), as detailed in~\cref{alg:transformation}.
 In practice we took \( \tau = 1 \) and \( \alpha = 0.5 \), thus the standardized data points above one standard deviation were mapped to their square root, as illustrated in~\cref{fig:data_transformation}.
 This transformation is reversible when \( \overline{x} \), \( \sigma_x \), and \( \delta \) are saved.
 
-Of course this transformation doesn't necessarily have an inherent meaning, and the transformed data isn't necessarily representative of anything, but we found it to improve some of the model results in the next chapter.
-
 \begin{algorithm}
-    \caption{Outlier Power Transformation}
+\caption{Outlier Power Transformation}
 \begin{algorithmic}[1]
     \Procedure{Transform}{$\vec{x}, \alpha, \tau$}
             \Comment $\alpha$ is the power, $\tau$ is the threshold
@@ -130,7 +129,7 @@ Of course this transformation doesn't necessarily have an inherent meaning, and 
         \For {$i$ in 1 to length($\vec{x}$)}
             \State $x_i \gets (x_i - \overline{x}) / \sigma_x$
                 \Comment standardize
-            \If {$x_i \ge \tau$}
+            \If {$x_i > \tau$}
                 \State $x_i \gets (\abs{x_i}^\alpha + \delta) \cdot \text{sign}(x_i)$
                     \Comment scale standardized values beyond $\tau$
             \EndIf
@@ -146,13 +145,13 @@ Of course this transformation doesn't necessarily have an inherent meaning, and 
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/data_transformation.png}
     \end{center}
-    \caption{Transformation applied to the data using \( \tau = 1 \) and \( \alpha = 0.5 \), for the purpose of reducing large "gaps" in the discretizing data by scaling outliers above one standard deviation by taking the square root of their standardized value.}
+    \caption{Transformation defined in~\cref{alg:transformation} using \( \tau = 1 \) and \( \alpha = 0.5 \), for the purpose of reducing large gaps in the discretized data set by scaling outliers above \( \tau \) standard deviations.}
     \label{fig:data_transformation}
 \end{figure}
 
-We visualized the transformed dataset with histograms in~\cref{fig:data_transformation} and a violin/box plot in~\cref{fig:violin_transformed}.
-These show the appearance of "shoulders" around one standard deviation where the outliers were scaled in, and that the outliers are now much more moderate, allowing us to better utilize the full range of discrete values.
-\cref{tbl:data_log_returns_transformed_stats} shows that the standard deviations have been decreased to roughly \( 78\% \) of their originals values in~\cref{tbl:data_log_returns_raw_stats}.
+We visualized the transformed data set with histograms in~\cref{fig:data_transformation} and a violin/box plot in~\cref{fig:violin_transformed}.
+In these, we observed the appearance of "shoulders" around one standard deviation where the outliers were scaled in, and that the outliers became much less extreme, allowing us to better utilize the full range of discrete values.
+\cref{tbl:data_log_returns_transformed_stats} shows that the standard deviations were decreased to roughly \( 78\% \) of their originals values in~\cref{tbl:data_log_returns_raw_stats}.
 
 \begin{figure}[!htb]
     \begin{center}
@@ -173,23 +172,23 @@ These show the appearance of "shoulders" around one standard deviation where the
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/data/log_returns_transformed_stats.tbl}
     \end{adjustbox}
-    \caption{Sample statistics of the transformed log returns.}
+    \caption{Sample statistics of the transformed log returns of the currency pairs.}
     \label{tbl:data_log_returns_transformed_stats}
 \end{table}
 
 \subsection{Additional Information}
-As mentioned in~\cite{kondratyev_2019}, one can use additional binary indicator variables to enrich the training dataset.
+As mentioned in~\cite{kondratyev_2019}, one can use additional binary indicator variables to enrich the training data set.
 One such bit of information is the rolling volatility relative to the historical median (see~\cref{app:annualized_volatility} for definition of annualized volatility).
 If the 3-month rolling volatility was (below) above the historical median it was assigned a value of 0 (1) to indicate the low (high) volatility regime.
-We plotted the 3-month rolling volatility versus its historical median, shown in~\cref{fig:rolling_volatility}.
+We plotted the 3-month rolling volatilities versus their historical medians in~\cref{fig:rolling_volatility}.
 
-These additional binary indicator variables were then concatenated onto the training data and fed to the model to make it more flexible by allowing for the model outputs to be conditioned on a specific volatility regime.
-Adding one indicator for each of the four currency increased the number of rows in our training dataset by four, thus the concatenated dataset was in the space \( \binset^{68 \times N} \).
+These additional binary indicator variables were then concatenated onto the training data set and fed to the model to make it more flexible by allowing for the model outputs to be conditioned on a specific volatility regime.
+Adding one indicator for each of the four currency pairs increased the number of rows in our training data set by four, thus the concatenated data set was in the space \( \binset^{68 \times N} \).
 
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/rolling_volatility.png}
     \end{center}
-    \caption{3-month rolling volatility of the log returns of the currency pairs compared to the historical median.}
+    \caption{3-month rolling volatilities of the log returns of the currency pairs compared to their historical medians.}
     \label{fig:rolling_volatility}
 \end{figure}
