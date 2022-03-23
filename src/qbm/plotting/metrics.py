@@ -147,7 +147,7 @@ def plot_qq(ax, data, sample, title, params, **kwargs):
     ax.set_yticks(params["yticks"])
     ax.set_xlim(params["xlims"])
     ax.set_ylim(params["ylims"])
-    ax.set_xlabel("Data")
+    ax.set_xlabel("Data Set")
     ax.set_ylabel("Model")
     ax.grid(alpha=0.7)
 

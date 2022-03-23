@@ -1,6 +1,6 @@
 \begin{tabular}{l r r r r r r}\multicolumn{7}{c}{\textbf{Correlation Coefficients}} \\
 \toprule
-& \multicolumn{3}{c}{\textbf{Data}} & \multicolumn{3}{c}{\textbf{RBM (B)}} \\
+& \multicolumn{3}{c}{\textbf{Data Set}} & \multicolumn{3}{c}{\textbf{RBM (B)}} \\
 \cmidrule(lr){2-4}
 \cmidrule(lr){5-7}
 Currency Pairs & Pearson & Spearman & Kendall & Pearson & Spearman & Kendall \\

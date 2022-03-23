@@ -1,7 +1,7 @@
 \begin{tabular}{l r r r r r}
 \multicolumn{6}{c}{\textbf{Historical Volatilities}} \\
 \toprule
-Currency Pair & \textbf{Data} & \textbf{RBM (B)} & \textbf{RBM (X)} & \textbf{RBM (V)} & \textbf{RBM (XV)} \\
+Currency Pair & \textbf{Data Set} & \textbf{RBM (B)} & \textbf{RBM (X)} & \textbf{RBM (V)} & \textbf{RBM (XV)} \\
 \midrule
 EURUSD & 9.78\% & 9.98\% $\pm$ 0.11\% & 10.10\% $\pm$ 0.10\% & 10.18\% $\pm$ 0.11\% & 10.27\% $\pm$ 0.10\% \\
 GBPUSD & 8.98\% & 9.34\% $\pm$ 0.11\% & 9.38\% $\pm$ 0.12\% & 9.55\% $\pm$ 0.12\% & 9.53\% $\pm$ 0.11\% \\

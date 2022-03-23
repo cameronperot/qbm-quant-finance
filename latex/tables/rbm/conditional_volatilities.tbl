@@ -4,7 +4,7 @@
 & \multicolumn{3}{c}{\textbf{Low Regime}} & \multicolumn{3}{c}{\textbf{High Regime}} \\
 \cmidrule(lr){2-4}
 \cmidrule(lr){5-7}
-Currency Pair & \textbf{Data} & \textbf{RBM (V)} & \textbf{RBM (XV)} & \textbf{Data} & \textbf{RBM (V)} & \textbf{RBM (XV)} \\
+Currency Pair & \textbf{Data Set} & \textbf{RBM (V)} & \textbf{RBM (XV)} & \textbf{Data Set} & \textbf{RBM (V)} & \textbf{RBM (XV)} \\
 \midrule
 EURUSD & 6.72\% & 7.67\% $\pm$ 0.23\% & 7.60\% $\pm$ 0.24\% & 13.04\% & 13.19\% $\pm$ 0.31\% & 12.92\% $\pm$ 0.27\% \\
 GBPUSD & 6.67\% & 7.45\% $\pm$ 0.21\% & 7.50\% $\pm$ 0.22\% & 12.69\% & 12.13\% $\pm$ 0.31\% & 11.61\% $\pm$ 0.28\% \\

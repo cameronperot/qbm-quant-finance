@@ -1,7 +1,7 @@
 \begin{tabular}{l r r r}
 \multicolumn{4}{c}{\textbf{Lower Tails (1st Percentile)}} \\
 \toprule
-Currency Pair & \textbf{Data} & \textbf{BQRBM} & \textbf{RBM} \\\midrule
+Currency Pair & \textbf{Data Set} & \textbf{BQRBM} & \textbf{RBM} \\\midrule
 EURUSD & -1.64\% & -2.02\% $\pm$ 0.24\% & -1.80\% $\pm$ 0.04\% \\
 GBPUSD & -1.47\% & -1.45\% $\pm$ 0.12\% & -1.59\% $\pm$ 0.04\% \\
 USDCAD & -1.40\% & -1.43\% $\pm$ 0.17\% & -1.54\% $\pm$ 0.05\% \\
@@ -9,7 +9,7 @@ USDJPY & -1.70\% & -2.32\% $\pm$ 0.38\% & -2.03\% $\pm$ 0.07\% \\
 \bottomrule \\
 \multicolumn{4}{c}{\textbf{Upper Tails (99th Percentile)}} \\
 \toprule
-Currency Pair & \textbf{Data} & \textbf{BQRBM} & \textbf{RBM} \\\midrule
+Currency Pair & \textbf{Data Set} & \textbf{BQRBM} & \textbf{RBM} \\\midrule
 EURUSD & 1.62\% & 1.70\% $\pm$ 0.23\% & 1.59\% $\pm$ 0.04\% \\
 GBPUSD & 1.42\% & 1.49\% $\pm$ 0.07\% & 1.45\% $\pm$ 0.04\% \\
 USDCAD & 1.51\% & 1.50\% $\pm$ 0.12\% & 1.61\% $\pm$ 0.04\% \\

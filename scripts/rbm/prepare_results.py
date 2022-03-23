@@ -202,7 +202,7 @@ matplotlib.rcParams.update({"font.size": 14})
 Plotting
 """
 colors = {
-    "Data": "tab:cyan",
+    "Data Set": "tab:cyan",
     "RBM (B)": "tab:blue",
     "RBM (X)": "tab:orange",
     "RBM (V)": "tab:red",
@@ -226,7 +226,7 @@ combinations = list(itertools.combinations(log_returns.columns, 2))
 tail_concentration_dfs = {}
 for model_name, model_info in models.items():
     if model_name == "baseline":
-        tail_concentration_dfs["Data"] = pd.read_csv(
+        tail_concentration_dfs["Data Set"] = pd.read_csv(
             project_dir / f"artifacts/{model_id}/log_returns.csv",
             index_col="date",
             parse_dates=["date"],
@@ -290,7 +290,7 @@ table = [
     r"\begin{tabular}{l r r r r r r}"
     r"\multicolumn{7}{c}{\textbf{Correlation Coefficients}} \\",
     r"\toprule",
-    r"& \multicolumn{3}{c}{\textbf{Data}} & \multicolumn{3}{c}{\textbf{RBM (%s)}} \\"
+    r"& \multicolumn{3}{c}{\textbf{Data Set}} & \multicolumn{3}{c}{\textbf{RBM (%s)}} \\"
     % prefixes,
     r"\cmidrule(lr){2-4}",
     r"\cmidrule(lr){5-7}",
@@ -381,7 +381,7 @@ table = [
     r"\begin{tabular}{l r r r r r}",
     r"\multicolumn{6}{c}{\textbf{Historical Volatilities}} \\",
     r"\toprule",
-    r"Currency Pair & \textbf{Data} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} \\"
+    r"Currency Pair & \textbf{Data Set} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} \\"
     % prefixes,
     r"\midrule",
 ]
@@ -423,7 +423,7 @@ table = [
     r"& \multicolumn{3}{c}{\textbf{Low Regime}} & \multicolumn{3}{c}{\textbf{High Regime}} \\",
     r"\cmidrule(lr){2-4}",
     r"\cmidrule(lr){5-7}",
-    r"Currency Pair & \textbf{Data} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{Data} & \textbf{RBM (%s)} & \textbf{RBM (%s)} \\"
+    r"Currency Pair & \textbf{Data Set} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{Data Set} & \textbf{RBM (%s)} & \textbf{RBM (%s)} \\"
     % (prefixes + prefixes),
     r"\midrule",
 ]
@@ -463,7 +463,7 @@ table = [
     r"\begin{tabular}{l r r r r r}",
     r"\multicolumn{6}{c}{\textbf{Lower Tails (1st Percentile)}} \\",
     r"\toprule",
-    r"Currency Pair & \textbf{Data} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} \\"
+    r"Currency Pair & \textbf{Data Set} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} \\"
     % prefixes,
     r"\midrule",
 ]
@@ -486,7 +486,7 @@ table += [
     r"\bottomrule \\",
     r"\multicolumn{6}{c}{\textbf{Upper Tails (99th Percentile)}} \\",
     r"\toprule",
-    r"Currency Pair & \textbf{Data} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} \\"
+    r"Currency Pair & \textbf{Data Set} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} & \textbf{RBM (%s)} \\"
     % prefixes,
     r"\midrule",
 ]
