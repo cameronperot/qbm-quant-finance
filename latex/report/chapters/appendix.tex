@@ -3,7 +3,7 @@
 This derivation follows along the lines of that found on p. 658-659 of~\cite{goodfellow_deep_learning}.
 We start by noting
 \begin{align}
-    p(\vec{v}) = \frac{1}{Z} \sum_\vec{h} e^{-E(\vec{v},\vec{h})}
+    p(\vec{v,h}) = \frac{1}{Z} e^{-E(\vec{v},\vec{h})}
 \end{align}
 From this we can derive the conditional probability
 \begin{align}
@@ -38,8 +38,8 @@ Analogously for \( p(\vec{v} | \vec{h}) \) one finds
     p(\vec{v} | \vec{h}) = \prod_i \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i
 \end{align}
 
-\subsection{Log-Likelihood}\label{app:rbm_log_likelihood_derivation}
-For data distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W}, \vec{a}, \vec{b}) \) the average log-likelihood is given by
+\subsection{Log-Likelihood Derivative}\label{app:rbm_log_likelihood_derivation}
+For data set distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W}, \vec{a}, \vec{b}) \) the average log-likelihood is given by
 \begin{align}
 \begin{split}
     \ell(\theta)
@@ -59,7 +59,7 @@ Taking the gradient we find
         - \Big\langle \partial_{\theta}\big( -E(\vec{v},\vec{h}) \big) \Big\rangle_{p(\vec{v},\vec{h})}
 \end{split}
 \end{align}
-We will use \( \langle \ \cdot \ \rangle_{\text{data}} \) to denote the expectation value w.r.t.\ the data, and \( \langle \ \cdot \ \rangle_{\text{model}} \) to denote the expectation value w.r.t.\ the model.
+Where \( \langle \ \cdot \ \rangle_{\text{data}} \) denotes the expectation value with respect to the data set distribution, and \( \langle \ \cdot \ \rangle_{\text{model}} \) denotes the expectation value with respect to the model distribution.
 This gives us
 \begin{align}
 \begin{split}
@@ -73,9 +73,9 @@ This gives us
 \end{align}
 
 \section{Quantum Boltzmann Machine}
-\subsection{Log-Likelihood}\label{app:qbm_log_likelihood_derivation}
+\subsection{Log-Likelihood Derivative}\label{app:qbm_log_likelihood_derivation}
 This derivation follows along the lines of that laid out in~\cite{amin_2018}.
-We start with the data-averaged log-likelihood
+We start with the data set-averaged log-likelihood
 \begin{align}
 \begin{split}
     \ell(\theta)
@@ -147,7 +147,7 @@ where
 \begin{align}
     H_\vec{v} &= \braket{\vec{v} | H | \vec{v}}
 \end{align}
-with \( H_\vec{v} \) being the "clamped" Hamiltonian.
+with \( H_\vec{v} \) being the \textit{clamped} Hamiltonian.
 This is called clamped because the visible qubits are held to the classical state of the visible vector \( \vec{v} \) due to an infinite energy penalty imposed by the \( \log(\Lambda_\vec{v} + \epsilon) \) term.
 Using this we can write the inequality
 \begin{align}
@@ -164,11 +164,11 @@ which in turn allows for the log-likelihood to be bounded as
 where
 \begin{align}
     \tilde{\ell}(\theta)
-        &\equiv \sum_\vec{v} p_\text{data}(\vec{v}) \log\frac{\tr(e^{-H_\vec{v}})}{\tr(e^{-H})}
+        &= \sum_\vec{v} p_\text{data}(\vec{v}) \log\frac{\tr(e^{-H_\vec{v}})}{\tr(e^{-H})}
 \end{align}
 \subsection{Log-Likelihood Lower Bound Derivative}\label{app:qbm_log_likelihood_lower_bound_derivative}
 This derivation follows along the lines of that laid out in~\cite{amin_2018}.
-Taking the partial derivative yields
+Taking the partial derivative of the log-likelihood lower bound yields
 \begin{align}
 \begin{split}
     \label{eq:qbm_log_likelihood_derivative_lower_bound}
@@ -229,34 +229,34 @@ Following along the lines of~\cite{xu_2021} we have
 \begin{split}
     p_\text{DW}
         &= \frac{1}{Z_\text{DW}} e^{-E_\text{DW}} \\
-        &= \frac{1}{Z_\text{DW}} e^{-E / \betahat} \\
+        &= \frac{1}{Z_\text{DW}} e^{-E / \beta} \\
 \end{split}
 \end{align}
-which leads to a negative log-likelihood derivative of
+which leads to a log-likelihood derivative of
 \begin{align}
-    -\frac{\partial \log p_\text{DW}}{\partial\betahat}
-        &= -\frac{1}{\betahat^2} (E - \langle E \rangle)
+    \frac{\partial \log p_\text{DW}}{\partial\beta}
+        &= \frac{1}{\beta^2} (E - \langle E \rangle)
 \end{align}
-and after averaging over the training data configurations we have
+and after averaging over the training data set we have
 \begin{align}
-    \Delta\betahat
-        &= \frac{\eta}{\betahat^2}\big(\langle E \rangle_\text{data} - \langle E \rangle_\text{model}\big)
+    \Delta\beta
+        &= \frac{\eta}{\beta^2}\big(\langle E \rangle_\text{data} - \langle E \rangle_\text{model}\big)
 \end{align}
 
 \section{Model Implementation in Python}
 A Python package named \texttt{qbm} was developed to house all of the reusable code for this project.
-The code implementing the quantum restricted Boltzmann machine, trained by minimizing the upper bound of the negative log-likelihood, is implemented as an easy to use Python class titled \texttt{BQRBM}.
+The code implementing the quantum restricted Boltzmann machine, trained by minimizing the upper bound of the negative log-likelihood, is implemented as an easy to use Python class named \texttt{BQRBM}.
 All code is commented and broken down into easy to understand methods and blocks.
 
 \subsection{Initialization}
-The object can be initialized as follows
+The model can be initialized with
 \begin{python}
 model = BQRBM(
     X_train,
     n_hidden,
     embedding,
     anneal_params,
-    beta_initial=1.5,
+    beta_initial=1.0,
     beta_range=(0.1, 10),
     qpu_params={"region": "na-west-1", "solver": "Advantage_system4.1"},
     exact_params=None,
@@ -362,7 +362,7 @@ In finance, the annualized volatility of a time series vector \( \vec{x} \) is c
 where the factor of \( \sqrt{252} \) comes from the square root of the number of trading days in a year, i.e., it's the annualization factor.
 
 \subsection{KL Divergence}\label{app:kl_divergence}
-The Kullback-Leibler divergence~\cite{kullback_1951} is measure of how much the probability distribution \( q \) differs from the reference probability distribution \( p \).
+The Kullback-Leibler divergence~\cite{kullback_1951} is a measure of how much the probability distribution \( q \) differs from the reference probability distribution \( p \).
 It is defined as
 \begin{align}
     \DKL{p}{q}
@@ -372,26 +372,25 @@ It can be interpreted as the amount of information loss associated with using \(
 It must also be noted that the KL divergence is a distance, but not a metric (rather a divergence), because of the asymmetry that \( \DKL{p}{q} \ne \DKL{q}{p} \).
 
 \subsubsection{KL Divergence in Practice}\label{app:kl_divergence_in_practice}
-If we wish to compare the distribution \( \psamples \) obtained from real world sampling to that of the reference distribution \( \ptheory \) computed exactly, we need to first do some preprocessing to ensure that our comparison carries some sort of meaning.
-Since \( \psamples \) is derived from a finite number of observations we will not always be able to get a full read of the true distribution.
-Therefore, it is ideal to take a histogram approach to better approximate the shape of the distribution and compare it to the same binned shape of the reference distribution.
-In practice this depends on how many samples ones has, and how many samples there are in comparison to the total number of states of the distribution.
+Due to the limited maximum sample size of \( 10^4 \) when using a D-Wave annealer and the inability to concatenate sample sets due to spin-bath polarization effects~\cite{pochart_2021}, it made computation of the KL divergence quite difficult because we couldn't get a proper read on the probability distribution when the number of possible states was high.
+Even for the small 12-qubit problem there were still \( 2^{12} = 4096 \) possible states, thus \( 10^4 \) samples weren't entirely representative of the true distribution.
+This problem was only exacerbated when working with larger system sizes.
 
-For the problem of comparing the distribution obtained by sampling the D-Wave annealer (maximum \( 10^4 \) sample size) in relation to \( 2^{12} = 4096 \) total possible configurations, we chose the number of bins in the histogram to be 32, since this is close to the number of bins computed using the Freedman-Diaconis rule on some of the sample sets.
+Therefore, in this thesis we chose to take a histogram-based approach to approximate the KL divergence.
+All KL divergences were computed using 32 bins since this was close to the number of bins computed using the Freedman-Diaconis rule on some of the sample sets for the 12-qubit problem.
 
-An issue we run into in practice is that \( \psamples \) computed via the histogram approach might contain zeros, which leads to issues when computing the KL divergence since it would diverge to \( \infty \) due to the zero in the denominator of the log argument of
-\begin{align}
-    \DKL{\ptheory}{\psamples} = \sum_i \ptheory^{(i)} \log\frac{\ptheory^{(i)}}{\psamples^{(i)}}
-\end{align}
-The way around this is the concept of smoothing~\cite{han_kl_divergence}, i.e., adding a small probability to the zeros in the case where we know the true probability to be nonzero.
-In this case, given the quantum nature of the problem and the distribution we know that no state has a truly zero probability (although they can be infinitesimally small).
-The real question is what probability do we add here so that the numbers still carry some meaning.
-For this we chose to take the following approach: if \( \psamples^{(i)} = 0 \) and \( \ptheory^{(i)} > 0 \), then we take \( \psamples^{(i)} = \ptheory^{(i)} \cdot 10^{-6} \), which means that the term \( \ptheory^{(i)} \log \frac{\ptheory^{(i)}}{\psamples^{(i)}} = \ptheory^{(i)} \log 10^6 \).
-Thus, any zeros in the sample distribution that are nonzero in the exact distribution will impose a \( \ptheory \) scaled constant penalty to the KL divergence.
-The sum of the terms of the sample probabilities that used to be zero are then evenly subtracted from the rest of the probabilities to ensure that the distribution remains normalized.
+When computing the \( q \) distribution from a sample set of limited size, it was inevitable that some of the probabilities came out to zero, which in turn led to issues computing the KL divergence due to zeros in the denominator of the argument of the log.
+Luckily there was a way around this if we knew the true probability of measuring such a state to be nonzero.
+Due to the quantum nature of this problem and the fact that no state had a truly zero probability (although some infinitesimally small), we could take such an approach.
 
-Even though this is not the true KL divergence as intended by theory, it provides a decent approximation for which we can use to compare distributions generated by real world processes with limited sample size.
+The method we used to mitigate this problem is called smoothing~\cite{han_kl_divergence}, where we added some small probability \( \epsilon \) to the \( q \) distribution probabilities that were observed to be zero, then took the sum of the added probabilities and evenly subtracted it from the nonzero probabilities in order to ensure the distribution remain normalized.
+For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the smoothed distribution would be \( \{q_1 = 1/3 - \epsilon, q_2 = 2/3 - \epsilon, q_3 = \epsilon, q_4 = \epsilon\} \).
 
+Furthermore, call it \textit{relative} smoothing when the smoothed probabilities were taken to be relative to the reference distribution \( p \), which was found to be useful when it was difficult to choose a constant value of \( \epsilon \), e.g. when the reference distribution probabilities varied widely and could sometimes coincide with \( \epsilon \).
+For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the relative smoothed distribution would be \( \{q_1 = 1/3 - \epsilon (p_3 + p_4)/2, q_2 = 2/3 - \epsilon (p_3 + p_4)/2, q_3 = \epsilon p_3, q_4 = \epsilon p_4\} \).
+
+We took a value of \( \epsilon = 10^{-6} \) when computing \( \DKL{\pdata}{\pmodel} \) because it was small enough that it wouldn't coincide with any of the \( \pdata \) values since the data sets contained only a few thousand samples, thus the smallest value of \( \pdata \) was roughly on the order of \( 10^{-4} \).
+When computing \( \DKL{\ptheory}{\psamples} \) though, we opted to use relative smoothing with a value of \( \epsilon = 10^{-6} \) since sometimes some probabilities of \( \ptheory \) could be close to \( \epsilon \) and give a false sense of agreement with the smoothed \( \psamples \).
 
 \subsection{Correlation Coefficients}\label{app:correlation_coefficients}
 The Pearson correlation coefficient is defined as
@@ -399,7 +398,7 @@ The Pearson correlation coefficient is defined as
     \rho_{X,Y} = \frac{\text{cov}{(X,Y)}}{\sigma_X \sigma_Y} \in [-1, 1]
 \end{align}
 and measures the linear correlation between the random variables \( X \) and \( Y \).
-Therefore, it must be noted that this does not capture nonlinear relations, thus it shouldn't be relied upon to tell the full story.
+Therefore, it must be noted that this does not capture nonlinear relations, and shouldn't be relied upon to tell the full story.
 Additionally, this measure is quite sensitive to outliers.
 
 The Spearman rank correlation coefficient is defined as
@@ -419,10 +418,10 @@ where \( (x_1, y_1), \dots, (x_n, y_n) \) are pairs of observations of the rando
 It is important to keep in mind how one interprets the correlation coefficients.
 The sign of the correlation coefficient determines whether or not it is negatively or positively correlated, and the magnitude determines how strong the correlation effects are.
 As a loose guide, correlation coefficient values of 0.1, 0.3, and 0.5 can be termed small, medium, and large, respectively~\cite{research_design_and_statistical_analysis}.
-In general, one must be careful when interpreting the correlation coefficients, thus it is important to understand what the values mean, and what they don't.
+In general, one must be careful when interpreting the correlation coefficients; it is important to understand what the values mean, and what they don't.
 Section 3.4.2 "Interpreting the Correlation Coefficient" of~\cite{research_design_and_statistical_analysis} offers further insight and points out some of the pitfalls to watch out for.
 
-In this thesis the correlation coefficients are computed using the respective functions from the SciPy Python package~\cite{python_scipy}.
+In this thesis the correlation coefficients were computed using the respective functions from the SciPy Python package~\cite{python_scipy}.
 
 \subsection{Tail Concentration Functions}\label{app:tail_concentration_functions}
 The lower tail concentration function is defined as~\cite{venter_2002}
@@ -443,9 +442,11 @@ and the upper as
 \end{align}
 where \( U_1 \) and \( U_2 \) uniform random variables on the interval \( [0, 1] \), and \( C(u_1, u_2) \) is the copula of \( (U_1, U_2) \).
 
-In practice we compute \( U_1 \) and \( U_2 \) as the normalized rank of the observations of the random variables \( X \) and \( Y \), respectively.
+In practice we computed \( U_1 \) and \( U_2 \) as the normalized rank of the observations of the random variables \( X \) and \( Y \), respectively.
 The way to interpret the concentration functions is that they represent the probability that \( X \) and \( Y \) simultaneously take on extreme values.
 When plotted, the lower tail concentration function is used for \( 0 \le z \le 0.5 \) and the upper for \( 0.5 \le z \le 1 \).
+
+A nice explanation with animations can be found at~\cite{charpentier_2012}.
 
 \subsection{Autocorrelation Analysis}\label{app:autocorrelation_analysis}
 When studying results from an MCMC-based model it is important to be aware that sequentially generated samples are not always statistically independent, that is, there is some thermalization threshold that corresponds to the minimum number of sampling steps between samples to consider them as statistically independent.
@@ -456,10 +457,10 @@ For a time series \( x_1, \dots, x_n \), the lag-\( k \) autocorrelation functio
         &= \frac{\text{cov}(x_t, x_{t+k})}{\sigma_{x}^2}
 \end{align}
 The autocorrelation function is essentially a correlation coefficient, except instead of comparing two different variables it compares the same variable at different times.
-In this thesis we use the statsmodels Python package~\cite{python_statsmodels} to compute the autocorrelation function as there are some caveats when computing it in practice with large chains (e.g. there are some tricks such as using a Fourier transformation to make the computations more efficient).
+In this thesis we used the statsmodels Python package~\cite{python_statsmodels} to compute the autocorrelation function as there are some caveats when computing it in practice with large chains, e.g. there are some tricks such as using a Fourier transformation to make the computations more efficient.
 
 The integrated autocorrelation time is a reasonable estimate of how many steps in between samples we should have before we can consider them to be (to a degree) statistically independent.
-In this thesis we use the emcee Python package~\cite{python_emcee} to estimate the integrated autocorrelation time, which follows the approach laid out by Goodman and Weare in~\cite{goodman_weare_2010}.
+In this thesis we used the emcee Python package~\cite{python_emcee} to estimate the integrated autocorrelation time, which follows the approach laid out by Goodman and Weare in~\cite{goodman_weare_2010}.
 
 \subsection{Exact Computation of \( \rho \)}\label{app:exact_rho_computation}
 For the density matrix
@@ -473,10 +474,10 @@ we can compute this as
 \end{align}
 where
 \begin{align}
-    A = \text{diag}\Big(e^{-\beta(\lambda_1 - \lambda_{\min})}, \dots, e^{-\beta(\lambda_{2^n} - \lambda_{\min})}\Big)
+    A = \text{diag}\Big(e^{-\beta(\lambda_1 - \min\{\lambda_i\})}, \dots, e^{-\beta(\lambda_{2^n} - \min\{\lambda_i\})}\Big)
 \end{align}
-with \( \lambda_i \) being the eigenvalues of \( H \), and \( S \) is the matrix of eigenvectors that transforms \( H \) to and from its eigenspace.
-The reason why we subtract \( \lambda_{\min} \) from the eigenvalues in practice is to avoid computing the exponential of a large number which can lead to divergence in floating point calculations.
+where \( \{\lambda_i\} \) are the eigenvalues of \( H \), and \( S \) is the matrix of eigenvectors that transforms \( H \) to and from its eigenspace.
+We subtract \( \min\{\lambda_i\} \) from the eigenvalues in practice to avoid computing the exponential of a large number which can lead to divergence in floating point calculations.
 
 \subsection{Learning Rate Decay Schedule}\label{app:lr_exp_decay}
 The learning rate at epoch \( t \) is given by
