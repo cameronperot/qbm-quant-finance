@@ -3,13 +3,13 @@
         "prefix": "B",
         "id": "BernoulliRBM_20211115_111609"
     },
-    "volatility_indicators": {
-        "prefix": "V",
-        "id": "BernoulliRBM_20211115_172831"
-    },
     "transformed": {
         "prefix": "X",
         "id": "BernoulliRBM_20211115_125359"
+    },
+    "volatility_indicators": {
+        "prefix": "V",
+        "id": "BernoulliRBM_20211115_172831"
     },
     "transformed_with_volatility_indicators": {
         "prefix": "XV",

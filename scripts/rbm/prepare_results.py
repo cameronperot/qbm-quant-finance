@@ -204,8 +204,8 @@ Plotting
 colors = {
     "Data": "tab:cyan",
     "RBM (B)": "tab:blue",
-    "RBM (V)": "tab:red",
     "RBM (X)": "tab:orange",
+    "RBM (V)": "tab:red",
     "RBM (XV)": "tab:green",
 }
 
@@ -249,7 +249,7 @@ dkls = pd.concat(dkls.values(), axis=1).applymap(str_map, digits=3)
 print("dkls")
 print(dkls)
 
-prefixes = ("B", "V", "X", "XV")
+prefixes = ("B", "X", "V", "XV")
 table = [
     r"\begin{tabular}{l r r r r}",
     r"\multicolumn{5}{c}{\(D_{\text{KL}}(p_\text{data} \ || \ p_\text{model})\)} \\",
@@ -313,7 +313,7 @@ for pair in ccs.index:
     row += r" \\"
     table.append(row)
 
-prefixes = ("V", "X")
+prefixes = ("X", "V")
 cc_names = ("Pearson", "Spearman", "Kendall")
 table += [
     r"\midrule",
@@ -376,7 +376,7 @@ volatilities = pd.concat(volatilities.values(), axis=1).applymap(
 print("Volatilities")
 print(volatilities)
 
-prefixes = ("B", "V", "X", "XV")
+prefixes = ("B", "X", "V", "XV")
 table = [
     r"\begin{tabular}{l r r r r r}",
     r"\multicolumn{6}{c}{\textbf{Historical Volatilities}} \\",
@@ -458,7 +458,7 @@ tails = pd.concat(tails.values(), axis=1).applymap(str_map, digits=2, factor=100
 print("Tails")
 print(tails)
 
-prefixes = ("B", "V", "X", "XV")
+prefixes = ("B", "X", "V", "XV")
 table = [
     r"\begin{tabular}{l r r r r r}",
     r"\multicolumn{6}{c}{\textbf{Lower Tails (1st Percentile)}} \\",
@@ -515,7 +515,7 @@ ac_times = pd.concat(ac_times.values(), axis=1).applymap(str_map, digits=1)
 print("Autocorrelation Times")
 print(ac_times)
 
-prefixes = ("B", "V", "X", "XV")
+prefixes = ("B", "X", "V", "XV")
 table = [
     r"\begin{tabular}{l r r r r}",
     r"\multicolumn{5}{c}{\textbf{Integrated Autocorrelation Times}} \\",

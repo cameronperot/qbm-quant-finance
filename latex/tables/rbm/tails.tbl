@@ -1,20 +1,20 @@
 \begin{tabular}{l r r r r r}
 \multicolumn{6}{c}{\textbf{Lower Tails (1st Percentile)}} \\
 \toprule
-Currency Pair & \textbf{Data} & \textbf{RBM (B)} & \textbf{RBM (V)} & \textbf{RBM (X)} & \textbf{RBM (XV)} \\
+Currency Pair & \textbf{Data} & \textbf{RBM (B)} & \textbf{RBM (X)} & \textbf{RBM (V)} & \textbf{RBM (XV)} \\
 \midrule
-EURUSD & -1.64\% & -1.80\% $\pm$ 0.04\% & -1.90\% $\pm$ 0.05\% & -1.68\% $\pm$ 0.05\% & -1.76\% $\pm$ 0.06\% \\
-GBPUSD & -1.47\% & -1.59\% $\pm$ 0.04\% & -1.63\% $\pm$ 0.05\% & -1.57\% $\pm$ 0.05\% & -1.66\% $\pm$ 0.06\% \\
-USDCAD & -1.40\% & -1.54\% $\pm$ 0.05\% & -1.59\% $\pm$ 0.05\% & -1.57\% $\pm$ 0.06\% & -1.58\% $\pm$ 0.06\% \\
-USDJPY & -1.70\% & -2.03\% $\pm$ 0.07\% & -2.17\% $\pm$ 0.09\% & -1.92\% $\pm$ 0.06\% & -1.96\% $\pm$ 0.06\% \\
+EURUSD & -1.64\% & -1.80\% $\pm$ 0.04\% & -1.68\% $\pm$ 0.05\% & -1.90\% $\pm$ 0.05\% & -1.76\% $\pm$ 0.06\% \\
+GBPUSD & -1.47\% & -1.59\% $\pm$ 0.04\% & -1.57\% $\pm$ 0.05\% & -1.63\% $\pm$ 0.05\% & -1.66\% $\pm$ 0.06\% \\
+USDCAD & -1.40\% & -1.54\% $\pm$ 0.05\% & -1.57\% $\pm$ 0.06\% & -1.59\% $\pm$ 0.05\% & -1.58\% $\pm$ 0.06\% \\
+USDJPY & -1.70\% & -2.03\% $\pm$ 0.07\% & -1.92\% $\pm$ 0.06\% & -2.17\% $\pm$ 0.09\% & -1.96\% $\pm$ 0.06\% \\
 \bottomrule \\
 \multicolumn{6}{c}{\textbf{Upper Tails (99th Percentile)}} \\
 \toprule
-Currency Pair & \textbf{Data} & \textbf{RBM (B)} & \textbf{RBM (V)} & \textbf{RBM (X)} & \textbf{RBM (XV)} \\
+Currency Pair & \textbf{Data} & \textbf{RBM (B)} & \textbf{RBM (X)} & \textbf{RBM (V)} & \textbf{RBM (XV)} \\
 \midrule
-EURUSD & 1.62\% & 1.59\% $\pm$ 0.04\% & 1.70\% $\pm$ 0.04\% & 1.84\% $\pm$ 0.06\% & 1.81\% $\pm$ 0.05\% \\
-GBPUSD & 1.42\% & 1.45\% $\pm$ 0.04\% & 1.53\% $\pm$ 0.03\% & 1.54\% $\pm$ 0.04\% & 1.57\% $\pm$ 0.04\% \\
-USDCAD & 1.51\% & 1.61\% $\pm$ 0.04\% & 1.60\% $\pm$ 0.05\% & 1.53\% $\pm$ 0.05\% & 1.56\% $\pm$ 0.05\% \\
-USDJPY & 1.59\% & 1.56\% $\pm$ 0.04\% & 1.61\% $\pm$ 0.04\% & 1.60\% $\pm$ 0.05\% & 1.61\% $\pm$ 0.05\% \\
+EURUSD & 1.62\% & 1.59\% $\pm$ 0.04\% & 1.84\% $\pm$ 0.06\% & 1.70\% $\pm$ 0.04\% & 1.81\% $\pm$ 0.05\% \\
+GBPUSD & 1.42\% & 1.45\% $\pm$ 0.04\% & 1.54\% $\pm$ 0.04\% & 1.53\% $\pm$ 0.03\% & 1.57\% $\pm$ 0.04\% \\
+USDCAD & 1.51\% & 1.61\% $\pm$ 0.04\% & 1.53\% $\pm$ 0.05\% & 1.60\% $\pm$ 0.05\% & 1.56\% $\pm$ 0.05\% \\
+USDJPY & 1.59\% & 1.56\% $\pm$ 0.04\% & 1.60\% $\pm$ 0.05\% & 1.61\% $\pm$ 0.04\% & 1.61\% $\pm$ 0.05\% \\
 \bottomrule
 \end{tabular}
