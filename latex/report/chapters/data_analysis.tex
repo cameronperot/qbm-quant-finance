@@ -1,5 +1,5 @@
 \section{Data Analysis}
-Our data set consisted of the daily open, high, low, close (OHLC) values for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs
+Our data set consisted of the daily open, high, low, and close (OHLC) values for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs
 \begin{itemize}
     \item EURUSD - Euro € / U.S. Dollar \$
     \item GBPUSD - British Pound Sterling £ / U.S. Dollar \$
@@ -31,12 +31,12 @@ due to several advantages~\cite{quantivity_2012}
 \end{itemize}
 
 We began our analysis by taking a look at the histograms depicted in~\cref{fig:histograms_raw}.
-From visual examination we saw that the log returns were roughly normally distributed with the sample statistics given in~\cref{tbl:data_log_returns_raw_stats}.
+From visual examination we saw that the log returns were roughly normally distributed with the statistics given in~\cref{tbl:data_log_returns_raw_stats}.
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/histograms.png}
     \end{center}
-    \caption{Histograms of the log returns of the currency pairs.}
+    \caption{Histograms of the log returns data set.}
     \label{fig:histograms_raw}
 \end{figure}
 
@@ -45,11 +45,11 @@ From visual examination we saw that the log returns were roughly normally distri
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/data/log_returns_raw_stats.tbl}
     \end{adjustbox}
-    \caption{Sample statistics of the log returns of the currency pairs.}
+    \caption{Statistics of the log returns data set.}
     \label{tbl:data_log_returns_raw_stats}
 \end{table}
 
-We also visualized the log returns in a violin/box plot in~\cref{fig:violin_raw}, which allowed us to identify outliers and see how they were distributed.
+We also visualized the log returns in a violin and box plot in~\cref{fig:violin_raw}, which allowed us to identify outliers and see how they were distributed.
 Immediately we saw that there was one major outlier to the downside for the GBPUSD currency pair.
 Further analysis indicated that this was an \( 11.1\sigma \) event that occurred on 2016-06-24, which corresponded to the results of the Brexit referendum in the UK~\cite{brexit_gov_uk}.
 The other outlier that really stood out was to the upside for the USDJPY currency pair on 2008-10-28.
@@ -59,7 +59,7 @@ In the final training data set we chose to remove outliers greater than \( 10\si
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/violin.png}
     \end{center}
-    \caption{Violin/box plot of the log returns of the currency pairs illustrating the distribution of the outliers.}
+    \caption{Violin and box plot of the log returns data set illustrating the distribution of the outliers.}
     \label{fig:violin_raw}
 \end{figure}
 
@@ -72,7 +72,7 @@ Details on how the correlation coefficients were computed and how to interpret t
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/scatters.png}
     \end{center}
-    \caption{Scatter plots of the log returns of the currency pairs against each other.}
+    \caption{Scatter plots of the log returns data set.}
     \label{fig:scatters}
 \end{figure}
 
@@ -81,7 +81,7 @@ Details on how the correlation coefficients were computed and how to interpret t
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/data/correlation_coefficients.tbl}
     \end{adjustbox}
-    \caption{Correlation coefficients of the log returns of the currency pairs.}
+    \caption{Correlation coefficients of the log returns data set.}
     \label{tbl:data_correlation_coefficients}
 \end{table}
 
@@ -111,11 +111,13 @@ For example, if \( \vec{x}' = (x_1',x_2',x_3',x_4') \) was a column of \( \mat{X
 For this research we took \( n_\text{bits} = 16 \), which gave us a training set \( \mat{V} \in \binset^{64 \times N} \), thus our training examples were bit vectors of length 64.
 The discretization errors associated with this conversion and data set were on the order of \( 10^{-7} \), well within the desired tolerance for this purpose.
 
-\subsection{Data Transformation}
+\subsection{Data Transformation}\label{sec:outlier_transform}
 Due to how the data was linearly converted to a discrete form before rounding, it opened up the possibility of the discretized data being clustered in the mid-range values if large outliers were present.
 To mitigate this, we came up with a transformation to reduce the gap between outliers by scaling outliers beyond a certain threshold \( \tau \), as detailed in~\cref{alg:transformation}.
+We call this the outlier power transformation.
 In practice we took \( \tau = 1 \) and \( \alpha = 0.5 \), thus the standardized data points above one standard deviation were mapped to their square root, as illustrated in~\cref{fig:data_transformation}.
-This transformation is reversible when \( \overline{x} \), \( \sigma_x \), and \( \delta \) are saved.
+We did explore a few other combinations of \( \tau \) and \( \alpha \), but found these values to produce the best results out of those we tried; of course this could likely be further optimized.
+This transformation is invertible when \( \overline{x} \), \( \sigma_x \), and \( \delta \) are saved.
 
 \begin{algorithm}
 \caption{Outlier Power Transformation}
@@ -125,7 +127,7 @@ This transformation is reversible when \( \overline{x} \), \( \sigma_x \), and \
         \State $\overline{x} \gets \text{mean}(\vec{x})$
         \State $\sigma_{x} \gets \text{std}(\vec{x})$
         \State $\delta \gets \tau - \tau^\alpha$
-            \Comment ensures the transformation is reversible
+            \Comment ensures the transformation is bijective
         \For {$i$ in 1 to length($\vec{x}$)}
             \State $x_i \gets (x_i - \overline{x}) / \sigma_x$
                 \Comment standardize
@@ -149,7 +151,7 @@ This transformation is reversible when \( \overline{x} \), \( \sigma_x \), and \
     \label{fig:data_transformation}
 \end{figure}
 
-We visualized the transformed data set with histograms in~\cref{fig:data_transformation} and a violin/box plot in~\cref{fig:violin_transformed}.
+We visualized the transformed data set with histograms in~\cref{fig:data_transformation} and a violin and box plot in~\cref{fig:violin_transformed}.
 In these, we observed the appearance of "shoulders" around one standard deviation where the outliers were scaled in, and that the outliers became much less extreme, allowing us to better utilize the full range of discrete values.
 \cref{tbl:data_log_returns_transformed_stats} shows that the standard deviations were decreased to roughly \( 78\% \) of their originals values in~\cref{tbl:data_log_returns_raw_stats}.
 
@@ -157,14 +159,14 @@ In these, we observed the appearance of "shoulders" around one standard deviatio
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/histograms_transformed.png}
     \end{center}
-    \caption{Histograms of the transformed log returns of the currency pairs.}
+    \caption{Histograms of the outlier power-transformed log returns data set.}
     \label{fig:histograms_transformed}
 \end{figure}
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/violin_transformed.png}
     \end{center}
-    \caption{Violin/box plot of the transformed log returns of the currency pairs illustrating the distribution of the rescaled outliers.}
+    \caption{Violin and box plot of the outlier power-transformed log returns data set illustrating the distribution of the rescaled outliers.}
     \label{fig:violin_transformed}
 \end{figure}
 \begin{table}[!htb]
@@ -172,7 +174,7 @@ In these, we observed the appearance of "shoulders" around one standard deviatio
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/data/log_returns_transformed_stats.tbl}
     \end{adjustbox}
-    \caption{Sample statistics of the transformed log returns of the currency pairs.}
+    \caption{Statistics of the outlier power-transformed log returns data set.}
     \label{tbl:data_log_returns_transformed_stats}
 \end{table}
 
@@ -189,6 +191,6 @@ Adding one indicator for each of the four currency pairs increased the number of
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/rolling_volatility.png}
     \end{center}
-    \caption{3-month rolling volatilities of the log returns of the currency pairs compared to their historical medians.}
+    \caption{3-month rolling volatilities of the log returns data set compared to their historical medians.}
     \label{fig:rolling_volatility}
 \end{figure}
