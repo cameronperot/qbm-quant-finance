@@ -1,26 +1,26 @@
-In the past few years we have seen the inception of cloud-based quantum computing, with a number of different providers offering various services.
-In terms of maturity, the quantum computing industry as a whole is still in the very early stages as there are still a lot of obstacles to overcome to reach mainstream use.
+In recent years we have seen the inception of cloud-based quantum computing, with a number of different providers offering various services.
+In terms of maturity, the quantum computing industry as a whole is still in the very early stages as there are a lot of obstacles left to overcome before mainstream adoption.
 Quantum computing is not only trying to advance the theory and technology, but also yearning for practical applications in which quantum computing offers advantages over classical computing.
 
 There are two main branches of quantum computing: universal quantum computing, i.e., gate-based quantum computing, and adiabatic quantum computing, i.e., quantum annealing.
 In our work here we focus on the latter, as it is slightly more mature than the former, with current generation devices having much higher numbers of qubits.
 We discuss the theory behind quantum annealing later in~\cref{sec:quantum_annealing}.
-One such cloud-based quantum computing service is D-Wave's Leap platform~\cite{dwave_leap}, which allows users to access quantum annealers and other solvers from the comfort of their homes and offices.
+One such cloud-based quantum computing service is D-Wave's Leap platform~\cite{dwave_leap}, which allows users to access quantum annealers and other solvers from anywhere in the world with an internet connection.
 
 D-Wave is a pioneer in this field, having been researching and developing quantum annealers since 1999.
-They revolutionized the field when released the world's first commercially available quantum annealer in 2011~\cite{zyga_2011}.
+They revolutionized the field with the release of the world's first commercially available quantum annealer in 2011~\cite{zyga_2011}.
 Since then they have released a new version every 2-3 years, each having more qubits and couplers than the previous.
 Their latest version, the D-Wave Advantage, has over 5000 qubits with 15 connections per qubit~\cite{dwave_advantage}.
 
-In this thesis we take a journey into the field of quantum machine learning, and explore the possibilities of using quantum Boltzmann machines (QBMs) as generative models for real-world financial data.
+In this thesis we take a journey into the field of quantum machine learning and explore the possibilities of using quantum Boltzmann machines (QBMs) as generative models for real-world financial data.
 As we will see, there is a deep connection between the quantum Boltzmann machine and quantum annealing, allowing one to train QBMs using a quantum annealer.
 
-Global foreign exchange (forex) markets had a daily volume of \$6.6T in 2019~\cite{bis_2019}, the majority of which was concentrated in a few major pairs.
-Risk management is one of the most important components of the financial system, and in 2008 it failed, leading to the financial crisis which wreaked havoc on economies across the world.
+Risk management is one of the most important components of the financial system, and in 2008 it failed, leading to the financial crisis which wreaked havoc on economies around the world.
 The success of risk management hinges on how accurately the underlying risk models capture the true behavior of the market.
 Therefore, it is essential that we continuously strive to find new and innovative ways of modeling that can help us understand the real risks involved and implement policies to effectively mitigate such risks.
 
-In the 2019 paper \textit{The Market Generator}~\cite{kondratyev_2019}, Kondratyev and Schwarz detailed how a classical restricted Boltzmann machine (RBM) could be used to generate synthetic forex data, and the advantages it offers over traditional parametric models.
+Global foreign exchange (forex) markets had a daily volume of \$6.6T in 2019~\cite{bis_2019}, the majority of which was concentrated in a few major pairs.
+In the 2019 paper \textit{The Market Generator}~\cite{kondratyev_2019}, Kondratyev and Schwarz detailed how a classical restricted Boltzmann machine (RBM) can be used to generate synthetic forex data, and the advantages it offers over traditional parametric models.
 We used their work as a basis to build our classical models upon, which we then used as a reference to compare our quantum models to.
 
 In~\cref{ch:data_analysis} we started by visualizing the data set in various ways to get an idea how it was distributed.
@@ -28,11 +28,13 @@ We further analyzed quantitative metrics to get a better understanding of some o
 Finally, we went through and detailed how we preprocessed the data set into a model-friendly format.
 
 With the data set in hand, we moved to explaining the theory behind the classical RBM in~\cref{ch:rbm}, and describing some of the difficulties associated with training and using classical RBMs.
-We then trained several classical models on the data set discussed in~\cref{ch:data_analysis} using different preprocessing methods, and compared them with each other using both visualizations and a number of quantitative metrics.
+We then trained several classical models on the data set discussed in~\cref{ch:data_analysis} using different preprocessing methods, and compared them with each other using visualizations and a number of quantitative metrics.
 
 In~\cref{ch:qbm} we started from the theory of quantum Boltzmann machines, detailing how they work and their connection to quantum annealing.
-We studied a small 12-qubit problem which we could simulate, allowing us to compare real-world performance to that of a simulation, and gaining key insights into how to train and use QBMs.
+We studied a small 12-qubit problem which we could simulate, allowing us to compare real-world performance to that of theory, and gaining key insights into how to train and use QBMs.
 With those insights, we moved to the final stage of training a model using the data set from~\cref{ch:data_analysis}, then assessing the performance versus the classical models from~\cref{ch:rbm}.
-Additionally, we covered some of the challenges of using D-Wave quantum annealers to train QBMs.
+Additionally, we covered some of the challenges of using D-Wave quantum annealers to train QBMs in~\cref{sec:challenges}.
 
 Lastly, we summarized our findings in~\cref{ch:conclusion}, as well as discussed future directions in which this research can be expanded.
+
+In addition to all of the research presented in this thesis, we also introduce the open source Python package \texttt{qbm} (see~\cref{app:qbm_python}) to make it easier for the community to train and study quantum Boltzmann machines.
