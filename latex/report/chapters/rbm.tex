@@ -126,7 +126,7 @@ Applying the algorithm to a mini-batch is essentially the same except that one d
 \caption{$n$-Step Contrastive Divergence (CD-$n$)}
 \begin{algorithmic}[1]
     \Procedure{CD}{$\vec{v}_+,n,\mat{W},\vec{a},\vec{b},\eta$}
-        \Comment $\vec{v}_+$ is a training example
+        \Comment $\vec{v}_+$ is a training sample
         \State $\vec{h}_+ \gets \sigma(\vec{b} + \mat{W}^\intercal\vec{v}_+)$
             \Comment $\sigma$ applied element-wise
         \State $\vec{v}_- \gets$ Gibbs$(\vec{v}_+,n,\mat{W},\vec{a},\vec{b})$
