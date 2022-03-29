@@ -1,35 +1,20 @@
 # Quantum Boltzmann Machines: Applications in Quantitative Finance
-The QBM implemented here is based on Quantum Boltzman Machine by Amin et al. [[1]](#1).
-The `qbm` Python package is designed to train models using both a simulation and a D-Wave quantum annealer.
-
 The latest version of the thesis can be found [here](https://jugit.fz-juelich.de/qip/quantum-boltzmann-machines/-/jobs/artifacts/main/raw/latex/report/main.pdf?job=report).
 
-The `qbm` Python package has been broken out into its own repository [here](https://jugit.fz-juelich.de/qip/qbm).
+The `qbm` Python package designed for training and analyzing QBMs has been moved to its own repository [here](https://jugit.fz-juelich.de/qip/qbm).
+
+## Abstract
+In this thesis we explore using the D-Wave Advantage 4.1 quantum annealer to sample from quantum Boltzmann distributions and train quantum Boltzmann machines (QBMs).
+We focus on the real-world problem of using QBMs as generative models to produce synthetic foreign exchange market data and analyze how the results stack up against classical models based on restricted Boltzmann machines.
+Additionally, we study a small 12-qubit problem which we use to compare samples obtained from the annealer to theory, and in the process gain vital insights into how well the Advantage 4.1 can sample quantum Boltzmann random variables and be used to train QBMs.
+Through this we are able to show that the D-Wave Advantage 4.1 can sample classical Boltzmann random variables to some extent, but is limited in its ability to sample from quantum Boltzmann distributions.
+Our findings indicate that models trained using the annealer are much noisier than simulations and struggle to perform at the same level as classical models.
 
 ## Table of Contents
 * [Installation](#installation)
-    * [Conda Environment](#conda-environment)
-* [Usage](#usage)
-    * [Basic Configuration](#basic-configuration)
-    * [BQRBM Model](#bqrbm-model)
-        * [Instantiation](#instantiation)
-        * [Training](#training)
-        * [Sampling](#sampling)
-        * [Saving and Loading](#saving-and-loading)
-    * [Example](#example)
-* [References](#references)
 
 ## Installation
-The `qbm` package itself can be installed with
-```
-git clone git@jugit.fz-juelich.de:c.perot/quantum-boltzmann-machines.git
-cd quantum-boltzmann-machines
-pip install .
-```
-
-### Conda Environment
-A predefined conda environment is already configured and ready for installation.
-This can be installed by running
+This code in this thesis is best used with the predefined conda environment, which can be installed by running
 ```
 conda env create -f environment.yml
 ```
@@ -40,8 +25,13 @@ Extra dev dependencies can be installed with
 conda env update --file environment-dev.yml
 ```
 
-## Usage
-The Python package development has been moved [here](https://jugit.fz-juelich.de/qip/qbm).
-
-# References
-<a name="1">[1]</a> Mohammad H. Amin et al. “Quantum Boltzmann Machine”. In: Phys. Rev. X 8 (2 May 2018), p. 021050. doi: 10.1103/PhysRevX.8.021050. url: [https://link.aps.org/doi/10.1103/PhysRevX.8.021050](https://link.aps.org/doi/10.1103/PhysRevX.8.021050).
+Additionally, a fork of scikit-learn is required, which can be installed by running
+```
+pip install --no-build-isolation git+https://github.com/cameronperot/scikit-learn.git@1.0.1-rbm#egg=scikit-learn
+```
+The thesis package can be installed by running
+```
+git clone git@jugit.fz-juelich.de:c.perot/quantum-boltzmann-machines.git
+cd quantum-boltzmann-machines
+pip install .
+```
