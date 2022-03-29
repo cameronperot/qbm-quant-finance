@@ -8,7 +8,7 @@ Our data set consisted of the daily open, high, low, and close (OHLC) values for
 \end{itemize}
 obtained from Dukascopy historical data feed~\cite{dukascopy}.
 The data set was filtered to remove days where any of the currencies had zero volume, as well as NYSE and LSE holidays.
-This resulted in a data set of 5165 training examples.
+This resulted in a data set of 5165 training samples.
 Here we use the notation \( x_\text{open} \), \( x_\text{high} \), \( x_\text{low} \), and \( x_\text{close} \) to denote the open, high, low, and close values of a currency pair on a particular day.
 
 Given that the values were on an absolute basis, we needed to convert them to relative terms in order to be able to compare data from different time periods on a more equal footing.
@@ -88,7 +88,7 @@ Details on how the correlation coefficients were computed and how to interpret t
 
 \section{Data Preprocessing}
 The models used in this thesis required the training data to be in the form of bit vectors, so we had to first convert our data set to such a form.
-Let \( \mat{X} \in \R^{4 \times N} \) represent the training data set of log returns with \( N \) examples, where training examples are vectors in the column space, thus element \( x_{ij} \) represents the \( i \)th currency pair log return for the \( j \)th training example.
+Let \( \mat{X} \in \R^{4 \times N} \) represent the training data set of log returns with \( N \) samples, where training samples are vectors in the column space, thus element \( x_{ij} \) represents the \( i \)th currency pair log return for the \( j \)th training sample.
 
 To discretize the data, we rescaled and rounded the entries of \( \mat{X} \) to integer values in \( \{0, 1, \dots, 2^{n_\text{bits}} - 1\} \), represented by the matrix \( \mat{X}' \in \N^{4 \times N} \) with entries
 \begin{align}
@@ -108,7 +108,7 @@ For example, if \( \vec{x}' = (x_1',x_2',x_3',x_4') \) was a column of \( \mat{X
     \in \binset^{4\cdot n_\text{bits}}
 \end{align}
 
-For this research we took \( n_\text{bits} = 16 \), which gave us a training set \( \mat{V} \in \binset^{64 \times N} \), thus our training examples were bit vectors of length 64.
+For this research we took \( n_\text{bits} = 16 \), which gave us a training set \( \mat{V} \in \binset^{64 \times N} \), thus our training samples were bit vectors of length 64.
 The discretization errors associated with this conversion and data set were on the order of \( 10^{-7} \), well within the desired tolerance for this purpose.
 
 \subsection{Data Transformation}\label{sec:outlier_transform}
