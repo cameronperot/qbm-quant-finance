@@ -4,6 +4,8 @@ The `qbm` Python package is designed to train models using both a simulation and
 
 The latest version of the thesis can be found [here](https://jugit.fz-juelich.de/qip/quantum-boltzmann-machines/-/jobs/artifacts/main/raw/latex/report/main.pdf?job=report).
 
+The `qbm` Python package has been broken out into its own repository [here](https://jugit.fz-juelich.de/qip/qbm).
+
 ## Table of Contents
 * [Installation](#installation)
     * [Conda Environment](#conda-environment)
