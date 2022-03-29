@@ -12,9 +12,6 @@ from qbm.utils.exact_qbm import compute_H, compute_rho, get_pauli_kron
 class BQRBM(QBMBase):
     """
     Bound-based Quantum Restricted Boltzmann Machine
-
-    Based on the work laid out in:
-        - https://journals.aps.org/prx/abstract/10.1103/PhysRevX.8.021050
     """
 
     def __init__(

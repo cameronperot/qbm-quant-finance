@@ -10,9 +10,8 @@ class QBMBase(ABC):
     """
     Abstract base class for Quantum Boltzmann Machines
 
-    Inspiration for implementing certain numerical methods taken from:
-        - https://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
-        - sklearn.neural_network.BernoulliRBM
+    Based on the work laid out in:
+        - https://journals.aps.org/prx/abstract/10.1103/PhysRevX.8.021050
     """
 
     def __init__(self, X_train, n_hidden, seed):
