@@ -1,4 +1,4 @@
-# Quantum Boltzmann Machines
+# Quantum Boltzmann Machines: Applications in Quantitative Finance
 The QBM implemented here is based on Quantum Boltzman Machine by Amin et al. [[1]](#1).
 The `qbm` Python package is designed to train models using both a simulation and a D-Wave quantum annealer.
 
