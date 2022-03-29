@@ -10,9 +10,6 @@ Additionally, we study a small 12-qubit problem which we use to compare samples 
 Through this we are able to show that the D-Wave Advantage 4.1 can sample classical Boltzmann random variables to some extent, but is limited in its ability to sample from quantum Boltzmann distributions.
 Our findings indicate that models trained using the annealer are much noisier than simulations and struggle to perform at the same level as classical models.
 
-## Table of Contents
-* [Installation](#installation)
-
 ## Installation
 This code in this thesis is best used with the predefined conda environment, which can be installed by running
 ```
