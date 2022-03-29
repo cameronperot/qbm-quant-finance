@@ -22,7 +22,7 @@ class BQRBM(QBMBase):
         anneal_params,
         beta_initial=1.5,
         beta_range=(0.1, 10),
-        qpu_params={"region": "eu-central-1", "solver": "Advantage_system5.1"},
+        qpu_params={"region": "na-west-1", "solver": "Advantage_system4.1"},
         exact_params=None,
         seed=0,
     ):
