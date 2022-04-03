@@ -94,7 +94,7 @@ def plot_correlation_coefficients(data, sample):
         ax.errorbar(
             range(3),
             sample["means"].loc[row],
-            label="Sample Ensemble",
+            label="Samples Ensemble",
             yerr=sample["stds"].loc[row],
             fmt="o",
             markersize=4,
@@ -191,7 +191,7 @@ def plot_volatility_comparison(data, sample, params):
     ax.errorbar(
         range(len(data)),
         sample["means"],
-        label="Sample Ensemble",
+        label="Samples Ensemble",
         yerr=sample["stds"],
         fmt="o",
         markersize=6,

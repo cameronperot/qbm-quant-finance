@@ -202,7 +202,7 @@ matplotlib.rcParams.update({"font.size": 14})
 Plotting
 """
 colors = {
-    "Data Set": "tab:cyan",
+    "Data Set": "k",
     "RBM (B)": "tab:blue",
     "RBM (X)": "tab:orange",
     "RBM (V)": "tab:red",
@@ -280,7 +280,9 @@ table = "\n".join(table)
 save_table(table, "kl_divergences.tbl")
 
 # correlation coefficients table
-ccs = pd.concat(ccs.values(), axis=1).applymap(str_map, digits=2)
+ccs = pd.concat(ccs.values(), axis=1)
+ccs.to_csv(results_dir / "correlation_coefficients.csv")
+ccs = ccs.applymap(str_map, digits=2)
 print("Correlation Coefficients")
 print(ccs)
 
