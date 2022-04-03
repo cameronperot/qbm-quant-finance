@@ -97,13 +97,13 @@ To discretize the data, we rescaled and rounded the entries of \( \mat{X} \) to 
 where \( \lfloor \ \cdot \ \rceil \) denotes rounding to the nearest integer.
 
 A new matrix \( \mat{V} \in \binset^{4\cdot n_\text{bits} \times N} \) was then created with the columns being the \( n_\text{bits} \)-length bit vectors corresponding to the binary representation of the entries of the columns of \( \mat{X}' \) concatenated together.
-For example, if \( \vec{x}' = (x_1',x_2',x_3',x_4') \) was a column of \( \mat{X}' \) and the function \( \text{bin}(x') \) takes in an integer \( x' \) and returns an \( n_\text{bits} \)-bit binary representation bit vector, then the corresponding column in \( \mat{V} \) would be
+For example, if \( \vec{x}' = (x_1',x_2',x_3',x_4') \) was a column of \( \mat{X}' \) and the function \( \text{bitvector}(x') \) takes in an integer \( x' \) and returns an \( n_\text{bits} \)-bit binary representation bit vector, then the corresponding column in \( \mat{V} \) would be
 \begin{align}
     \vec{v} = \begin{bmatrix}
-        \text{bin}(x_1') \\
-        \text{bin}(x_2') \\
-        \text{bin}(x_3') \\
-        \text{bin}(x_4') \\
+        \text{bitvector}(x_1') \\
+        \text{bitvector}(x_2') \\
+        \text{bitvector}(x_3') \\
+        \text{bitvector}(x_4') \\
     \end{bmatrix}
     \in \binset^{4\cdot n_\text{bits}}
 \end{align}
