@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    qbm.metrics
+   qbm.models
    qbm.plotting
    qbm.sampling
    qbm.utils
