@@ -707,7 +707,7 @@ Due to the spin-bath polarization effect (see error sources below), one cannot c
 Another issue is the time requirements.
 Most models trained here required little QPU access time, around 5-10 minutes, but this can add up and get expensive if one is doing a hyperparameter grid search.
 Additionally, there is the total training time, which as we saw can be quite substantial due the latency to the cloud platform combined with the load queue of the solver.
-To illustrate this point, training the simulation-based 12-qubit model took less than two seconds per epoch (the majority of which was spent computing the density matrix), whereas the Advantage 4.1-based model took around three minutes per epoch.
+To illustrate this point, training the simulation-based 12-qubit model took roughly 2 seconds per epoch (the majority of which was spent computing the density matrix), whereas the Advantage 4.1-based model took 2-5 minutes per epoch.
 
 \subsubsection{Error Sources}
 There are a number of sources from which errors can arise on a D-Wave quantum annealer.
