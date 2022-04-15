@@ -4,15 +4,15 @@ The Quantum Boltzmann Machine detailed here is based on the work in \textit{Quan
 In this section we use spin eigenvalues \( +1 \) and \( -1 \) rather than binary values \( 0 \) and \( 1 \), respectively, in order to maintain consistency with the language of quantum mechanics.
 We start with the Hamiltonian
 \begin{align}
-    H = -\sum_i \Gamma_i \sigma_i^x -\sum_i b_i \sigma_i^z - \sum_{i,j} w_{ij} \sigma_i^z \sigma_j^z
+    H = -\sum_i \Gamma_i \sigma_i^x -\sum_i b_i \sigma_i^z - \sum_{i,j} w_{ij} \sigma_i^z \sigma_j^z,
 \end{align}
 where
 \begin{align}
 \begin{split}
     \sigma_i^x
-        &= I^{\otimes i-1} \otimes \sigma_x \otimes I^{\otimes n-i} \\
+        &= I^{\otimes i-1} \otimes \sigma_x \otimes I^{\otimes n-i}, \\
     \sigma_i^z
-        &= I^{\otimes i-1} \otimes \sigma_z \otimes I^{\otimes n-i}
+        &= I^{\otimes i-1} \otimes \sigma_z \otimes I^{\otimes n-i},
 \end{split}
 \end{align}
 with \( \sigma_x \) and \( \sigma_z \) being the Pauli \( x \) and \( z \) matrices, and \( I \) being the \( 2 \times 2 \) identity matrix.
@@ -20,27 +20,27 @@ We denote the first \( n_v \) qubits as the visible units and the last \( n_h \)
 
 The system's distribution is modeled by the density matrix
 \begin{align}
-    \rho = \frac{1}{Z} e^{-H}
+    \rho = \frac{1}{Z} e^{-H},
 \label{eq:density_operator}
 \end{align}
 where \( e^{-H} = \sum_n \frac{1}{n!} (-H)^n \) is the matrix exponential, and \( Z = \tr(e^{-H}) \) is the partition function.
 The probability to observe the system in state \( \ket{\vec{v},\vec{h}} \) is given by
 \begin{align}
     p(\vec{v},\vec{h})
-        &= \tr(\ket{\vec{v},\vec{h}}\bra{\vec{v},\vec{h}} \rho)
+        &= \tr(\ket{\vec{v},\vec{h}}\bra{\vec{v},\vec{h}} \rho),
 \end{align}
 and if we define the projection operator
 \begin{align}
-    \Lambda_\vec{v} = \ket{\vec{v}}\bra{\vec{v}} \otimes I^{\otimes n_h}
+    \Lambda_\vec{v} = \ket{\vec{v}}\bra{\vec{v}} \otimes I^{\otimes n_h},
 \end{align}
 then the marginal probability to measure the visible units in state \( \ket{\vec{v}} \) is given by
 \begin{align}
-    p(\vec{v}) = \tr(\Lambda_{\vec{v}}\rho)
+    p(\vec{v}) = \tr(\Lambda_{\vec{v}}\rho).
 \end{align}
 
 Using the probabilities above we can obtain an average log-likelihood, which for data set distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W}, \vec{a}, \vec{b}) \) is
 \begin{align}
-    \ell(\theta) = \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \tr(\Lambda_\vec{v}\rho)
+    \ell(\theta) = \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \tr(\Lambda_\vec{v}\rho).
 \end{align}
 
 \subsection{Optimizing a QBM}
@@ -48,17 +48,17 @@ When optimizing a QBM, it is preferable to maximize the lower bound of the log-l
 The reason for this is that the partial derivative of the log-likelihood with respect to the parameters has a term which is computationally expensive to compute, as discussed in \cref{app:qbm_log_likelihood_derivation}.
 The lower bound of the log-likelihood is given by (see \cref{app:qbm_log_likelihood_lower_bound} for derivation)
 \begin{align}
-    \tilde{\ell}(\theta) = \sum_{\vec{v}} \pdata(\vec{v}) \log \tr(\rho_\vec{v})
+    \tilde{\ell}(\theta) = \sum_{\vec{v}} \pdata(\vec{v}) \log \tr(\rho_\vec{v}),
 \end{align}
 where we have what is referred to as the \textit{clamped} Hamiltonian, which for a given visible vector \( \vec{v} \) is
 \begin{align}
     H_\vec{v}
-        &= \braket{\vec{v}|H|\vec{v}}
+        &= \braket{\vec{v}|H|\vec{v}},
 \end{align}
 with corresponding clamped density matrix
 \begin{align}
     \rho_\vec{v}
-        &= \frac{1}{Z_\vec{v}} e^{-H_\vec{v}}
+        &= \frac{1}{Z_\vec{v}} e^{-H_\vec{v}},
 \end{align}
 and \( Z_\vec{v} = \tr(e^{-H_\vec{v}}) \).
 
@@ -66,9 +66,9 @@ The associated derivatives with respect to the parameters of the lower bound are
 \begin{align}
 \begin{split}
     \partial_{w_{ij}} \tilde{\ell}(\theta)
-        &= \langle \sigma_i^z \sigma_j^z \rangle_\text{data} - \langle \sigma_i^z \sigma_j^z \rangle_\text{model} \\
+        &= \langle \sigma_i^z \sigma_j^z \rangle_\text{data} - \langle \sigma_i^z \sigma_j^z \rangle_\text{model}, \\
     \partial_{b_i} \tilde{\ell}(\theta)
-        &= \langle \sigma_i^z \rangle_\text{data} - \langle \sigma_i^z \rangle_\text{model}
+        &= \langle \sigma_i^z \rangle_\text{data} - \langle \sigma_i^z \rangle_\text{model},
 \end{split}
 \end{align}
 where \( \langle \ \cdot \ \rangle_\text{data} \) is the data set-averaged expectation value with respect to the clamped density matrix, and \( \langle \ \cdot \ \rangle_\text{model} \) is the expectation value with respect to the original density matrix.
@@ -79,16 +79,14 @@ This leads to positive phase expectation values of
 \begin{split}
     \langle \sigma_i^z \rangle_\text{data}
         &= \sum_\vec{v} \pdata(\vec{v}) v_i,
-        \ i \in \mathcal{I}_v \\
+        \ i \in \mathcal{I}_v, \\
+    \langle \sigma_i^z \rangle_\text{data}
+        &= \sum_\vec{v} \pdata(\vec{v}) \frac{b_i'(\vec{v})}{D_i(\vec{v})} \tanh\big(D_i(\vec{v})\big), \ i \in \mathcal{I}_h, \\
     \langle \sigma_i^z \sigma_j^z \rangle_\text{data}
         &= \sum_\vec{v} \pdata(\vec{v}) v_i v_j,
-        \ i, j \in \mathcal{I}_v \\
-    \langle \sigma_i^z \rangle_\text{data}
-        &= \sum_\vec{v} \pdata(\vec{v}) \frac{b_i'(\vec{v})}{D_i(\vec{v})} \tanh\big(D_i(\vec{v})\big),
-        \ i \in \mathcal{I}_h \\
+        \ i, j \in \mathcal{I}_v, \\
     \langle \sigma_i^z \sigma_j^z \rangle_\text{data}
-        &= \sum_\vec{v} \pdata(\vec{v}) v_i \frac{b_j'(\vec{v})}{D_j(\vec{v})} \tanh\big(D_j(\vec{v})\big),
-        \ i \in \mathcal{I}_v, \ j \in \mathcal{I}_h
+        &= \sum_\vec{v} \pdata(\vec{v}) v_i \frac{b_j'(\vec{v})}{D_j(\vec{v})} \tanh\big(D_j(\vec{v})\big), \ i \in \mathcal{I}_v, \ j \in \mathcal{I}_h,
 \end{split}
 \end{align}
 where \( b_i'(\vec{v}) = b_i + (\mat{W}^\intercal\vec{v})_i \), \( D_i(\vec{v}) = \sqrt{\Gamma_i^2 + b_i'(\vec{v})^2} \), \( \mathcal{I}_v = \{1, \dots, n_v\} \) represents the visible qubit indices, and \( \mathcal{I}_h = \{n_v + 1, \dots, n\} \) represents the hidden qubit indices.
@@ -98,7 +96,7 @@ Quantum annealing, also known as adiabatic quantum computing, is a branch of qua
 "A physical system remains in its instantaneous eigenstate if a given perturbation is acting on it slowly enough and if there is a gap between the eigenvalue and the rest of the Hamiltonian's spectrum."
 This can be achieved by implementing a Hamiltonian of the form~\cite{qc_lecture_notes}
 \begin{align}
-    H(s) = A(s) H_{\text{initial}} + B(s) H_{\text{final}}
+    H(s) = A(s) H_{\text{initial}} + B(s) H_{\text{final}},
 \end{align}
 where \( s \in [0, 1] \).
 For a linear anneal schedule \( s(t) = t / t_a \), with \( t_a \) being the total duration the system is annealed for.
@@ -108,8 +106,8 @@ For a linear anneal schedule \( s(t) = t / t_a \), with \( t_a \) being the tota
 The functions \( A(s) \) and \( B(s) \) must be such that they satisfy the relations
 \begin{align}
 \begin{split}
-    A(0) &\gg B(0) \\
-    A(1) &\ll B(1)
+    A(0) &\gg B(0), \\
+    A(1) &\ll B(1).
 \end{split}
 \end{align}
 
@@ -120,7 +118,7 @@ Therefore, when the qubits are measured they should correspond to an optimal sol
 \subsubsection{D-Wave Quantum Annealer}
 D-Wave quantum annealers implement a time-dependent Hamiltonian of the form~\cite{dwave_qa}
 \begin{align}
-    H(s) = A(s) \bigg( -\sum_i \sigma_i^x \bigg) + B(s) \bigg( \sum_i h_i \sigma_i^z + \sum_{i,j} J_{ij} \sigma_i^z \sigma_j^z \bigg)
+    H(s) = A(s) \bigg( -\sum_i \sigma_i^x \bigg) + B(s) \bigg( \sum_i h_i \sigma_i^z + \sum_{i,j} J_{ij} \sigma_i^z \sigma_j^z \bigg).
 \end{align}
 From this we see the initial Hamiltonian has a ground state where all of the qubits are aligned in the \( x \)-direction, i.e., \( \ket{+}^{\otimes n} \), which corresponds to an equal superposition of all possible states in the computational basis.
 The final Hamiltonian corresponds to the Ising model described by the \( h_i \) and \( J_{ij} \) values.
@@ -156,7 +154,7 @@ In an earlier paper~\cite{amin_2015}, Amin showed that the quasistatic regime be
 Since a quantum annealer is a real-world physical device, samples generated with it have an associated temperature called the effective temperature.
 To be more specific, the corresponding density operator is of the form
 \begin{align}
-    \rho(s, T) = \frac{1}{Z} e^{-\beta H(s)}
+    \rho(s, T) = \frac{1}{Z} e^{-\beta H(s)},
 \label{eq:effective_density_operator}
 \end{align}
 where \( \beta = \frac{1}{k_B T} \) is the effective inverse temperature.
@@ -166,11 +164,11 @@ Comparing the density operator of the QBM in~\cref{eq:density_operator} to the o
 \begin{align}
 \begin{split}
     \Gamma_i
-        &= \beta A(s^*) \\
+        &= \beta A(s^*), \\
     b_i
-        &= -\beta B(s^*) h_i \\
+        &= -\beta B(s^*) h_i, \\
     w_{ij}
-        &= -\beta B(s^*) J_{ij}
+        &= -\beta B(s^*) J_{ij},
     \label{eq:qbm_scaling}
 \end{split}
 \end{align}
@@ -181,7 +179,7 @@ There is the possibility to treat \( \beta \) as a learnable parameter rather th
 Their methodology is based on a log-likelihood maximization approach, and leads to iterative updates of the form (see \cref{app:learning_beta} for how one arrives at this result)
 \begin{align}
     \betahat^{(t)}
-        &= \betahat^{(t-1)} + \frac{\eta}{\big(\betahat^{(t-1)}\big)^2}\big(\langle E \rangle_\text{data} - \langle E \rangle_\text{model}\big)
+        &= \betahat^{(t-1)} + \frac{\eta}{\big(\betahat^{(t-1)}\big)^2}\big(\langle E \rangle_\text{data} - \langle E \rangle_\text{model}\big),
 \end{align}
 where \( \betahat = \frac{1}{k_B\hat{T}} \) is the estimator of the effective inverse temperature.
 We forego the factor of \( \betahat^2 \) downstairs in practice for simplicity and to keep a similar form to the other gradient updates.
@@ -209,7 +207,7 @@ The \texttt{sample\_ising(h, J)} function has the keyword argument \texttt{autos
             \max\bigg\{\frac{\min\{h_i\}}{\min\{h_\text{range}\}},0\bigg\}, \\
             &\max\bigg\{\frac{\max\{J_{ij}\}}{\max\{J_\text{range}\}},0\bigg\},
             \max\bigg\{\frac{\min\{J_{ij}\}}{\min\{J_\text{range}\}},0\bigg\}
-        \Bigg\}
+        \Bigg\}.
 \end{split}
 \end{align}
 This is because the main use case of D-Wave annealers is to maximize the probability of measuring the ground state, thus the problem is rescaled so that the \( h_i \) and \( J_{ij} \) values fully utilize the allowed range of values, essentially decreasing the effective temperature.
@@ -223,11 +221,11 @@ This is done by taking
 \begin{align}
 \begin{split}
     h_i
-        &\rightarrow r_i h_i \\
+        &\rightarrow r_i h_i, \\
     J_{ij}
-        &\rightarrow r_i r_j J_{ij} \\
+        &\rightarrow r_i r_j J_{ij}, \\
     (s_1, \dots, s_n)
-        &\rightarrow (r_1 s_1, \dots, r_n s_n)
+        &\rightarrow (r_1 s_1, \dots, r_n s_n),
 \end{split}
 \end{align}
 then transforming the results back using the third relation above, where \( s_i \) is the measured value of qubit \( i \).
@@ -264,14 +262,14 @@ thus the anneal schedules provided to the solver were of the form
         (\tpause, \spause),
         (\tquench, \squench),
         (\tquench + \Deltaquench, 1)
-    ]
+    ],
 \end{align}
 where
 \begin{align}
 \begin{split}
-    \squench &\equiv \spause \\
-    \tpause &= \spause \cdot \trelative \\
-    \tquench &= \tpause + \Deltapause
+    \squench &\equiv \spause, \\
+    \tpause &= \spause \cdot \trelative, \\
+    \tquench &= \tpause + \Deltapause.
 \end{split}
 \end{align}
 An annotated example of a custom pause-and-quench anneal schedule with \( \squench = 0.55 \), \( \trelative = 20 \ \si{\micro\second} \), and \( \Deltapause = 10 \ \si{\micro\second} \) is given in~\cref{fig:anneal_schedule_annotated}.
@@ -288,7 +286,7 @@ An annotated example of a custom pause-and-quench anneal schedule with \( \squen
 
 The minimum quench duration \( \Deltaquench \) is a function of \( \squench \) and is limited by the system's fastest anneal rate \( \alphaquench \)
 \begin{align}
-    \Deltaquench(\squench) = \frac{1 - \squench}{\alphaquench}
+    \Deltaquench(\squench) = \frac{1 - \squench}{\alphaquench}.
 \end{align}
 The Advantage 4.1 system allows a maximum of \( \alphaquench = 2 \ \si{\micro\second}^{-1} \)~\cite{dwave_solver_parameters}.
 
@@ -298,7 +296,7 @@ More information on how the KL divergence was computed can be found in~\cref{app
 In the right heatmap, where \( \squench = 0.55 \), we observed a narrow band at which the annealer sampled close to a quantum Boltzmann distribution, and in fact it approximated multiple distributions, depending on the effective temperature.
 Similar results were obtained by Marshall et al.~\cite{marshall_2019} using a D-Wave 2000Q, in which they discussed how if the distribution returned by the annealer fits that of a quantum Boltzmann distribution late in the anneal process when \( A(s^*) / B(s^*) \ll 1 \), then the distribution at \( s^* \) should be close to a classical Boltzmann distribution, i.e.,
 \begin{align}
-    e^{-\beta H(s^*)} \approx e^{-\beta B(s^*) H_\text{final}}
+    e^{-\beta H(s^*)} \approx e^{-\beta B(s^*) H_\text{final}}.
 \end{align}
 This in turn means that not only is there one optimal \( s^* \) and effective temperature which models the distribution, but rather a set of them corresponding to a family of distributions for which \( \beta B(s^*) \) is constant.
 Therefore, this explains the streak pattern in the heatmaps.
@@ -503,7 +501,7 @@ The chain strength \( \gamma \) was computed using the relative chain strength \
     \gamma
         &= \rcs \cdot \min\Big\{
             \max\{J_\text{range}\}, \max\big\{\{\abs{h_i}\} \cup \{\abs{J_{ij}}\}\big\}
-        \Big\}
+        \Big\}.
 \end{align}
 
 We trained models using various values of \( \rcs \in [0.3, 2] \), and a pause-and-quench anneal schedule with \( \squench = 0.55 \), \( \trelative = 20 \ \si{\micro\second} \), and \( \Deltapause = 0 \ \si{\micro\second} \).
@@ -716,7 +714,7 @@ The D-Wave documentation does an excellent job at detailing these errors in thei
     \item \textbf{Integrated Control Errors (ICE)} are errors due to the accuracy at which the \( h_i \) and \( J_{ij} \) values can be implemented.
         In mathematical terms this is because the problem the QPU solves is closer to
         \begin{align}
-            H_{\text{Ising}}^\delta(s) = \sum_i (h_i + \delta_{h_i}) \sigma_i^z + \sum_{i,j} (J_{ij} + \delta_{J_{ij}}) \sigma_i^z \sigma_j^z
+            H_{\text{Ising}}^\delta(s) = \sum_i (h_i + \delta_{h_i}) \sigma_i^z + \sum_{i,j} (J_{ij} + \delta_{J_{ij}}) \sigma_i^z \sigma_j^z.
         \end{align}
     \item \textbf{Temperature} errors arise due to fluctuations in the physical temperature of the device, which can change depending on how frequently the QPU is programmed.
     \item \textbf{High-Energy Photon Flux} errors can occur in the presence of photons with energies higher than that expected at the effective temperature dependent equilibrium, which can lead to higher energy solutions. These photons originate from cryogenic filtering at higher temperature phases.

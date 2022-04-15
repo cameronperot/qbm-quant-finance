@@ -5,7 +5,7 @@ The restricted Boltzmann machine (RBM) is an energy-based model defined by the e
 \begin{split}
     E(\vec{v}, \vec{h})
         &= -\sum_i a_i v_i - \sum_j b_j h_j - \sum_{i,j} v_i w_{ij} h_j \\
-        &= -\vec{a}^\intercal\vec{v} - \vec{b}^\intercal\vec{h} - \vec{v}^\intercal\mat{W}\vec{h}
+        &= -\vec{a}^\intercal\vec{v} - \vec{b}^\intercal\vec{h} - \vec{v}^\intercal\mat{W}\vec{h},
 \end{split}
 \end{align}
 where
@@ -28,20 +28,20 @@ An example diagram is depicted in~\cref{fig:rbm_diagram}.
 
 The probability to find the system in the configuration \( (\vec{v},\vec{h}) \) is given by the Boltzmann distribution (with \( \beta = \frac{1}{k_BT} = 1 \))
 \begin{align}
-    p(\vec{v}, \vec{h}) = \frac{1}{Z} e^{-E(\vec{v},\vec{h})}
+    p(\vec{v}, \vec{h}) = \frac{1}{Z} e^{-E(\vec{v},\vec{h})},
 \end{align}
 with intractable~\cite{long_servedio_2010} partition function
 \begin{align}
-    Z = \sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})}
+    Z = \sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})}.
 \end{align}
 
 The imposed restrictions on intra-layer connections enable us to write the conditional probabilities of the layers as the product of the individual units' probabilities~\footnote{Here \( \sigma(x) \) is the element-wise logistic sigmoid function and \( \odot \) denotes element-wise multiplication.} (see \cref{app:conditional_probabilities_derivation} for derivation)
 \begin{align}
 \begin{split}
     p(\vec{h} | \vec{v})
-        &= \prod_j \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j \\
+        &= \prod_j \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j, \\
     p(\vec{v} | \vec{h})
-        &= \prod_i \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i
+        &= \prod_i \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i.
 \end{split}
 \end{align}
 
@@ -52,29 +52,29 @@ For data set distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W
 \begin{split}
     \ell(\theta)
         &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log p(\vec{v}) \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \bigg(\frac{1}{Z} \sum_\vec{h} e^{-E(\vec{v},\vec{h})}\bigg)
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \bigg(\frac{1}{Z} \sum_\vec{h} e^{-E(\vec{v},\vec{h})}\bigg),
 \end{split}
 \end{align}
 with gradients (see \cref{app:rbm_log_likelihood_derivation} for derivation)
 \begin{align}
 \begin{split}
     \partial_{w_{ij}} \ell(\theta)
-        &= \langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{model}} \\
+        &= \langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{model}}, \\
     \partial_{a_i} \ell(\theta)
-        &= \langle v_i \rangle_{\text{data}} - \langle v_i \rangle_{\text{model}} \\
+        &= \langle v_i \rangle_{\text{data}} - \langle v_i \rangle_{\text{model}}, \\
     \partial_{b_j} \ell(\theta)
-        &= \langle h_j \rangle_{\text{data}} - \langle h_j \rangle_{\text{model}}
+        &= \langle h_j \rangle_{\text{data}} - \langle h_j \rangle_{\text{model}}.
 \end{split}
 \end{align}
 Therefore, the parameters at step \( t \) are given by
 \begin{align}
 \begin{split}
     \mat{W}^{(t)}
-        &= \mat{W}^{(t-1)} + \eta(\langle \vec{v} \vec{h}^\intercal \rangle_{\text{data}} - \langle \vec{v} \vec{h}^\intercal \rangle_{\text{model}}) \\
+        &= \mat{W}^{(t-1)} + \eta(\langle \vec{v} \vec{h}^\intercal \rangle_{\text{data}} - \langle \vec{v} \vec{h}^\intercal \rangle_{\text{model}}), \\
     \vec{a}^{(t)}
-        &= \vec{a}^{(t-1)} + \eta(\langle \vec{v} \rangle_{\text{data}} - \langle \vec{v} \rangle_{\text{model}}) \\
+        &= \vec{a}^{(t-1)} + \eta(\langle \vec{v} \rangle_{\text{data}} - \langle \vec{v} \rangle_{\text{model}}), \\
     \vec{b}^{(t)}
-        &= \vec{b}^{(t-1)} + \eta(\langle \vec{h} \rangle_{\text{data}} - \langle \vec{h} \rangle_{\text{model}})
+        &= \vec{b}^{(t-1)} + \eta(\langle \vec{h} \rangle_{\text{data}} - \langle \vec{h} \rangle_{\text{model}}),
 \end{split}
 \end{align}
 where \( \eta \) is the learning rate hyperparameter.

@@ -14,7 +14,7 @@ Here we use the notation \( x_\text{open} \), \( x_\text{high} \), \( x_\text{lo
 Given that the values were on an absolute basis, we needed to convert them to relative terms in order to be able to compare data from different time periods on a more equal footing.
 The natural way to do so was to compare the returns
 \begin{align}
-    r = \frac{x_\text{close} - x_\text{open}}{x_\text{open}}
+    r = \frac{x_\text{close} - x_\text{open}}{x_\text{open}}.
 \end{align}
 However, this wasn't necessarily the best way to approach this.
 Instead we opted to use the log returns
@@ -92,7 +92,7 @@ Let \( \mat{X} \in \R^{4 \times N} \) represent the training data set of log ret
 
 To discretize the data, we rescaled and rounded the entries of \( \mat{X} \) to integer values in \( \{0, 1, \dots, 2^{n_\text{bits}} - 1\} \), represented by the matrix \( \mat{X}' \in \N^{4 \times N} \) with entries
 \begin{align}
-    x_{ij}' = \bigg\lfloor \frac{x_{ij} - \min_k \{x_{ik}\}}{\max_k \{x_{ik}\} - \min_k \{x_{ik}\}} \cdot (2^{n_\text{bits}} - 1) \bigg\rceil
+    x_{ij}' = \bigg\lfloor \frac{x_{ij} - \min_k \{x_{ik}\}}{\max_k \{x_{ik}\} - \min_k \{x_{ik}\}} \cdot (2^{n_\text{bits}} - 1) \bigg\rceil,
 \end{align}
 where \( \lfloor \ \cdot \ \rceil \) denotes rounding to the nearest integer.
 
@@ -105,7 +105,7 @@ For example, if \( \vec{x}' = (x_1',x_2',x_3',x_4') \) was a column of \( \mat{X
         \text{bitvector}(x_3') \\
         \text{bitvector}(x_4') \\
     \end{bmatrix}
-    \in \binset^{4\cdot n_\text{bits}}
+    \in \binset^{4\cdot n_\text{bits}}.
 \end{align}
 
 For this research we took \( n_\text{bits} = 16 \), which gave us a training set \( \mat{V} \in \binset^{64 \times N} \), thus our training samples were bit vectors of length 64.
