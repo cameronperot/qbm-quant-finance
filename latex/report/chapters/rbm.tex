@@ -80,7 +80,7 @@ Therefore, the parameters at step \( t \) are given by
 where \( \eta \) is the learning rate hyperparameter.
 
 The part of the gradient using the data set distribution is referred to as the \textit{positive} phase, and the part using the model distribution is referred to as the \textit{negative} phase.
-It's trivial to compute the expectation values in the positive phase, but not so much in the negative phase because \( p(\vec{v}) \) can not be sampled directly.
+It is trivial to compute the expectation values in the positive phase, but not so much in the negative phase because \( p(\vec{v}) \) can not be sampled directly.
 
 In practice the negative phase expectation values are sampled using a Markov chain Monte Carlo (MCMC) method.
 This is done using Gibbs sampling~\cite{hinton_rbm_training}, which uses the conditional probabilities \( p(\vec{h}|\vec{v}) \) and \( p(\vec{v}|\vec{h}) \).
@@ -251,7 +251,7 @@ We found that the models were able to reproduce similar volatility structures, a
 \subsubsection{Tails}
 One of the most important things that we wanted the models to learn was the tail events, as these play a crucial role in financial risk management.
 The models trained on the transformed data sets appear to have learned the lower tails a little bit better for most currency pairs, but overestimated some of the upper tails.
-It's difficult to say overall if one model performed better than another here, as it really depends on what one wants to do with the generated data.
+It is difficult to say overall if one model performed better than another here, as it really depends on what one wants to do with the generated data.
 \begin{table}[!htb]
     \centering
     \begin{adjustbox}{max width=\textwidth}
@@ -263,7 +263,7 @@ It's difficult to say overall if one model performed better than another here, a
 
 We also studied the tail concentration functions (see~\cref{app:tail_concentration_functions} for definitions and interpretations) between currency pairs in~\cref{fig:rbm_tail_concentrations}.
 Here we noticed that all models performed quite well for the most part outside of a few of the extreme regions in the EURUSD/GBPUSD, EURUSD/USDJPY, and GBPUSD/USDJPY plots.
-The differences aren't so stark here between the RBM models, but when Kondratyev and Schwarz performed the same comparison to the parametric model they used, it was clear that the RBM was the better performer.
+The differences are not so stark here between the RBM models, but when Kondratyev and Schwarz performed the same comparison to the parametric model they used, it was clear that the RBM was the better performer.
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{rbm/tail_concentrations.png}

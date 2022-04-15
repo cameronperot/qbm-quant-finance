@@ -149,7 +149,7 @@ The default anneal schedule for the D-Wave Advantage 4.1 is shown in~\cref{fig:a
 \subsubsection{Mapping the QBM to the D-Wave Quantum Annealer}
 As stated in~\cite{amin_2018}, in order get a quantum annealer to sample from a quantum Boltzmann distribution, one would need to freeze the evolution at some point \( s^* \) during the annealing process and then perform the measurements.
 It goes on to say that this can be done in practice using a nonuniform \( s(t) \) that anneals slowly in the beginning, then quenches the system (completes the annealing as fast as possible) at the freeze out point \( s^* \), if \( s^* \) is in the quasistatic regime.
-In an earlier paper~\cite{amin_2015}, Amin showed that the quasistatic regime begins around 1 \si{\micro\second} for the D-Wave 2000Q, so it shouldn't be an issue to reach the quasistatic regime for annealing times longer than 5 \si{\micro\second}.
+In an earlier paper~\cite{amin_2015}, Amin showed that the quasistatic regime begins around 1 \si{\micro\second} for the D-Wave 2000Q, so it should not be an issue to reach the quasistatic regime for annealing times longer than 5 \si{\micro\second}.
 
 Since a quantum annealer is a real-world physical device, samples generated with it have an associated temperature called the effective temperature.
 To be more specific, the corresponding density operator is of the form
@@ -214,7 +214,7 @@ This is because the main use case of D-Wave annealers is to maximize the probabi
 For the Advantage 4.1 system the allowed value ranges are \( h_\text{range} = [-4, 4] \) and \( J_\text{range} = [-1, 1] \)~\cite{dwave_solver_properties}.
 
 \subsubsection{Generating More Robust Statistics}\label{sec:gauge}
-QPUs aren't perfect, and sometimes specific qubits or parts of the chip might have readout biases.
+QPUs are not perfect, and sometimes specific qubits or parts of the chip might have readout biases.
 One can perform a gauge transformation on the problem to mitigate such issues.
 If we have an \( n \)-qubit problem, then we can generate a random vector \( \vec{r} \in \{+1, -1\}^n \) which allows us to change the submission to the solver without actually changing the underlying problem.
 This is done by taking
@@ -233,7 +233,7 @@ then transforming the results back using the third relation above, where \( s_i 
 \subsubsection{Previous Work in This Field}
 In recent years a number of researchers have dabbled in using D-Wave quantum annealers to train Boltzmann machines~\cite{adachi_2015,benedetti_2016,anschuetz_2019,wiebe_2019,rocutto_2020,dixit_2021,ilmo_2021,wilson_2021,xu_2021}.
 The most common approach is to train a classical RBM with quantum assistance, i.e., using the annealer to generate the samples in the negative phase rather than using Gibbs sampling.
-This isn't necessarily a fully quantum Boltzmann machine as per~\cite{amin_2018}, but the case where \( s^* = 1 \) reduces it to a classical RBM, as \( \lim_{s\rightarrow 1} \Gamma_i = 0 \) in~\cref{eq:qbm_scaling}.
+This is not necessarily a fully quantum Boltzmann machine as per~\cite{amin_2018}, but the case where \( s^* = 1 \) reduces it to a classical RBM, as \( \lim_{s\rightarrow 1} \Gamma_i = 0 \) in~\cref{eq:qbm_scaling}.
 
 One thing that stands out the most about some of the previous research is that very few discuss embeddings and anneal schedules, which as we will see in the next section are important for getting the best possible performance out of the annealer.
 Therefore, we aim to create a basic framework with which one can use to approach the problem of using a D-Wave annealer to sample from a (quantum) Boltzmann distribution.
@@ -323,7 +323,7 @@ In principle, higher effective temperatures are unwanted because they shrink the
 From analysis of the heatmaps and the fact that we could not produce distributions with \( s^* \lessapprox 0.45 \), we concluded that nontrivial dynamics were occurring while the system was quenching, i.e., the system could not quench fast enough.
 It is difficult to compare directly since the D-Wave 2000Q is a different system than the Advantage 4.1 studied here, but in~\cite{marshall_2019} they alluded to this as well.
 The 2000Q allowed for quenching with \( \alphaquench = 1 \), which is only a factor of two smaller than that allowed by the Advantage 4.1.
-Therefore, if as supposed in~\cite{marshall_2019} that the quench isn't fast enough, then likely such a small difference in how fast the system can be quenched wouldn't drastically change the results.
+Therefore, if as supposed in~\cite{marshall_2019} that the quench is not fast enough, then likely such a small difference in how fast the system can be quenched would not drastically change the results.
 
 If we take a second to think about it, the qubits are oscillating at a frequency in terms of gigahertz.
 This means that a quench duration of a few hundred nanoseconds still allows for a number of oscillations in the qubits, which is likely enough time for nontrivial dynamics to occur.
@@ -462,7 +462,7 @@ We noticed that the Advantage 4.1-based model struggled most with learning the t
     \label{fig:qq_comparison}
 \end{figure}
 
-Although we couldn't track the true effective temperature throughout the training process, we were able to see how close the learned effective temperature estimate at the end matched that generated by samples using the final learned weights and biases.
+Although we could not track the true effective temperature throughout the training process, we were able to see how close the learned effective temperature estimate at the end matched that generated by samples using the final learned weights and biases.
 \cref{fig:learned_effective_temperature} shows that the annealer-based model was able to learn an effective temperature estimate of \( 97.8 \ \si{\milli\kelvin} \), quite close to the \( 95.6 \ \si{\milli\kelvin} \) computed from the optimal \( B(s) / T \) value.
 \begin{figure}[!htb]
     \begin{center}
@@ -479,7 +479,7 @@ Although we couldn't track the true effective temperature throughout the trainin
 
 The results in this section showed that a BQRBM can indeed be trained using a D-Wave quantum annealer.
 The 12-qubit problem played a crucial role in our understanding of how one can use a D-Wave quantum annealer to generate Boltzmann distributed samples.
-Although the results aren't spectacular and underperform the simulation and classical model, they still show promise.
+Although the results are not spectacular and underperform the simulation and classical model, they still show promise.
 It will be interesting to rerun this analysis on the next generation of D-Wave quantum annealers to see how much they improve.
 
 \section{The Quantum Market Generator}\label{sec:quantum_market_generator}
@@ -492,8 +492,8 @@ Therefore, we had to take a more practical approach when choosing some of the an
 To this end, we trained a number of models with various settings of these hyperparameters for 20 epochs to get a read on the trend direction, then chose their values empirically.
 For this we used a mini-batch size of 10, \( s^* = 1 \), constant learning rates of \( \eta = 0.02 \) and \( \eta_{\hat{\beta}} = 0.01 \), and an initial value of \( \betahat = 0.25 \ \si{\giga\hertz}^{-1} \ (\hat{T} \approx 192 \ \si{\milli\kelvin}) \).
 
-The reason models were only trained for 20 epochs is that the epoch duration was found to be quite high (10-25 minutes) due to latency and load on the annealer, ergo it wasn't very feasible to train every model for a higher number of epochs.
-With an average epoch duration of around 15 minutes, a model trained for 20 epochs took roughly 5 hours, so training for 100 epochs would've taken around a day.
+The reason models were only trained for 20 epochs is that the epoch duration was found to be quite high (10-25 minutes) due to latency and load on the annealer, ergo it was not very feasible to train every model for a higher number of epochs.
+With an average epoch duration of around 15 minutes, a model trained for 20 epochs took roughly 5 hours, so training for 100 epochs would have taken around a day.
 
 \subsubsection{Choosing a Relative Chain Strength}\label{sec:qbm_rcs}
 The chain strength \( \gamma \) was computed using the relative chain strength \( \rcs \) as
@@ -646,7 +646,7 @@ The was further confirmed by the tail concentration functions in~\cref{fig:qbm_l
 
 \subsection{Summary}
 Overall, the BQRBM model trained using the D-Wave Advantage 4.1 produced lackluster results when compared to the classical RBM, and did not motivate training additional models on the transformed and volatility indicator enhanced data sets.
-This could possibly be due to hyperparameters, as our grid search of the space wasn't the most optimal due to training time requirements, but it wasn't really clear if there was a better way to do this.
+This could possibly be due to hyperparameters, as our grid search of the space was not the most optimal due to training time requirements, but it was not really clear if there was a better way to do this.
 This could also be due to the fact that the model was so large that it used a significant portion of the QPU and required chains with such lengths of up to 7, which added complexity.
 
 In conclusion, it does not appear that the Advantage 4.1-trained BQRBM can produce results good enough to replace the classical RBM.
@@ -660,7 +660,7 @@ Around the time this project was started, Pochart et al. released a paper~\cite{
 
 \subsection{Choosing an Embedding}
 Mapping the logical qubits to physical qubits is a nontrivial task.
-D-Wave provides a heuristic method to find embeddings, but in practice it can't be guaranteed that the returned embedding is optimal.
+D-Wave provides a heuristic method to find embeddings, but in practice it can not be guaranteed that the returned embedding is optimal.
 As we saw first hand, different embeddings can produce different results.
 Therefore, it is recommended to generate multiple embeddings and compare them against each other, and choose the one that performs the best.
 Additionally, it is worth noting that an optimal embedding on one QPU might not be optimal on another of the same generation.
@@ -682,7 +682,7 @@ Alternatively, one can try a hyperparameter grid search as we did in~\cref{sec:q
 One of the most important hyperparameters is that of the effective inverse temperature \( \beta \).
 In practice we divide our weights and biases by a factor of \( -\betahat B(s^*) \) (as per~\cref{eq:qbm_scaling}) in order to cancel out the effective temperature so that we can sample the problem we wish to, thus it is crucial for proper parameter scaling.
 For the case of \( s^* = 1 \) we have the ability to treat the effective temperature as a learnable parameter (as in~\cref{sec:learning_beta}), for which we use \( \betahat \) as an estimator of.
-This isn't so straight forward for \( s^* < 1 \) though, because of the initial Hamiltonian and the D-Wave's inability to measure the qubits in the \( x \)-direction.
+This is not so straight forward for \( s^* < 1 \) though, because of the initial Hamiltonian and the D-Wave's inability to measure the qubits in the \( x \)-direction.
 
 \subsubsection{Anneal Schedules}
 The ability to configure the anneal schedule as allowed by the D-Wave annealer means that there are a number of different ways one can tweak the annealing process such that the results returned minimize the KL divergence between the theoretical distribution one wishes to approximate and the samples returned by the annealer.
@@ -698,7 +698,7 @@ It is possible for some areas of the chip to perform better than others, or for 
 \subsubsection{Maximum Sample Set Size}
 One of the main limitations of the D-Wave annealer for this purpose is that of the maximum sample set size.
 When sampling the D-Wave one can only generate sample sets with a maximum size of \( 10^4 \) samples, which is adequate for the intended purpose of optimization, but can fall short when one wants to use it as a sampler for a QBM.
-It is natural to think that one could just combine the results from multiple sample sets, but this isn't necessarily the case.
+It is natural to think that one could just combine the results from multiple sample sets, but this is not necessarily the case.
 Due to the spin-bath polarization effect (see error sources below), one cannot combine sample sets because of the possibility of previous samples affecting future ones~\cite{pochart_2021}.
 
 \subsubsection{Time Requirements}

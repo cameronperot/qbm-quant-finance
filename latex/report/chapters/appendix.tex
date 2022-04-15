@@ -262,8 +262,8 @@ It can be interpreted as the amount of information loss associated with using \(
 It must also be noted that the KL divergence is a distance, but not a metric (rather a divergence), because of the asymmetry that \( \DKL{p}{q} \ne \DKL{q}{p} \).
 
 \subsubsection{KL Divergence in Practice}\label{app:kl_divergence_in_practice}
-Due to the limited maximum sample size of \( 10^4 \) when using a D-Wave annealer and the inability to concatenate sample sets due to spin-bath polarization effects~\cite{pochart_2021}, it made computation of the KL divergence quite difficult because we couldn't get a proper read on the probability distribution when the number of possible states was high.
-Even for the small 12-qubit problem there were still \( 2^{12} = 4096 \) possible states, thus \( 10^4 \) samples weren't entirely representative of the true distribution.
+Due to the limited maximum sample size of \( 10^4 \) when using a D-Wave annealer and the inability to concatenate sample sets due to spin-bath polarization effects~\cite{pochart_2021}, it made computation of the KL divergence quite difficult because we could not get a proper read on the probability distribution when the number of possible states was high.
+Even for the small 12-qubit problem there were still \( 2^{12} = 4096 \) possible states, thus \( 10^4 \) samples were not entirely representative of the true distribution.
 This problem was only exacerbated when working with larger system sizes.
 
 Therefore, in this thesis we chose to take a histogram-based approach to approximate the KL divergence.
@@ -279,7 +279,7 @@ For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the smoot
 Furthermore, call it \textit{relative} smoothing when the smoothed probabilities were taken to be relative to the reference distribution \( p \), which was found to be useful when it was difficult to choose a constant value of \( \epsilon \), e.g. when the reference distribution probabilities varied widely and could sometimes coincide with \( \epsilon \).
 For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the relative smoothed distribution would be \( \{q_1 = 1/3 - \epsilon (p_3 + p_4)/2, q_2 = 2/3 - \epsilon (p_3 + p_4)/2, q_3 = \epsilon p_3, q_4 = \epsilon p_4\} \).
 
-We took a value of \( \epsilon = 10^{-6} \) when computing \( \DKL{\pdata}{\pmodel} \) because it was small enough that it wouldn't coincide with any of the \( \pdata \) values since the data sets contained only a few thousand samples, thus the smallest value of \( \pdata \) was roughly on the order of \( 10^{-4} \).
+We took a value of \( \epsilon = 10^{-6} \) when computing \( \DKL{\pdata}{\pmodel} \) because it was small enough that it would not coincide with any of the \( \pdata \) values since the data sets contained only a few thousand samples, thus the smallest value of \( \pdata \) was roughly on the order of \( 10^{-4} \).
 When computing \( \DKL{\ptheory}{\psamples} \) though, we opted to use relative smoothing with a value of \( \epsilon = 10^{-6} \) since sometimes some probabilities of \( \ptheory \) could be close to \( \epsilon \) and give a false sense of agreement with the smoothed \( \psamples \).
 
 \subsection{Correlation Coefficients}\label{app:correlation_coefficients}
@@ -288,7 +288,7 @@ The Pearson correlation coefficient is defined as
     \rho_{X,Y} = \frac{\text{cov}{(X,Y)}}{\sigma_X \sigma_Y} \in [-1, 1],
 \end{align}
 and measures the linear correlation between the random variables \( X \) and \( Y \).
-Therefore, it must be noted that this does not capture nonlinear relations, and shouldn't be relied upon to tell the full story.
+Therefore, it must be noted that this does not capture nonlinear relations, and should not be relied upon to tell the full story.
 Additionally, this measure is quite sensitive to outliers.
 
 The Spearman rank correlation coefficient is defined as
@@ -308,7 +308,7 @@ where \( (x_1, y_1), \dots, (x_n, y_n) \) are pairs of observations of the rando
 It is important to keep in mind how one interprets the correlation coefficients.
 The sign of the correlation coefficient determines whether or not it is negatively or positively correlated, and the magnitude determines how strong the correlation effects are.
 As a loose guide, correlation coefficient values of 0.1, 0.3, and 0.5 can be termed small, medium, and large, respectively~\cite{research_design_and_statistical_analysis}.
-In general, one must be careful when interpreting the correlation coefficients; it is important to understand what the values mean, and what they don't.
+In general, one must be careful when interpreting the correlation coefficients; it is important to understand what the values mean, and what they do not.
 Section 3.4.2 "Interpreting the Correlation Coefficient" of~\cite{research_design_and_statistical_analysis} offers further insight and points out some of the pitfalls to watch out for.
 
 In this thesis the correlation coefficients were computed using the respective functions from the SciPy Python package~\cite{python_scipy}.
