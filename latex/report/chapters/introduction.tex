@@ -23,19 +23,19 @@ Global foreign exchange (forex) markets had a daily volume of \$6.6T in 2019~\ci
 In the 2019 paper \textit{The Market Generator}~\cite{kondratyev_2019}, Kondratyev and Schwarz detailed how a classical restricted Boltzmann machine (RBM) can be used to generate synthetic forex data, and the advantages it offers over traditional parametric models.
 We used their work as a basis to build our classical models upon, which we then used as a reference to compare our quantum models with.
 
-In~\cref{ch:data_analysis} we started with visualizing the data set in various ways to get an idea how it was distributed.
-We further analyzed quantitative metrics to get a better understanding of some of the intricacies of the data set.
-Finally, we went through and detailed how we preprocessed the data set into a model-friendly format.
+In~\cref{ch:data_analysis} we start by visualizing the data set in various ways to get an idea how it is distributed.
+We further analyze quantitative metrics to get a better understanding of some of the intricacies of the data set.
+Finally, we go through and detail how we preprocess the data set into a model-friendly format.
 
-With the data set in hand, we moved to explaining the theory behind the classical RBM in~\cref{ch:rbm}, and describing some of the difficulties associated with training and using classical RBMs.
-We then trained several classical models on the data set discussed in~\cref{ch:data_analysis} using different preprocessing methods, and compared them with each other using visualizations and a number of quantitative metrics.
+With the data set in hand, we move to explaining the theory behind the classical RBM in~\cref{ch:rbm}, and describing some of the difficulties associated with training and using classical RBMs.
+We then train several classical models on the data set discussed in~\cref{ch:data_analysis} using different preprocessing methods, and compare them with each other using visualizations and a number of quantitative metrics.
 
-In~\cref{ch:qbm} we started from the theory of quantum Boltzmann machines, detailing how they work and their connection to quantum annealing.
-We studied a small 12-qubit problem which we could simulate, allowing us to compare annealer performance with that of theory, and gaining key insights into how to train and use QBMs.
-With those insights, we moved to the final stage of training a model using the data set from~\cref{ch:data_analysis}, then assessing the performance versus the classical models from~\cref{ch:rbm}.
-Additionally, we covered some of the challenges of using D-Wave quantum annealers to train QBMs in~\cref{sec:challenges}.
+In~\cref{ch:qbm} we start from the theory of quantum Boltzmann machines, detailing how they work and their connection to quantum annealing.
+We study a small 12-qubit problem which we can simulate, allowing us to compare annealer performance with that of theory, and gaining key insights into how to train and use QBMs.
+With those insights, we move to the final stage of training a model using the data set from~\cref{ch:data_analysis}, then assessing the performance versus the classical models from~\cref{ch:rbm}.
+Additionally, we cover some of the challenges of using D-Wave quantum annealers to train QBMs in~\cref{sec:challenges}.
 
-Lastly, we summarized our findings in~\cref{ch:conclusion}, as well as discussed future directions in which this research can be expanded.
+Lastly, we summarize our findings in~\cref{ch:conclusion}, as well as discuss future directions in which this research can be expanded.
 
 In addition to all of the research presented in this thesis, we also introduce the open source Python package \texttt{qbm}~\cite{qbm} to make it easier for the community to train and study quantum Boltzmann machines.
 All of the work presented here is reproducible (except for that involving quantum measurements), and the code is available on the Forschungszentrum J\"ulich Git server~\footnote{\url{https://jugit.fz-juelich.de/qip/qbm-quant-finance}}.

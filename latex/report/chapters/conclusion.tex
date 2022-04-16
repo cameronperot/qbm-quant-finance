@@ -1,22 +1,22 @@
 \section{Summary}
 We started with an analysis of the forex log returns data set in~\cref{ch:data_analysis}, analyzing the data from a number of aspects to get an understanding of the intricacies.
 After that we moved to training classical RBM models in~\cref{ch:rbm}, where we were able to produce good results similar to those in~\cite{kondratyev_2019}.
-The outlier power transformation we detailed in~\cref{sec:outlier_transform} showed much promise; models trained on the transformed data sets performed noticeably better than those trained on the base data sets.
+The outlier power transformation we detailed in~\cref{sec:outlier_transform} showed much promise; models trained on the transformed data sets perform noticeably better than those trained on the base data sets.
 
 After establishing a classical baseline to compare our quantum models with, we moved to studying a small 12-qubit problem in~\cref{sec:qbm_12_qubit_problem}, through which we gained a deeper understanding of how to sample quantum Boltzmann random variables using a D-Wave quantum annealer, specifically the Advantage 4.1.
-There we were able to match sample distributions returned by the annealer to distributions from the family of distributions corresponding to the density operator \( \rho(s,T) = \frac{1}{Z}e^{-\beta H(s)} \).
-Our findings indicated that, in general, the Advantage 4.1 was not able to sample from just any quantum Boltzmann distribution, rather just those that were classical Boltzmann-like in nature.
-To be more specific, not only did the results match a single distribution, but rather a subset of the family that satisfied \( B(s) / T = \text{constant} \), as indicated by the streak patterns observed in~\cref{fig:dkl_min_heatmap}.
+There we were able to match sample distributions returned by the annealer to theoretical distributions from the family of distributions corresponding to the density operator \( \rho(s,T) = \frac{1}{Z}e^{-\beta H(s)} \).
+Our findings indicate that, with the anneal schedules and parameters used here, the Advantage 4.1 is not able to sample from just any quantum Boltzmann distribution, rather only those that are classical Boltzmann-like in nature.
+To be more specific, the samples we obtained from the annealer resemble a subset of the family of distributions that satisfies \( B(s) / T = \text{constant} \), as indicated by the streak patterns observed in~\cref{fig:dkl_min_heatmap}.
 This occurs when the distribution is similar to one late in the anneal process, i.e., when \( e^{-\beta H(s^*)} \approx e^{-\beta B(s^*) H_\text{final}} \).
-This was likely due to the annealer not being able to quench the system fast enough, allowing for nontrivial dynamics to occur, as the shortest allowed quench durations were still on the order of a few hundred nanoseconds, which is still quite long when considering that the qubits oscillate at a frequency in terms of gigahertz.
-How closely the annealer could approximate a desired classical Boltzmann distribution was found to be dependent on both the embedding as well as the anneal schedule, thus it is highly recommended to tune these accordingly.
+This is likely due to the annealer not being able to quench the system fast enough, allowing for nontrivial dynamics to occur, as the shortest allowed quench durations are still quite long relative to the qubit oscillation frequency in terms of \si{\giga\hertz}.
+How closely the annealer can approximate a desired classical Boltzmann distribution was found to be dependent on both the embedding as well as the anneal schedule, thus it is highly recommended to tune these accordingly.
 
-With the information that only classical Boltzmann distributions could be sampled well, we moved to training a bound-based quantum restricted Boltzmann machine (BQRBM), which essentially reduced the problem to a classical RBM trained using quantum assistance.
+With the information that we could only reliably sample classical Boltzmann distributions, we moved to training a bound-based quantum restricted Boltzmann machine (BQRBM), essentially reducing the problem to a classical RBM trained using quantum assistance.
 The difficulty of choosing the effective temperature was in this case easily circumvented by treating \( \beta \) as a learnable parameter as described in~\cref{sec:learning_beta} and verified in~\cref{sec:qbm_simulation_results}.
 We trained BQRBM models using both a simulation and the Advantage 4.1 annealer, allowing us to compare exactly how close the annealer trained model was to the theory.
-Additionally, we trained classical RBM to use as a reference point.
-In short, the BQRBM model trained using the quantum annealer underperformed both the classical RBM as well as the simulation, as seen in~\cref{sec:qbm_annealer_results}.
-The simulation-based model showed promise though, outperforming the classical RBM, offering hope for future annealer-trained models if annealers can further reduce the information loss associated with sampling (quantum) Boltzmann distributions.
+Additionally, we trained a classical RBM to use as a reference point.
+In short, the BQRBM model trained using the quantum annealer underperforms both the classical RBM as well as the simulation, as seen in~\cref{sec:qbm_annealer_results}.
+The simulation-based model shows promise though, outperforming the classical RBM, offering hope for future annealer-trained models if annealers can further reduce the information loss associated with sampling (quantum) Boltzmann distributions.
 
 Finally, we used the knowledge gained about how to train a small BQRBM and applied it to training a larger one in~\cref{sec:quantum_market_generator} using the log returns data set, mapping 94 logical qubits to 398 physical qubits with chain lengths of up to 7.
 This model proved to be more challenging to train because setting the annealer hyperparameters (chain strength, anneal schedule, and embedding) could not be done as in the 12-qubit problem due to the fact that we could not simulate such a large system.
@@ -24,8 +24,8 @@ In practice we had to choose these values by doing a limited hyperparameter scan
 Longer epoch times originated from a combination of solver load and latency from Europe to the North American west coast.
 This meant that training a model for 100 epochs would have taken around a day, and if we wanted to fully train the models for all of the hyperparameters in our scan it would have taken weeks.
 
-The results in~\cref{sec:qbm_log_returns_results} illustrated that the BQRBM was able to learn to produce synthetic data according to the log returns data set distribution to some extent, but drastically underperformed the classical RBM.
-This could likely have been improved with a more exhaustive hyperparameter scan, but that was not necessarily feasible given the time requirements, and it is unclear if the results would have been drastically better given that even the 12-qubit BQRBM trained on the annealer was unable to outperform the classical RBM.
+The results in~\cref{sec:qbm_log_returns_results} illustrated that the BQRBM was able to learn to produce synthetic data similar to the log returns data set distribution to some extent, but drastically underperforms the classical RBM.
+This could likely have been improved with a more exhaustive hyperparameter scan, but that was not necessarily feasible given the time requirements, and it is unclear if the results would have been significantly better given that even the 12-qubit BQRBM trained on the annealer was unable to outperform the classical RBM.
 
 In this thesis we laid out a framework with which one can train quantum Boltzmann machines using both simulation and D-Wave quantum annealers.
 As part of this thesis, the Python package \texttt{qbm}~\cite{qbm} was developed to make it easy to train and study QBMs.

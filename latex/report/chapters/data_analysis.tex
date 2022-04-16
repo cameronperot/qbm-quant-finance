@@ -1,5 +1,5 @@
 \section{Data Analysis}
-Our data set consisted of the daily open, high, low, and close (OHLC) values for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs
+Our data set consists of the daily open, high, low, and close (OHLC) values for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs
 \begin{itemize}
     \item EURUSD - Euro € / U.S. Dollar \$
     \item GBPUSD - British Pound Sterling £ / U.S. Dollar \$
@@ -11,8 +11,8 @@ The data set was filtered to remove days where any of the currencies had zero vo
 This resulted in a data set of 5165 training samples.
 Here we use the notation \( x_\text{open} \), \( x_\text{high} \), \( x_\text{low} \), and \( x_\text{close} \) to denote the open, high, low, and close values of a currency pair on a particular day.
 
-Given that the values were on an absolute basis, we needed to convert them to relative terms in order to be able to compare data from different time periods on a more equal footing.
-The natural way to do so was to compare the returns
+Given that the raw data values are on an absolute basis, we needed to convert them to relative terms in order to be able to compare data from different time periods on a more equal footing.
+The natural way to do so is to use the returns
 \begin{align}
     r = \frac{x_\text{close} - x_\text{open}}{x_\text{open}}.
 \end{align}
@@ -49,12 +49,12 @@ From visual examination we saw that the log returns are roughly normally distrib
     \label{tbl:data_log_returns_raw_stats}
 \end{table}
 
-We also visualized the log returns in a violin and box plot in~\cref{fig:violin_raw}, which allowed us to identify outliers and see how they were distributed.
-Immediately we saw that there was one major outlier to the downside for the GBPUSD currency pair.
-Further analysis indicated that this was an \( 11.1\sigma \) event that occurred on 2016-06-24, which corresponded to the results of the Brexit referendum in the UK~\cite{brexit_gov_uk}.
-The other outlier that really stood out was to the upside for the USDJPY currency pair on 2008-10-28.
+We also visualized the log returns in a violin and box plot in~\cref{fig:violin_raw}, which allowed us to identify outliers and see how they are distributed.
+Immediately we noticed the major outlier to the downside for the GBPUSD currency pair.
+Further analysis indicated that this \( 11.1\sigma \) event occurred on 2016-06-24, corresponding to the results of the Brexit referendum in the UK~\cite{brexit_gov_uk}.
+The other outlier we looked into was the one to the upside for the USDJPY currency pair on 2008-10-28.
 This \( 8.3\sigma \) event occurred right in midst of the financial crisis when people were talking about the end of the Yen carry trade~\cite{jpy_carry_trade_nyt}.
-In the final training data set we chose to remove outliers greater than \( 10\sigma \) from the mean, which resulted in only removing the day corresponding to Brexit.
+In the final training data set we chose to remove outliers greater than \( 10\sigma \) from the mean, which resulted in only removing the day corresponding to the Brexit referendum results.
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/violin.png}
@@ -66,7 +66,7 @@ In the final training data set we chose to remove outliers greater than \( 10\si
 Next we examined the correlations between the currency pairs to get an idea of the interdependencies between them.
 We visualized this with scatter plots shown in~\cref{fig:scatters} where we observed a clear positive correlation between EURUSD/GBPUSD, and clear negative correlations between EURUSD/USDCAD and GBPUSD/USDCAD.
 We verified this by examining the Pearson \( r \), Spearman \( \rho \), and Kendall \( \tau \) correlation coefficients laid out in~\cref{tbl:data_correlation_coefficients}.
-We found the correlation coefficients to be positive when the pairs were of the form \( X \)USD/\( Y \)USD, and negative when the pairs were of the form \( X \)USD/USD\( Y \), for \( X,Y \in \) \{EUR, GBP, CAD, JPY\}, as expected.
+We found the correlation coefficients to be positive for pairs of the form \( X \)USD/\( Y \)USD, and negative for pairs of the form \( X \)USD/USD\( Y \), for \( X,Y \in \) \{EUR, GBP, CAD, JPY\}, as expected.
 Details on how the correlation coefficients were computed and how to interpret them can be found in~\cref{app:correlation_coefficients}.
 \begin{figure}[!htb]
     \begin{center}
@@ -87,7 +87,7 @@ Details on how the correlation coefficients were computed and how to interpret t
 
 
 \section{Data Preprocessing}
-The models used in this thesis required the training data to be in the form of bit vectors, so we had to first convert our data set to such a form.
+The models in the following sections require the training data to be in the form of bit vectors, so we had to first convert our data set to such a form.
 Let \( \mat{X} \in \R^{4 \times N} \) represent the training data set of log returns with \( N \) samples, where training samples are vectors in the column space, thus element \( x_{ij} \) represents the \( i \)th currency pair log return for the \( j \)th training sample.
 
 To discretize the data, we rescaled and rounded the entries of \( \mat{X} \) to integer values in \( \{0, 1, \dots, 2^{n_\text{bits}} - 1\} \), represented by the matrix \( \mat{X}' \in \N^{4 \times N} \) with entries
@@ -108,13 +108,13 @@ For example, if \( \vec{x}' = (x_1',x_2',x_3',x_4') \) was a column of \( \mat{X
     \in \binset^{4\cdot n_\text{bits}}.
 \end{align}
 
-For this research we took \( n_\text{bits} = 16 \), which gave us a training set \( \mat{V} \in \binset^{64 \times N} \), thus our training samples were bit vectors of length 64.
-The discretization errors associated with this conversion and data set were on the order of \( 10^{-7} \), well within the desired tolerance for this purpose.
+For this research we took \( n_\text{bits} = 16 \), which gave us a training set \( \mat{V} \in \binset^{64 \times N} \), thus our training samples are bit vectors of length 64.
+The discretization errors associated with this conversion and data set are on the order of \( 10^{-7} \), well within the desired tolerance for this purpose.
 
 \subsection{Data Transformation}\label{sec:outlier_transform}
 Due to how the data was linearly converted to a discrete form before rounding, it opened up the possibility of the discretized data being clustered in the mid-range values if large outliers were present.
 To mitigate this, we came up with a transformation to reduce the gap between outliers by scaling outliers beyond a certain threshold \( \tau \), as detailed in~\cref{alg:transformation}.
-We call this the outlier power transformation.
+We call this the \textit{outlier power transformation}.
 In practice we took \( \tau = 1 \) and \( \alpha = 0.5 \), thus the standardized data points above one standard deviation were mapped to their square root, as illustrated in~\cref{fig:data_transformation}.
 We did explore a few other combinations of \( \tau \) and \( \alpha \), but found these values to produce the best results out of those we tried; of course this could likely be further optimized.
 This transformation is invertible when \( \bar{x} \), \( \sigma_x \), and \( \delta \) are saved.
@@ -153,8 +153,8 @@ This transformation is invertible when \( \bar{x} \), \( \sigma_x \), and \( \de
 \end{figure}
 
 Histograms of the transformed data set are shown in~\cref{fig:histograms_transformed}, and a violin and box plot is shown in~\cref{fig:violin_transformed}.
-In these, we observed the appearance of "shoulders" around one standard deviation where the outliers were scaled in, and that the outliers became much less extreme, allowing us to better utilize the full range of discrete values.
-\cref{tbl:data_log_returns_transformed_stats} shows that the standard deviations were decreased to roughly \( 78\% \) of their originals values in~\cref{tbl:data_log_returns_raw_stats}.
+In these, we observed the appearance of "shoulders" around the threshold \( \tau = 1 \) standard deviation, and that the transformed outliers appear much less extreme, allowing us to better utilize the full range of discrete values.
+\cref{tbl:data_log_returns_transformed_stats} shows that the transformation reduced the standard deviations to roughly \( 78\% \) of their originals values given in~\cref{tbl:data_log_returns_raw_stats}.
 
 \begin{figure}[!htb]
     \begin{center}
@@ -186,7 +186,7 @@ If the 3-month rolling volatility was (below) above the historical median it was
 We plotted the 3-month rolling volatilities versus their historical medians in~\cref{fig:rolling_volatility}.
 
 These additional binary indicator variables were then concatenated onto the training data set and fed to the model to make it more flexible by allowing for the model outputs to be conditioned on a specific volatility regime.
-Adding one indicator for each of the four currency pairs increased the number of rows in our training data set by four, thus the concatenated data set was in the space \( \binset^{68 \times N} \).
+Adding one indicator for each of the four currency pairs increased the number of rows in our training data set by four, thus the volatility-concatenated data set is in the space \( \binset^{68 \times N} \).
 
 \begin{figure}[!htb]
     \begin{center}
