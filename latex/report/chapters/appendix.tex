@@ -1,269 +1,77 @@
-\section{Restricted Boltzmann Machine}
-\subsection{Conditional Probabilities}\label{app:conditional_probabilities_derivation}
-This derivation follows along the lines of that found on p. 658-659 of~\cite{goodfellow_deep_learning}.
-We start by noting
+\section{Definitions and Methodologies}
+\subsection{Correlation Coefficients}\label{app:correlation_coefficients}
+The Pearson correlation coefficient is defined as
 \begin{align}
-    p(\vec{v,h}) = \frac{1}{Z} e^{-E(\vec{v},\vec{h})}
+    \rho_{X,Y} = \frac{\text{cov}{(X,Y)}}{\sigma_X \sigma_Y} \in [-1, 1],
 \end{align}
-From this we can derive the conditional probability
-\begin{align}
-\begin{split}
-    p(\vec{h} | \vec{v})
-        &= \frac{p(\vec{v},\vec{h})}{p(\vec{v})} \\
-        &= \frac{1}{p(\vec{v})} \frac{1}{Z} \exp( \vec{a}^\intercal\vec{v} + \vec{b}^\intercal\vec{h} + \vec{v}^\intercal\mat{W}\vec{h} ) \\
-        &= \frac{1}{Z'} \exp\bigg( \sum_j b_j h_j + \sum_j (\vec{v}^\intercal\mat{W})_j h_j \bigg) \\
-        &= \frac{1}{Z'} \prod_j \exp\big( b_j h_j + (\vec{v}^\intercal\mat{W})_j h_j \big)
-\end{split}
-\end{align}
-where
-\begin{align}
-    Z' = \sum_\vec{h} \exp( \vec{b}^\intercal\vec{h} + \vec{v}^\intercal\mat{W}\vec{h} )
-\end{align}
-This leads us to
-\begin{align}
-\begin{split}
-    p(h_j = 1 | \vec{v})
-        &= \frac{\tilde{p}(h_j = 1 | \vec{v})}{\tilde{p}(h_j = 0 | \vec{v}) + \tilde{p}(h_j = 1 | \vec{v})} \\
-        &= \frac{\exp\big( b_j + (\vec{v}^\intercal\mat{W})_j \big)}{1 + \exp\big( b_j + (\vec{v}^\intercal\mat{W})_j \big)} \\
-        &= \sigma\big( b_j + (\vec{v}^\intercal\mat{W})_j \big)
-\end{split}
-\end{align}
-Finally, we have
-\begin{align}
-    p(\vec{h} | \vec{v}) = \prod_j \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j
-\end{align}
+and measures the linear correlation between the random variables \( X \) and \( Y \).
+Therefore, it must be noted that this does not capture nonlinear relations, and should not be relied upon to tell the full story.
+Additionally, this measure is quite sensitive to outliers.
 
-Analogously for \( p(\vec{v} | \vec{h}) \) one finds
+The Spearman rank correlation coefficient is defined as
 \begin{align}
-    p(\vec{v} | \vec{h}) = \prod_i \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i
+    r_s = \rho_{R(X),R(Y)} = \frac{\text{cov}{\big(R(X),R(Y)\big)}}{\sigma_{R(X)} \sigma_{R(Y)}} \in [-1, 1],
 \end{align}
+and is the Pearson correlation coefficient of the rank of the random variables \( X \) and \( Y \).
+The main difference to the Pearson correlation coefficient is that the Spearman measures the monotonic relationship, regardless of linearity.
+The Spearman correlation coefficient is also less sensitive to outliers than the Pearson.
 
-\subsection{Log-Likelihood Derivative}\label{app:rbm_log_likelihood_derivation}
-For data set distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W}, \vec{a}, \vec{b}) \) the average log-likelihood is given by
+The Kendall rank correlation coefficient is defined as
 \begin{align}
-\begin{split}
-    \ell(\theta)
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log p(\vec{v}) \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \sum_\vec{h} p(\vec{v},\vec{h}) \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \bigg(\frac{1}{Z} \sum_\vec{h} e^{-E(\vec{v},\vec{h})}\bigg) \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \sum_\vec{h} e^{-E(\vec{v},\vec{h})} - \log \sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})}
-\end{split}
+    \tau = \frac{2}{n(n-1)} \sum_{i<j} \text{sign}(x_i - x_j) \text{sign}(y_i - y_j) \in [-1, 1],
 \end{align}
-Taking the gradient we find
-\begin{align}
-\begin{split}
-    \partial_{\theta} \ell(\theta)
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \frac{\sum_\vec{h} e^{-E(\vec{v},\vec{h})} \partial_{\theta}\big( -E(\vec{v},\vec{h}) \big) }{\sum_\vec{h} e^{-E(\vec{v},\vec{h})}}
-            - \frac{\sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})} \partial_{\theta}\big( -E(\vec{v},\vec{h}) \big) }{\sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})}} \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \Big\langle \partial_{\theta}\big( -E(\vec{v},\vec{h}) \big) \Big\rangle_{p(\vec{h}|\vec{v})}
-        - \Big\langle \partial_{\theta}\big( -E(\vec{v},\vec{h}) \big) \Big\rangle_{p(\vec{v},\vec{h})}
-\end{split}
-\end{align}
-Where \( \langle \ \cdot \ \rangle_{\text{data}} \) denotes the expectation value with respect to the data set distribution, and \( \langle \ \cdot \ \rangle_{\text{model}} \) denotes the expectation value with respect to the model distribution.
-This gives us
-\begin{align}
-\begin{split}
-    \partial_{w_{ij}} \ell(\theta)
-        &= \langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{model}} \\
-    \partial_{a_i} \ell(\theta)
-        &= \langle v_i \rangle_{\text{data}} - \langle v_i \rangle_{\text{model}} \\
-    \partial_{b_j} \ell(\theta)
-        &= \langle h_j \rangle_{\text{data}} - \langle h_j \rangle_{\text{model}}
-\end{split}
-\end{align}
+where \( (x_1, y_1), \dots, (x_n, y_n) \) are pairs of observations of the random variables \( X \) and \( Y \).
 
-\section{Quantum Boltzmann Machine}
-\subsection{Log-Likelihood Derivative}\label{app:qbm_log_likelihood_derivation}
-This derivation follows along the lines of that laid out in~\cite{amin_2018}.
-We start with the data set-averaged log-likelihood
-\begin{align}
-\begin{split}
-    \ell(\theta)
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log p(\vec{v}) \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \frac{\tr(\Lambda_\vec{v} e^{-H})}{\tr(e^{-H})} \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \Big[ \log\tr(\Lambda_\vec{v} e^{-H}) - \log\tr(e^{-H}) \Big]
-\end{split}
-\end{align}
-Taking the partial derivative yields
-\begin{align}
-    \label{eq:qbm_log_likelihood_derivative}
-    \partial_\theta \ell(\theta)
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \bigg[ \frac{\tr(\Lambda_\vec{v} \partial_\theta e^{-H})}{\tr(\Lambda_\vec{v} e^{-H})} - \frac{\tr(\partial_\theta e^{-H})}{\tr(e^{-H})} \bigg]
-\end{align}
-Due to the noncommutativity of \( H \) and \( \partial_\theta H \), we need to use the trick laid out in~\cite{amin_2018} where we take \( e^{-H} = (e^{-\delta\tau H})^n \) with \( \delta\tau \equiv 1 / n \), which allows one to write
-\begin{align}
-    \partial_\theta e^{-H}
-        &= -\sum_{m=1}^{n} e^{-m\delta\tau H} \delta\tau \partial_\theta He^{-(n-m)\delta\tau H} + \mathcal{O}(\delta\tau^2)
-\end{align}
-Taking the limit as \( n \rightarrow \infty \) of both sides gives
-\begin{align}
-\begin{split}
-    \partial_\theta e^{-H}
-        &= \lim_{n\rightarrow\infty} -\sum_{m=1}^{n} e^{-m\delta\tau H} \delta\tau \partial_\theta He^{-(n-m)\delta\tau H} + \mathcal{O}(\delta\tau^2) \\
-        &= -\int_{0}^{1} d\tau e^{-\tau H} \partial_\theta H e^{(\tau-1)H}
-\end{split}
-\end{align}
-From here one can take the trace of both sides to arrive at
-\begin{align}
-\begin{split}
-    \tr(\partial_\theta e^{-H})
-        &= -\tr\bigg( \int_{0}^{1} d\tau e^{-\tau H} \partial_\theta H e^{(\tau-1)H} \bigg) \\
-        &= -\int_{0}^{1} d\tau \tr\big(e^{-\tau H} \partial_\theta H e^{(\tau-1)H} \big) \\
-        &= -\int_{0}^{1} d\tau \tr\big(e^{(\tau-1)H} e^{-\tau H} \partial_\theta H \big) \\
-        &= -\int_{0}^{1} d\tau \tr\big(e^{-H} \partial_\theta H \big) \\
-        &= -\tr\big(e^{-H} \partial_\theta H \big)
-\end{split}
-\end{align}
-Which gives
-\begin{align}
-\begin{split}
-    \frac{\tr(\partial_\theta e^{-H})}{\tr(e^{-H})}
-        &= -\frac{\tr(e^{-H} \partial_\theta H)}{\tr(e^{-H})} \\
-        &= -\tr(\rho \partial_\theta H) \\
-        &= -\langle \partial_\theta H \rangle
-\end{split}
-\end{align}
-Unfortunately, due to the additional factor of \( \Lambda_\vec{v} \) in the first term of \cref{eq:qbm_log_likelihood_derivative}, one arrives at
-\begin{align}
-\begin{split}
-    \tr(\Lambda_\vec{v} \partial_\theta e^{-H})
-        &= -\tr\bigg( \int_{0}^{1} d\tau \Lambda_\vec{v} e^{-\tau H} \partial_\theta H e^{(\tau-1)H} \bigg) \\
-        &= -\int_{0}^{1} d\tau \tr\big(\Lambda_\vec{v} e^{-\tau H} \partial_\theta H e^{(\tau-1)H} \big)
-\end{split}
-\end{align}
-which is nontrivial to compute in practice.
+It is important to keep in mind how one interprets the correlation coefficients.
+The sign of the correlation coefficient determines whether or not it is negatively or positively correlated, and the magnitude determines how strong the correlation effects are.
+As a loose guide, correlation coefficient values of 0.1, 0.3, and 0.5 can be termed small, medium, and large, respectively~\cite{research_design_and_statistical_analysis}.
+In general, one must be careful when interpreting the correlation coefficients; it is important to understand what the values mean, and what they do not.
+Section 3.4.2 "Interpreting the Correlation Coefficient" of~\cite{research_design_and_statistical_analysis} offers further insight and points out some of the pitfalls to watch out for.
 
-\subsection{Log-Likelihood Lower Bound}\label{app:qbm_log_likelihood_lower_bound}
-This derivation follows along the lines of that laid out in~\cite{amin_2018}.
-The Golden-Thompson inequality that \( \tr(e^{A}e^{B}) \ge \tr(e^{A+B}) \) allows one to write (for small \( \epsilon > 0 \))
-\begin{align}
-    \tr(e^{-H} e^{\log(\Lambda_\vec{v}+\epsilon)}) \ge \tr(e^{-H+\log(\Lambda_\vec{v}+\epsilon)})
-\end{align}
-Taking the limit \( \epsilon \rightarrow 0 \) yields
-\begin{align}
-    \tr(\Lambda_\vec{v}e^{-H}) \ge \tr(e^{-H_\vec{v}})
-\end{align}
-where
-\begin{align}
-    H_\vec{v} &= \braket{\vec{v} | H | \vec{v}}
-\end{align}
-with \( H_\vec{v} \) being the \textit{clamped} Hamiltonian.
-This is called clamped because the visible qubits are held to the classical state of the visible vector \( \vec{v} \) due to an infinite energy penalty imposed by the \( \log(\Lambda_\vec{v} + \epsilon) \) term.
-Using this we can write the inequality
-\begin{align}
-\begin{split}
-    p(\vec{v})
-        &= \frac{\tr(\Lambda_\vec{v} e^{-H})}{\tr(e^{-H})} \\
-        &\ge \frac{\tr(e^{-H_\vec{v}})}{\tr(e^{-H})}
-\end{split}
-\end{align}
-which in turn allows for the log-likelihood to be bounded as
-\begin{align}
-    \ell(\theta) \ge \tilde{\ell}(\theta)
-\end{align}
-where
-\begin{align}
-    \tilde{\ell}(\theta)
-        &= \sum_\vec{v} p_\text{data}(\vec{v}) \log\frac{\tr(e^{-H_\vec{v}})}{\tr(e^{-H})}
-\end{align}
-\subsection{Log-Likelihood Lower Bound Derivative}\label{app:qbm_log_likelihood_lower_bound_derivative}
-This derivation follows along the lines of that laid out in~\cite{amin_2018}.
-Taking the partial derivative of the log-likelihood lower bound yields
-\begin{align}
-\begin{split}
-    \label{eq:qbm_log_likelihood_derivative_lower_bound}
-    \partial_\theta \tilde{\ell}(\theta)
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \bigg[ \frac{\tr(\partial_\theta e^{-H_\vec{v}})}{\tr(e^{-H_\vec{v}})} - \frac{\tr(\partial_\theta e^{-H})}{\tr(e^{-H})} \bigg] \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \bigg[ \frac{\tr(e^{-H_\vec{v}} \partial_\theta H_\vec{v})}{\tr(e^{-H_\vec{v}})} - \frac{\tr(e^{-H} \partial_\theta H)}{\tr(e^{-H})} \bigg] \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) [ \tr(\rho_\vec{v} \partial_\theta H_\vec{v}) - \tr(\rho \partial_\theta H) ] \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) [ \langle \partial_\theta H_\vec{v} \rangle_\vec{v} - \langle \partial_\theta H \rangle ] \\
-        &= \overline{\langle \partial_\theta H_\vec{v} \rangle_\vec{v}} - \langle \partial_\theta H \rangle
-\end{split}
-\end{align}
-Plugging in our parameters we get
-\begin{align}
-\begin{split}
-    \partial_{w_{ij}} \tilde{\ell}(\theta)
-        &= \overline{\langle \sigma_i^z \sigma_j^z \rangle_\vec{v}} - \langle \sigma_i^z \sigma_j^z \rangle \\
-        &= \langle \sigma_i^z \sigma_j^z \rangle_\text{data} - \langle \sigma_i^z \sigma_j^z \rangle_\text{model} \\
-    \partial_{b_i} \tilde{\ell}(\theta)
-        &= \overline{\langle \sigma_i^z \rangle_\vec{v}} - \langle \sigma_i^z \rangle \\
-        &= \langle \sigma_i^z \rangle_\text{data} - \langle \sigma_i^z \rangle_\text{model}
-\end{split}
-\end{align}
-When restrictions are imposed on connections within the hidden layer, the clamped Hamiltonian reduces to
-\begin{align}
-    H_\vec{v}
-        &= -\sum_i \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big)
-\end{align}
-where \( b_i'(\vec{v}) = b_i + (\mat{W}^\intercal\vec{v})_i \).
-This allows one to rewrite the clamped density matrix as
-\begin{align}
-\begin{split}
-    \rho_\vec{v}
-        &= \frac{1}{Z_\vec{v}} \exp\bigg( \sum_i \big(\Gamma_i \sigma_i^x + h_i'(\vec{v}) \sigma_i^z\big) \bigg) \\
-        &= \frac{1}{Z_\vec{v}} \prod_i \exp \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big) \\
-        &= \prod_i \rho_\vec{v}^{(i)}
-\end{split}
-\end{align}
-With this we can compute the expectation values as
-\begin{align}
-\begin{split}
-    \langle \sigma_i^z \rangle_\vec{v}
-        &= \tr(\rho_\vec{v}^{(i)}\sigma_i^z) \\
-        &= \frac{\tr\bigg[ \exp \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big) \sigma_i^z \bigg]}{\tr\bigg[ \exp \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big) \bigg]} \\
-        &= \frac{b_i'(\vec{v})}{D_i(\vec{v})} \tanh\big(D_i(\vec{v})\big)
-\end{split}
-\end{align}
-where \( D_i(\vec{v}) = \sqrt{\Gamma_i^2 + b_i'(\vec{v})^2} \).
+In this thesis the correlation coefficients were computed using the respective functions from the SciPy Python package~\cite{python_scipy}.
 
-The last equality above is obtained by using that for traceless \( A \) with \( \det A < 0 \) we can write
-\begin{align}
-    \exp(A) = \cosh\Big(\sqrt{\abs{\det A}}\Big) I + \frac{1}{\sqrt{\abs{\det A}}}\sinh\Big(\sqrt{\abs{\det A}}\Big) A
-\end{align}
-This is obtained by using Cayley-Hamilton theorem along with the series expansion of the matrix exponential and grouping the terms.
-
-\subsection{Learning The Effective Inverse Temperature \( \beta \)}\label{app:learning_beta}
-Following along the lines of~\cite{xu_2021} we have
-\begin{align}
-\begin{split}
-    p_\text{DW}
-        &= \frac{1}{Z_\text{DW}} e^{-E_\text{DW}} \\
-        &= \frac{1}{Z_\text{DW}} e^{-E / \beta} \\
-\end{split}
-\end{align}
-which leads to a log-likelihood derivative of
-\begin{align}
-    \frac{\partial \log p_\text{DW}}{\partial\beta}
-        &= \frac{1}{\beta^2} (E - \langle E \rangle)
-\end{align}
-and after averaging over the training data set we have
-\begin{align}
-    \Delta\beta
-        &= \frac{\eta}{\beta^2}\big(\langle E \rangle_\text{data} - \langle E \rangle_\text{model}\big)
-\end{align}
-
-\section{Miscellaneous}
 \subsection{Annualized Volatility}\label{app:annualized_volatility}
 In finance, the annualized volatility of a time series vector \( \vec{x} \) is computed as
 \begin{align}
-    \text{vol}(\vec{x}) = \sqrt{252} \cdot \text{std}(\vec{x})
+    \text{vol}(\vec{x}) = \sqrt{252} \cdot \text{std}(\vec{x}),
 \end{align}
 where the factor of \( \sqrt{252} \) comes from the square root of the number of trading days in a year, i.e., it's the annualization factor.
+
+\subsection{Learning Rate Decay Schedule}\label{app:lr_exp_decay}
+The learning rate at epoch \( t \) is given by
+\begin{align}
+    \eta^{(t)}
+        &= \eta^{(0)} \cdot \min\bigg\{1, 2^{-\frac{t - t_\text{decay}}{T_\text{decay}}}\bigg\},
+\end{align}
+where \( \eta^{(0)} \) is the initial learning rate, \( t_\text{decay} \) is the epoch at which the decay begins, and \( T_\text{decay} \) is the decay period.
+
+\subsection{Autocorrelation Analysis}\label{app:autocorrelation_analysis}
+When studying results from an MCMC-based model it is important to be aware that sequentially generated samples are not always statistically independent, that is, there is some thermalization threshold that corresponds to the minimum number of sampling steps between samples to consider them as statistically independent.
+
+For a time series \( x_1, \dots, x_n \), the lag-\( k \) autocorrelation function is defined as~\cite{time_series_analysis}
+\begin{align}
+    \rho_k
+        &= \frac{\text{cov}(x_t, x_{t+k})}{\sigma_{x}^2}.
+\end{align}
+The autocorrelation function is essentially a correlation coefficient, except instead of comparing two different variables it compares the same variable at different times.
+In this thesis we used the statsmodels Python package~\cite{python_statsmodels} to compute the autocorrelation function as there are some caveats when computing it in practice with large chains, e.g. there are some tricks such as using a Fourier transformation to make the computations more efficient.
+
+The integrated autocorrelation time is a reasonable estimate of how many steps in between samples we should have before we can consider them to be (to a degree) statistically independent.
+In this thesis we used the emcee Python package~\cite{python_emcee} to estimate the integrated autocorrelation time, which follows the approach laid out by Goodman and Weare in~\cite{goodman_weare_2010}.
 
 \subsection{KL Divergence}\label{app:kl_divergence}
 The Kullback-Leibler divergence~\cite{kullback_1951} is a measure of how much the probability distribution \( q \) differs from the reference probability distribution \( p \).
 It is defined as
 \begin{align}
     \DKL{p}{q}
-        &= \sum_{x} p(x) \log\frac{p(x)}{q(x)}
+        &= \sum_{x} p(x) \log\frac{p(x)}{q(x)}.
 \end{align}
 It can be interpreted as the amount of information loss associated with using \( q \) to approximate \( p \).
 It must also be noted that the KL divergence is a distance, but not a metric (rather a divergence), because of the asymmetry that \( \DKL{p}{q} \ne \DKL{q}{p} \).
 
 \subsubsection{KL Divergence in Practice}\label{app:kl_divergence_in_practice}
-Due to the limited maximum sample size of \( 10^4 \) when using a D-Wave annealer and the inability to concatenate sample sets due to spin-bath polarization effects~\cite{pochart_2021}, it made computation of the KL divergence quite difficult because we couldn't get a proper read on the probability distribution when the number of possible states was high.
-Even for the small 12-qubit problem there were still \( 2^{12} = 4096 \) possible states, thus \( 10^4 \) samples weren't entirely representative of the true distribution.
+Due to the limited maximum sample size of \( 10^4 \) when using a D-Wave annealer and the inability to concatenate sample sets due to spin-bath polarization effects~\cite{pochart_2021}, it made computation of the KL divergence quite difficult because we could not get a proper read on the probability distribution when the number of possible states was high.
+Even for the small 12-qubit problem there were still \( 2^{12} = 4096 \) possible states, thus \( 10^4 \) samples were not entirely representative of the true distribution.
 This problem was only exacerbated when working with larger system sizes.
 
 Therefore, in this thesis we chose to take a histogram-based approach to approximate the KL divergence.
@@ -279,39 +87,8 @@ For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the smoot
 Furthermore, call it \textit{relative} smoothing when the smoothed probabilities were taken to be relative to the reference distribution \( p \), which was found to be useful when it was difficult to choose a constant value of \( \epsilon \), e.g. when the reference distribution probabilities varied widely and could sometimes coincide with \( \epsilon \).
 For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the relative smoothed distribution would be \( \{q_1 = 1/3 - \epsilon (p_3 + p_4)/2, q_2 = 2/3 - \epsilon (p_3 + p_4)/2, q_3 = \epsilon p_3, q_4 = \epsilon p_4\} \).
 
-We took a value of \( \epsilon = 10^{-6} \) when computing \( \DKL{\pdata}{\pmodel} \) because it was small enough that it wouldn't coincide with any of the \( \pdata \) values since the data sets contained only a few thousand samples, thus the smallest value of \( \pdata \) was roughly on the order of \( 10^{-4} \).
+We took a value of \( \epsilon = 10^{-6} \) when computing \( \DKL{\pdata}{\pmodel} \) because it was small enough that it would not coincide with any of the \( \pdata \) values since the data sets contained only a few thousand samples, thus the smallest value of \( \pdata \) was roughly on the order of \( 10^{-4} \).
 When computing \( \DKL{\ptheory}{\psamples} \) though, we opted to use relative smoothing with a value of \( \epsilon = 10^{-6} \) since sometimes some probabilities of \( \ptheory \) could be close to \( \epsilon \) and give a false sense of agreement with the smoothed \( \psamples \).
-
-\subsection{Correlation Coefficients}\label{app:correlation_coefficients}
-The Pearson correlation coefficient is defined as
-\begin{align}
-    \rho_{X,Y} = \frac{\text{cov}{(X,Y)}}{\sigma_X \sigma_Y} \in [-1, 1]
-\end{align}
-and measures the linear correlation between the random variables \( X \) and \( Y \).
-Therefore, it must be noted that this does not capture nonlinear relations, and shouldn't be relied upon to tell the full story.
-Additionally, this measure is quite sensitive to outliers.
-
-The Spearman rank correlation coefficient is defined as
-\begin{align}
-    r_s = \rho_{R(X),R(Y)} = \frac{\text{cov}{\big(R(X),R(Y)\big)}}{\sigma_{R(X)} \sigma_{R(Y)}} \in [-1, 1]
-\end{align}
-and is the Pearson correlation coefficient of the rank of the random variables \( X \) and \( Y \).
-The main difference to the Pearson correlation coefficient is that the Spearman measures the monotonic relationship, regardless of linearity.
-The Spearman correlation coefficient is also less sensitive to outliers than the Pearson.
-
-The Kendall rank correlation coefficient is defined as
-\begin{align}
-    \tau = \frac{2}{n(n-1)} \sum_{i<j} \text{sign}(x_i - x_j) \text{sign}(y_i - y_j) \in [-1, 1]
-\end{align}
-where \( (x_1, y_1), \dots, (x_n, y_n) \) are pairs of observations of the random variables \( X \) and \( Y \).
-
-It is important to keep in mind how one interprets the correlation coefficients.
-The sign of the correlation coefficient determines whether or not it is negatively or positively correlated, and the magnitude determines how strong the correlation effects are.
-As a loose guide, correlation coefficient values of 0.1, 0.3, and 0.5 can be termed small, medium, and large, respectively~\cite{research_design_and_statistical_analysis}.
-In general, one must be careful when interpreting the correlation coefficients; it is important to understand what the values mean, and what they don't.
-Section 3.4.2 "Interpreting the Correlation Coefficient" of~\cite{research_design_and_statistical_analysis} offers further insight and points out some of the pitfalls to watch out for.
-
-In this thesis the correlation coefficients were computed using the respective functions from the SciPy Python package~\cite{python_scipy}.
 
 \subsection{Tail Concentration Functions}\label{app:tail_concentration_functions}
 The lower tail concentration function is defined as~\cite{venter_2002}
@@ -319,7 +96,7 @@ The lower tail concentration function is defined as~\cite{venter_2002}
 \begin{split}
     L(z)
         &= \frac{p(U_1 \le z, U_2 \le z)}{z} \\
-        &= \frac{C(z,z)}{z}
+        &= \frac{C(z,z)}{z},
 \end{split}
 \end{align}
 and the upper as
@@ -327,7 +104,7 @@ and the upper as
 \begin{split}
     R(z)
         &= \frac{p(U_1 > z, U_2 > z)}{1-z} \\
-        &= \frac{1 - 2z + C(z,z)}{1-z}
+        &= \frac{1 - 2z + C(z,z)}{1-z},
 \end{split}
 \end{align}
 where \( U_1 \) and \( U_2 \) uniform random variables on the interval \( [0, 1] \), and \( C(u_1, u_2) \) is the copula of \( (U_1, U_2) \).
@@ -338,41 +115,279 @@ When plotted, the lower tail concentration function is used for \( 0 \le z \le 0
 
 A nice explanation with animations can be found at~\cite{charpentier_2012}.
 
-\subsection{Autocorrelation Analysis}\label{app:autocorrelation_analysis}
-When studying results from an MCMC-based model it is important to be aware that sequentially generated samples are not always statistically independent, that is, there is some thermalization threshold that corresponds to the minimum number of sampling steps between samples to consider them as statistically independent.
-
-For a time series \( x_1, \dots, x_n \), the lag-\( k \) autocorrelation function is defined as~\cite{time_series_analysis}
-\begin{align}
-    \rho_k
-        &= \frac{\text{cov}(x_t, x_{t+k})}{\sigma_{x}^2}
-\end{align}
-The autocorrelation function is essentially a correlation coefficient, except instead of comparing two different variables it compares the same variable at different times.
-In this thesis we used the statsmodels Python package~\cite{python_statsmodels} to compute the autocorrelation function as there are some caveats when computing it in practice with large chains, e.g. there are some tricks such as using a Fourier transformation to make the computations more efficient.
-
-The integrated autocorrelation time is a reasonable estimate of how many steps in between samples we should have before we can consider them to be (to a degree) statistically independent.
-In this thesis we used the emcee Python package~\cite{python_emcee} to estimate the integrated autocorrelation time, which follows the approach laid out by Goodman and Weare in~\cite{goodman_weare_2010}.
-
 \subsection{Exact Computation of \( \rho \)}\label{app:exact_rho_computation}
 For the density matrix
 \begin{align}
-    \rho = \frac{1}{Z} e^{-\beta H}
+    \rho = \frac{1}{Z} e^{-\beta H},
 \end{align}
 we can compute this as
 \begin{align}
     \rho
-        &= \frac{1}{\tr(A)} S A S^{-1}
+        &= \frac{1}{\tr(A)} S A S^{-1},
 \end{align}
 where
 \begin{align}
-    A = \text{diag}\Big(e^{-\beta(\lambda_1 - \min\{\lambda_i\})}, \dots, e^{-\beta(\lambda_{2^n} - \min\{\lambda_i\})}\Big)
+    A = \text{diag}\Big(e^{-\beta(\lambda_1 - \min\{\lambda_i\})}, \dots, e^{-\beta(\lambda_{2^n} - \min\{\lambda_i\})}\Big),
 \end{align}
 where \( \{\lambda_i\} \) are the eigenvalues of \( H \), and \( S \) is the matrix of eigenvectors that transforms \( H \) to and from its eigenspace.
 We subtract \( \min\{\lambda_i\} \) from the eigenvalues in practice to avoid computing the exponential of a large number which can lead to divergence in floating point calculations.
 
-\subsection{Learning Rate Decay Schedule}\label{app:lr_exp_decay}
-The learning rate at epoch \( t \) is given by
+\subsection{Constants}\label{app:constants}
+The values of \( A(s) \) and \( B(s) \) are in terms of \si{\giga\hertz}, and consequently so is the Hamiltonian.
+The density matrix is of the form \( \rho = e^{-\beta H(s)} \), where \( \beta = 1 / kT \), so in order to obtain the (effective) temperature we need the argument of the exponential to be dimensionless, i.e., \( k \) must be in terms of \( \si{\giga\hertz} \cdot \si{\kelvin}^{-1} \).
+This is achieved by taking a value of
 \begin{align}
-    \eta^{(t)}
-        &= \eta^{(0)} \cdot \min\bigg\{1, 2^{-\frac{t - t_\text{decay}}{T_\text{decay}}}\bigg\}
+\begin{split}
+    k
+        &= \frac{k_B}{h} \\
+        &\approx \frac{1.380649 \cdot 10^{23} \ \si{\joule} \cdot \si{\kelvin}^{-1}}{6.62607015 \cdot 10^{-34} \ \si{\joule} \cdot \si{\hertz}^{-1}} \\
+        &\approx 2.083661912 \cdot 10^{10} \ \si{\hertz} \cdot \si{\kelvin}^{-1} \\
+        &= 20.83661912 \ \si{\giga\hertz} \cdot \si{\kelvin}^{-1}.
+\end{split}
 \end{align}
-where \( \eta^{(0)} \) is the initial learning rate, \( t_\text{decay} \) is the epoch at which the decay begins, and \( T_\text{decay} \) is the decay period.
+
+\section{Restricted Boltzmann Machine}
+\subsection{Conditional Probabilities}\label{app:conditional_probabilities_derivation}
+This derivation follows along the lines of that found on p. 658-659 of~\cite{goodfellow_deep_learning}.
+We start by noting~\cref{eq:rbm_joint_probability}
+\begin{align}
+    p(\vec{v,h}) = \frac{1}{Z} e^{-E(\vec{v},\vec{h})}.
+\end{align}
+From this we can derive the conditional probability using~\cref{eq:rbm_energy,eq:rbm_partition_function}
+\begin{align}
+\begin{split}
+    p(\vec{h} | \vec{v})
+        &= \frac{p(\vec{v},\vec{h})}{p(\vec{v})} \\
+        &= \frac{1}{p(\vec{v})} \frac{1}{Z} \exp( \vec{a}^\intercal\vec{v} + \vec{b}^\intercal\vec{h} + \vec{v}^\intercal\mat{W}\vec{h} ) \\
+        &= \frac{1}{Z'} \exp\bigg( \sum_j b_j h_j + \sum_j (\vec{v}^\intercal\mat{W})_j h_j \bigg) \\
+        &= \frac{1}{Z'} \prod_j \exp\big( b_j h_j + (\vec{v}^\intercal\mat{W})_j h_j \big),
+\end{split}
+\end{align}
+where
+\begin{align}
+    Z' = \sum_\vec{h} \exp( \vec{b}^\intercal\vec{h} + \vec{v}^\intercal\mat{W}\vec{h} ).
+\end{align}
+This leads us to
+\begin{align}
+\begin{split}
+    p(h_j = 1 | \vec{v})
+        &= \frac{\tilde{p}(h_j = 1 | \vec{v})}{\tilde{p}(h_j = 0 | \vec{v}) + \tilde{p}(h_j = 1 | \vec{v})} \\
+        &= \frac{\exp\big( b_j + (\vec{v}^\intercal\mat{W})_j \big)}{1 + \exp\big( b_j + (\vec{v}^\intercal\mat{W})_j \big)} \\
+        &= \sigma\big( b_j + (\vec{v}^\intercal\mat{W})_j \big).
+\end{split}
+\end{align}
+Finally, we have
+\begin{align}
+    p(\vec{h} | \vec{v}) = \prod_j \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j.
+\end{align}
+
+Analogously for \( p(\vec{v} | \vec{h}) \) one finds
+\begin{align}
+    p(\vec{v} | \vec{h}) = \prod_i \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i.
+\end{align}
+
+\subsection{Log-Likelihood Derivative}\label{app:rbm_log_likelihood_derivation}
+For the data set distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W}, \vec{a}, \vec{b}) \) the average log-likelihood is given by
+\begin{align}
+\begin{split}
+    \ell(\theta)
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log p(\vec{v}) \\
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \sum_\vec{h} p(\vec{v},\vec{h}) \\
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \bigg(\frac{1}{Z} \sum_\vec{h} e^{-E(\vec{v},\vec{h})}\bigg) \\
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \sum_\vec{h} e^{-E(\vec{v},\vec{h})} - \log \sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})}.
+\end{split}
+\end{align}
+Taking the gradient we find
+\begin{align}
+\begin{split}
+    \partial_{\theta} \ell(\theta)
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \frac{\sum_\vec{h} e^{-E(\vec{v},\vec{h})} \partial_{\theta}\big( -E(\vec{v},\vec{h}) \big) }{\sum_\vec{h} e^{-E(\vec{v},\vec{h})}}
+            - \frac{\sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})} \partial_{\theta}\big( -E(\vec{v},\vec{h}) \big) }{\sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})}} \\
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \Big\langle \partial_{\theta}\big( -E(\vec{v},\vec{h}) \big) \Big\rangle_{p(\vec{h}|\vec{v})}
+        - \Big\langle \partial_{\theta}\big( -E(\vec{v},\vec{h}) \big) \Big\rangle_{p(\vec{v},\vec{h})}.
+\end{split}
+\end{align}
+This gives us
+\begin{align}
+\begin{split}
+    \partial_{w_{ij}} \ell(\theta)
+        &= \langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{model}}, \\
+    \partial_{a_i} \ell(\theta)
+        &= \langle v_i \rangle_{\text{data}} - \langle v_i \rangle_{\text{model}}, \\
+    \partial_{b_j} \ell(\theta)
+        &= \langle h_j \rangle_{\text{data}} - \langle h_j \rangle_{\text{model}},
+\end{split}
+\end{align}
+where \( \langle \ \cdot \ \rangle_{\text{data}} \) denotes the expectation value with respect to the data set distribution, and \( \langle \ \cdot \ \rangle_{\text{model}} \) denotes the expectation value with respect to the model distribution.
+
+\section{Quantum Boltzmann Machine}
+\subsection{Log-Likelihood Derivative}\label{app:qbm_log_likelihood_derivation}
+This derivation follows along the lines of that laid out in~\cite{amin_2018}.
+We start with the data set-averaged log-likelihood
+\begin{align}
+\begin{split}
+    \ell(\theta)
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log p(\vec{v}) \\
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \frac{\tr(\Lambda_\vec{v} e^{-H})}{\tr(e^{-H})} \\
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \Big[ \log\tr(\Lambda_\vec{v} e^{-H}) - \log\tr(e^{-H}) \Big].
+\end{split}
+\end{align}
+Taking the partial derivative yields
+\begin{align}
+    \label{eq:qbm_log_likelihood_derivative}
+    \partial_\theta \ell(\theta)
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \bigg[ \frac{\tr(\Lambda_\vec{v} \partial_\theta e^{-H})}{\tr(\Lambda_\vec{v} e^{-H})} - \frac{\tr(\partial_\theta e^{-H})}{\tr(e^{-H})} \bigg].
+\end{align}
+Due to the noncommutativity of \( H \) and \( \partial_\theta H \), we need to use the trick laid out in~\cite{amin_2018} where we take \( e^{-H} = (e^{-\delta\tau H})^n \) with \( \delta\tau \equiv 1 / n \), which allows one to write
+\begin{align}
+    \partial_\theta e^{-H}
+        &= -\sum_{m=1}^{n} e^{-m\delta\tau H} \delta\tau \partial_\theta He^{-(n-m)\delta\tau H} + \mathcal{O}(\delta\tau^2).
+\end{align}
+Taking the limit as \( n \rightarrow \infty \) of both sides gives
+\begin{align}
+\begin{split}
+    \partial_\theta e^{-H}
+        &= \lim_{n\rightarrow\infty} -\sum_{m=1}^{n} e^{-m\delta\tau H} \delta\tau \partial_\theta He^{-(n-m)\delta\tau H} + \mathcal{O}(\delta\tau^2) \\
+        &= -\int_{0}^{1} d\tau e^{-\tau H} \partial_\theta H e^{(\tau-1)H}.
+\end{split}
+\end{align}
+From here one can take the trace of both sides to arrive at
+\begin{align}
+\begin{split}
+    \tr(\partial_\theta e^{-H})
+        &= -\tr\bigg( \int_{0}^{1} d\tau e^{-\tau H} \partial_\theta H e^{(\tau-1)H} \bigg) \\
+        &= -\int_{0}^{1} d\tau \tr\big(e^{-\tau H} \partial_\theta H e^{(\tau-1)H} \big) \\
+        &= -\int_{0}^{1} d\tau \tr\big(e^{(\tau-1)H} e^{-\tau H} \partial_\theta H \big) \\
+        &= -\int_{0}^{1} d\tau \tr\big(e^{-H} \partial_\theta H \big) \\
+        &= -\tr\big(e^{-H} \partial_\theta H \big),
+\end{split}
+\end{align}
+which gives
+\begin{align}
+\begin{split}
+    \frac{\tr(\partial_\theta e^{-H})}{\tr(e^{-H})}
+        &= -\frac{\tr(e^{-H} \partial_\theta H)}{\tr(e^{-H})} \\
+        &= -\tr(\rho \partial_\theta H) \\
+        &= -\langle \partial_\theta H \rangle.
+\end{split}
+\end{align}
+Unfortunately, due to the additional factor of \( \Lambda_\vec{v} \) in the first term of \cref{eq:qbm_log_likelihood_derivative}, one arrives at
+\begin{align}
+\begin{split}
+    \tr(\Lambda_\vec{v} \partial_\theta e^{-H})
+        &= -\tr\bigg( \int_{0}^{1} d\tau \Lambda_\vec{v} e^{-\tau H} \partial_\theta H e^{(\tau-1)H} \bigg) \\
+        &= -\int_{0}^{1} d\tau \tr\big(\Lambda_\vec{v} e^{-\tau H} \partial_\theta H e^{(\tau-1)H} \big),
+\end{split}
+\end{align}
+which is nontrivial to compute in practice.
+
+\subsection{Log-Likelihood Lower Bound}\label{app:qbm_log_likelihood_lower_bound}
+This derivation follows along the lines of that laid out in~\cite{amin_2018}.
+The Golden-Thompson inequality that \( \tr(e^{A}e^{B}) \ge \tr(e^{A+B}) \) allows one to write (for small \( \epsilon > 0 \))
+\begin{align}
+    \tr(e^{-H} e^{\log(\Lambda_\vec{v}+\epsilon)}) \ge \tr(e^{-H+\log(\Lambda_\vec{v}+\epsilon)}).
+\end{align}
+Taking the limit \( \epsilon \rightarrow 0 \) yields
+\begin{align}
+    \tr(\Lambda_\vec{v}e^{-H}) \ge \tr(e^{-H_\vec{v}}),
+\end{align}
+where
+\begin{align}
+    H_\vec{v} &= \braket{\vec{v} | H | \vec{v}},
+\end{align}
+with \( H_\vec{v} \) being the \textit{clamped} Hamiltonian.
+This is called clamped because the visible qubits are held to the classical state of the visible vector \( \vec{v} \) due to an infinite energy penalty imposed by the \( \log(\Lambda_\vec{v} + \epsilon) \) term.
+Using this we can write the inequality
+\begin{align}
+\begin{split}
+    p(\vec{v})
+        &= \frac{\tr(\Lambda_\vec{v} e^{-H})}{\tr(e^{-H})} \\
+        &\ge \frac{\tr(e^{-H_\vec{v}})}{\tr(e^{-H})},
+\end{split}
+\end{align}
+which in turn allows for the log-likelihood to be bounded as
+\begin{align}
+    \ell(\theta) \ge \tilde{\ell}(\theta),
+\end{align}
+where
+\begin{align}
+    \tilde{\ell}(\theta)
+        &= \sum_\vec{v} p_\text{data}(\vec{v}) \log\frac{\tr(e^{-H_\vec{v}})}{\tr(e^{-H})}.
+\end{align}
+\subsection{Log-Likelihood Lower Bound Derivative}\label{app:qbm_log_likelihood_lower_bound_derivative}
+This derivation follows along the lines of that laid out in~\cite{amin_2018}.
+Taking the partial derivative of the log-likelihood lower bound yields
+\begin{align}
+\begin{split}
+    \label{eq:qbm_log_likelihood_derivative_lower_bound}
+    \partial_\theta \tilde{\ell}(\theta)
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \bigg[ \frac{\tr(\partial_\theta e^{-H_\vec{v}})}{\tr(e^{-H_\vec{v}})} - \frac{\tr(\partial_\theta e^{-H})}{\tr(e^{-H})} \bigg] \\
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \bigg[ \frac{\tr(e^{-H_\vec{v}} \partial_\theta H_\vec{v})}{\tr(e^{-H_\vec{v}})} - \frac{\tr(e^{-H} \partial_\theta H)}{\tr(e^{-H})} \bigg] \\
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) [ \tr(\rho_\vec{v} \partial_\theta H_\vec{v}) - \tr(\rho \partial_\theta H) ] \\
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) [ \langle \partial_\theta H_\vec{v} \rangle_\vec{v} - \langle \partial_\theta H \rangle ] \\
+        &= \overline{\langle \partial_\theta H_\vec{v} \rangle_\vec{v}} - \langle \partial_\theta H \rangle.
+\end{split}
+\end{align}
+Plugging in our parameters we get
+\begin{align}
+\begin{split}
+    \partial_{w_{ij}} \tilde{\ell}(\theta)
+        &= \overline{\langle \sigma_i^z \sigma_j^z \rangle_\vec{v}} - \langle \sigma_i^z \sigma_j^z \rangle \\
+        &= \langle \sigma_i^z \sigma_j^z \rangle_\text{data} - \langle \sigma_i^z \sigma_j^z \rangle_\text{model}, \\
+    \partial_{b_i} \tilde{\ell}(\theta)
+        &= \overline{\langle \sigma_i^z \rangle_\vec{v}} - \langle \sigma_i^z \rangle \\
+        &= \langle \sigma_i^z \rangle_\text{data} - \langle \sigma_i^z \rangle_\text{model}.
+\end{split}
+\end{align}
+When restrictions are imposed on connections within the hidden layer, the clamped Hamiltonian reduces to
+\begin{align}
+    H_\vec{v}
+        &= -\sum_i \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big),
+\end{align}
+where \( b_i'(\vec{v}) = b_i + (\mat{W}^\intercal\vec{v})_i \).
+This allows one to rewrite the clamped density matrix as
+\begin{align}
+\begin{split}
+    \rho_\vec{v}
+        &= \frac{1}{Z_\vec{v}} \exp\bigg( \sum_i \big(\Gamma_i \sigma_i^x + h_i'(\vec{v}) \sigma_i^z\big) \bigg) \\
+        &= \frac{1}{Z_\vec{v}} \prod_i \exp \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big) \\
+        &= \prod_i \rho_\vec{v}^{(i)}.
+\end{split}
+\end{align}
+With this we can compute the expectation values as
+\begin{align}
+\begin{split}
+    \langle \sigma_i^z \rangle_\vec{v}
+        &= \tr(\rho_\vec{v}^{(i)}\sigma_i^z) \\
+        &= \frac{\tr\bigg[ \exp \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big) \sigma_i^z \bigg]}{\tr\bigg[ \exp \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big) \bigg]} \\
+        &= \frac{b_i'(\vec{v})}{D_i(\vec{v})} \tanh\big(D_i(\vec{v})\big),
+\end{split}
+\end{align}
+where \( D_i(\vec{v}) = \sqrt{\Gamma_i^2 + b_i'(\vec{v})^2} \).
+
+The last equality above is obtained by using that for traceless \( A \) with \( \det A < 0 \) we can write
+\begin{align}
+    \exp(A) = \cosh\Big(\sqrt{\abs{\det A}}\Big) I + \frac{1}{\sqrt{\abs{\det A}}}\sinh\Big(\sqrt{\abs{\det A}}\Big) A.
+\end{align}
+This is obtained by using Cayley-Hamilton theorem along with the series expansion of the matrix exponential and grouping the terms.
+
+\subsection{Effective \( \beta \) as a Learnable Parameter}\label{app:learning_beta}
+Following along the lines of~\cite{xu_2021} we have
+\begin{align}
+\begin{split}
+    p_\text{DW}
+        &= \frac{1}{Z_\text{DW}} e^{-E_\text{DW}} \\
+        &= \frac{1}{Z_\text{DW}} e^{-E / \beta},
+\end{split}
+\end{align}
+which leads to a log-likelihood derivative of
+\begin{align}
+    \frac{\partial \log p_\text{DW}}{\partial\beta}
+        &= \frac{1}{\beta^2} (E - \langle E \rangle),
+\end{align}
+and after averaging over the training data set we have
+\begin{align}
+    \Delta\beta
+        &= \frac{\eta}{\beta^2}\big(\langle E \rangle_\text{data} - \langle E \rangle_\text{model}\big).
+\end{align}
+

@@ -3,7 +3,7 @@ We started with an analysis of the forex log returns data set in~\cref{ch:data_a
 After that we moved to training classical RBM models in~\cref{ch:rbm}, where we were able to produce good results similar to those in~\cite{kondratyev_2019}.
 The outlier power transformation we detailed in~\cref{sec:outlier_transform} showed much promise; models trained on the transformed data sets performed noticeably better than those trained on the base data sets.
 
-After establishing a classical baseline with which to compare our quantum models to, we moved to studying a small 12-qubit problem in~\cref{sec:qbm_12_qubit_problem}, through which we gained a deeper understanding of how to sample quantum Boltzmann random variables using a D-Wave quantum annealer, specifically the Advantage 4.1.
+After establishing a classical baseline to compare our quantum models with, we moved to studying a small 12-qubit problem in~\cref{sec:qbm_12_qubit_problem}, through which we gained a deeper understanding of how to sample quantum Boltzmann random variables using a D-Wave quantum annealer, specifically the Advantage 4.1.
 There we were able to match sample distributions returned by the annealer to distributions from the family of distributions corresponding to the density operator \( \rho(s,T) = \frac{1}{Z}e^{-\beta H(s)} \).
 Our findings indicated that, in general, the Advantage 4.1 was not able to sample from just any quantum Boltzmann distribution, rather just those that were classical Boltzmann-like in nature.
 To be more specific, not only did the results match a single distribution, but rather a subset of the family that satisfied \( B(s) / T = \text{constant} \), as indicated by the streak patterns observed in~\cref{fig:dkl_min_heatmap}.
@@ -11,7 +11,7 @@ This occurs when the distribution is similar to one late in the anneal process, 
 This was likely due to the annealer not being able to quench the system fast enough, allowing for nontrivial dynamics to occur, as the shortest allowed quench durations were still on the order of a few hundred nanoseconds, which is still quite long when considering that the qubits oscillate at a frequency in terms of gigahertz.
 How closely the annealer could approximate a desired classical Boltzmann distribution was found to be dependent on both the embedding as well as the anneal schedule, thus it is highly recommended to tune these accordingly.
 
-With the information that only classical Boltzmann distributions could be sampled, we moved to training a bound-based quantum restricted Boltzmann machine (BQRBM), which essentially reduced the problem to a classical RBM trained using quantum assistance.
+With the information that only classical Boltzmann distributions could be sampled well, we moved to training a bound-based quantum restricted Boltzmann machine (BQRBM), which essentially reduced the problem to a classical RBM trained using quantum assistance.
 The difficulty of choosing the effective temperature was in this case easily circumvented by treating \( \beta \) as a learnable parameter as described in~\cref{sec:learning_beta} and verified in~\cref{sec:qbm_simulation_results}.
 We trained BQRBM models using both a simulation and the Advantage 4.1 annealer, allowing us to compare exactly how close the annealer trained model was to the theory.
 Additionally, we trained classical RBM to use as a reference point.
@@ -36,7 +36,7 @@ We hope that this work will be useful for future research and development.
 
 
 \section{Future Directions}
-Throughout this thesis we came across several directions which we would've liked to explore more in depth but did not have the time to.
+Throughout this thesis we came across several directions which we would have liked to explore more in depth but did not have the time to.
 
 It would be interesting to investigate if adding technical indicators to the log returns data set could increase model performance.
 Given that the log returns data set only took into account the currency pairs' behavior over one day (excluding the volatility indicators), technical indicators calculated using data over a historical window could enrich the data set with vital information to help the model better learn the complexities of the distribution.

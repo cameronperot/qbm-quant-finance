@@ -3,9 +3,10 @@
 The restricted Boltzmann machine (RBM) is an energy-based model defined by the energy function~\cite{goodfellow_deep_learning}
 \begin{align}
 \begin{split}
+    \label{eq:rbm_energy}
     E(\vec{v}, \vec{h})
         &= -\sum_i a_i v_i - \sum_j b_j h_j - \sum_{i,j} v_i w_{ij} h_j \\
-        &= -\vec{a}^\intercal\vec{v} - \vec{b}^\intercal\vec{h} - \vec{v}^\intercal\mat{W}\vec{h}
+        &= -\vec{a}^\intercal\vec{v} - \vec{b}^\intercal\vec{h} - \vec{v}^\intercal\mat{W}\vec{h},
 \end{split}
 \end{align}
 where
@@ -26,61 +27,63 @@ where
 It is termed \textit{restricted} due to the fact that there are no intra-layer connections, i.e., visible units are only connected to hidden units, and vice versa.
 An example diagram is depicted in~\cref{fig:rbm_diagram}.
 
-The probability to find the system in the configuration \( (\vec{v},\vec{h}) \) is given by the Boltzmann distribution (with \( \beta = \frac{1}{k_BT} = 1 \))
+The probability to find the system in the configuration \( (\vec{v},\vec{h}) \) is given by the Boltzmann distribution (with \( \beta = 1/kT = 1 \))
 \begin{align}
-    p(\vec{v}, \vec{h}) = \frac{1}{Z} e^{-E(\vec{v},\vec{h})}
+    \label{eq:rbm_joint_probability}
+    p(\vec{v}, \vec{h}) = \frac{1}{Z} e^{-E(\vec{v},\vec{h})},
 \end{align}
 with intractable~\cite{long_servedio_2010} partition function
 \begin{align}
-    Z = \sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})}
+    \label{eq:rbm_partition_function}
+    Z = \sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})}.
 \end{align}
 
 The imposed restrictions on intra-layer connections enable us to write the conditional probabilities of the layers as the product of the individual units' probabilities~\footnote{Here \( \sigma(x) \) is the element-wise logistic sigmoid function and \( \odot \) denotes element-wise multiplication.} (see \cref{app:conditional_probabilities_derivation} for derivation)
 \begin{align}
 \begin{split}
     p(\vec{h} | \vec{v})
-        &= \prod_j \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j \\
+        &= \prod_j \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j, \\
     p(\vec{v} | \vec{h})
-        &= \prod_i \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i
+        &= \prod_i \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i.
 \end{split}
 \end{align}
 
 \subsection{Optimizing an RBM}
-Due to the intractability of the partition function, the model cannot be solved exactly, thus we resort to other methods to optimize it such as likelihood maximization via gradient descent.
+Due to the intractability of the partition function, the model cannot be solved exactly in general, thus we resort to other methods to optimize it such as likelihood maximization via gradient descent.
 For data set distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W}, \vec{a}, \vec{b}) \), the average log-likelihood is given by
 \begin{align}
 \begin{split}
     \ell(\theta)
         &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log p(\vec{v}) \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \bigg(\frac{1}{Z} \sum_\vec{h} e^{-E(\vec{v},\vec{h})}\bigg)
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \bigg(\frac{1}{Z} \sum_\vec{h} e^{-E(\vec{v},\vec{h})}\bigg),
 \end{split}
 \end{align}
 with gradients (see \cref{app:rbm_log_likelihood_derivation} for derivation)
 \begin{align}
 \begin{split}
     \partial_{w_{ij}} \ell(\theta)
-        &= \langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{model}} \\
+        &= \langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{model}}, \\
     \partial_{a_i} \ell(\theta)
-        &= \langle v_i \rangle_{\text{data}} - \langle v_i \rangle_{\text{model}} \\
+        &= \langle v_i \rangle_{\text{data}} - \langle v_i \rangle_{\text{model}}, \\
     \partial_{b_j} \ell(\theta)
-        &= \langle h_j \rangle_{\text{data}} - \langle h_j \rangle_{\text{model}}
+        &= \langle h_j \rangle_{\text{data}} - \langle h_j \rangle_{\text{model}}.
 \end{split}
 \end{align}
 Therefore, the parameters at step \( t \) are given by
 \begin{align}
 \begin{split}
     \mat{W}^{(t)}
-        &= \mat{W}^{(t-1)} + \eta(\langle \vec{v} \vec{h}^\intercal \rangle_{\text{data}} - \langle \vec{v} \vec{h}^\intercal \rangle_{\text{model}}) \\
+        &= \mat{W}^{(t-1)} + \eta(\langle \vec{v} \vec{h}^\intercal \rangle_{\text{data}} - \langle \vec{v} \vec{h}^\intercal \rangle_{\text{model}}), \\
     \vec{a}^{(t)}
-        &= \vec{a}^{(t-1)} + \eta(\langle \vec{v} \rangle_{\text{data}} - \langle \vec{v} \rangle_{\text{model}}) \\
+        &= \vec{a}^{(t-1)} + \eta(\langle \vec{v} \rangle_{\text{data}} - \langle \vec{v} \rangle_{\text{model}}), \\
     \vec{b}^{(t)}
-        &= \vec{b}^{(t-1)} + \eta(\langle \vec{h} \rangle_{\text{data}} - \langle \vec{h} \rangle_{\text{model}})
+        &= \vec{b}^{(t-1)} + \eta(\langle \vec{h} \rangle_{\text{data}} - \langle \vec{h} \rangle_{\text{model}}),
 \end{split}
 \end{align}
 where \( \eta \) is the learning rate hyperparameter.
 
 The part of the gradient using the data set distribution is referred to as the \textit{positive} phase, and the part using the model distribution is referred to as the \textit{negative} phase.
-It's trivial to compute the expectation values in the positive phase, but not so much in the negative phase because \( p(\vec{v}) \) can not be sampled directly.
+It is trivial to compute the expectation values in the positive phase, but not so much in the negative phase because \( p(\vec{v}) \) cannot be sampled directly.
 
 In practice the negative phase expectation values are sampled using a Markov chain Monte Carlo (MCMC) method.
 This is done using Gibbs sampling~\cite{hinton_rbm_training}, which uses the conditional probabilities \( p(\vec{h}|\vec{v}) \) and \( p(\vec{v}|\vec{h}) \).
@@ -108,7 +111,7 @@ The algorithm is presented in a vectorized format for brevity.
 \end{algorithmic}
 \label{alg:Gibbs}
 \end{algorithm}
-The Uniform$(a, b, n)$ function in \cref{alg:Gibbs} produces a length \( n \) vector of uniform i.i.d. random variables on the interval $[a, b)$.
+The Uniform$(a, b, n)$ function in \cref{alg:Gibbs} produces a length \( n \) vector of uniform i.i.d. random variables on the interval $[a, b)$, and the \( < \) operator returns a binary output with \( (\text{true}, \text{false}) \mapsto (1, 0) \).
 
 \begin{figure}
     \begin{center}
@@ -145,10 +148,10 @@ Applying the algorithm to a mini-batch is essentially the same except that one d
 \section{The Classical Market Generator}\label{sec:classical_market_generator}
 In \textit{The Market Generator}~\cite{kondratyev_2019} by Kondratyev and Schwarz, they showed how an RBM could be used as a generative model to produce synthetic market data.
 Specifically, they studied how it performed on the log returns of forex data for the same currencies as we analyzed here for the time period 1999-2019.
-In this section we used a lot of the same metrics so that we could verify our models achieved similar performance to theirs, as well as give us a good reference point with which to compare our quantum models in~\cref{ch:qbm}.
+In this section we used a lot of the same metrics so that we could verify our models achieved similar performance to theirs, as well as give us a good reference point to compare our quantum models with in~\cref{ch:qbm}.
 
 \subsection{Models}
-We compared four different RBM models trained on the data set laid out in~\cref{ch:data_analysis}, each with slightly different preprocessing procedures denoted by:
+We trained and analyzed four RBM models using the data set in~\cref{ch:data_analysis}, each with slightly different preprocessing procedures denoted by:
 \begin{itemize}
     \item (B): trained on the base data set.
     \item (X): trained on the base data set transformed using~\cref{alg:transformation}.
@@ -171,7 +174,7 @@ Therefore, we first examined the autocorrelations to see how dependent samples w
 We used Gibbs sample chains of length \( 10^8 \) for this analysis.
 More information about the autocorrelation function and time can be found in~\cref{app:autocorrelation_analysis}.
 
-In~\cref{fig:rbm_autocorrelation_functions} we plotted the autocorrelation functions for the various models and currency pairs.
+\cref{fig:rbm_autocorrelation_functions} shows the autocorrelation functions for the various models and currency pairs.
 The first observation we made was that the autocorrelations fall off much sooner for the models trained on the transformed data sets for all currency pairs.
 This observation was confirmed when looking at the integrated autocorrelation times in~\cref{tbl:rbm_ac_times}.
 
@@ -232,7 +235,7 @@ We found that the generated data was able to reproduce the structure of the corr
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/rbm/correlation_coefficients.tbl}
     \end{adjustbox}
-    \caption{Correlation coefficients of the data set vs. samples generated by the RBM models. The RBM values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.}
+    \caption{Correlation coefficients of the data set vs.~samples generated by the RBM models. The RBM values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.}
     \label{tbl:rbm_correlation_coefficients}
 \end{table}
 
@@ -244,31 +247,31 @@ We found that the models were able to reproduce similar volatility structures, a
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/rbm/volatilities.tbl}
     \end{adjustbox}
-    \caption{Historical volatilities of the data set vs. samples generated by the RBM models. The RBM values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.}
+    \caption{Historical volatilities of the data set vs.~samples generated by the RBM models. The RBM values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.}
     \label{tbl:rbm_volatilities}
 \end{table}
 
 \subsubsection{Tails}
 One of the most important things that we wanted the models to learn was the tail events, as these play a crucial role in financial risk management.
 The models trained on the transformed data sets appear to have learned the lower tails a little bit better for most currency pairs, but overestimated some of the upper tails.
-It's difficult to say overall if one model performed better than another here, as it really depends on what one wants to do with the generated data.
+It is difficult to say overall if one model performed better than another here, as it really depends on what one wants to do with the generated data.
 \begin{table}[!htb]
     \centering
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/rbm/tails.tbl}
     \end{adjustbox}
-    \caption{Lower and upper tails, i.e., 1st and 99th percentiles, of the data set vs. samples generated by the RBM models. The RBM values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.}
+    \caption{Lower and upper tails, i.e., 1st and 99th percentiles, of the data set vs.~samples generated by the RBM models. The RBM values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.}
     \label{tbl:rbm_tails}
 \end{table}
 
 We also studied the tail concentration functions (see~\cref{app:tail_concentration_functions} for definitions and interpretations) between currency pairs in~\cref{fig:rbm_tail_concentrations}.
 Here we noticed that all models performed quite well for the most part outside of a few of the extreme regions in the EURUSD/GBPUSD, EURUSD/USDJPY, and GBPUSD/USDJPY plots.
-The differences aren't so stark here between the RBM models, but when Kondratyev and Schwarz performed the same comparison to the parametric model they used, it was clear that the RBM was the better performer.
+The differences are not so stark here between the RBM models, but when Kondratyev and Schwarz performed the same comparison to the parametric model they used, it was clear that the RBM was the better performer.
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{rbm/tail_concentrations.png}
     \end{center}
-    \caption{Tail concentration functions of the data set vs. samples generated by the RBM models.}
+    \caption{Tail concentration functions of the data set vs.~samples generated by the RBM models.}
     \label{fig:rbm_tail_concentrations}
 \end{figure}
 
@@ -278,20 +281,20 @@ For the data sets with additional volatility indicators, we have the ability to 
 This is useful for example if we are trying to generate real-world data that fits the current volatility landscape.
 
 This led us to look at the conditional volatilities, i.e., seeing how well the models could reproduce the volatilities from the two volatility regimes.
-Laid out in~\cref{tbl:rbm_conditional_volatilities}, we observed that the RBMs produced samples with slightly (higher) lower volatilities in the (low) high regime, but overall pretty much in agreement with the data set.
+Laid out in~\cref{tbl:rbm_conditional_volatilities}, we observed that the RBMs produced samples with slightly lower (higher) volatilities in the high (low) regime, but overall pretty much in agreement with the data set.
 \begin{table}[!htb]
     \centering
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/rbm/conditional_volatilities.tbl}
     \end{adjustbox}
-    \caption{Conditional historical volatilities of the data set vs. samples generated by the RBM models. The RBM values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.}
+    \caption{Conditional historical volatilities of the data set vs.~samples generated by the RBM models. The RBM values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.}
     \label{tbl:rbm_conditional_volatilities}
 \end{table}
 
 \subsection{Summary}
-The classical RBM results arrived at in this section were found to be in line with those obtained by Kondratyev and Schwarz in~\cite{kondratyev_2019}, and the differences could likely accounted for by the different data sets used in training, model hyperparameters, and the stochastic nature of the models.
+The classical RBM results arrived at in this section were found to be in line with those obtained by Kondratyev and Schwarz in~\cite{kondratyev_2019}, and the differences could likely accounted for by the different data sets used in training (e.g. different sources, different filtering, etc.), model hyperparameters, and the stochastic nature of the models.
 This further confirms that the RBM is performant and can be used to generate synthetic data from distributions with intricate structures, such as the correlations and volatilities seen here.
 
 Overall it is difficult to say that one of the models performed the best, as it depends on the desired use case, but the models trained on the transformed data sets do offer evidence that the results might be able to be further improved through the use of more advanced data preprocessing methods.
 We did not investigate these possibilities any further though, given that this was not the main scope of this thesis.
-The results in this section act mainly as a point of reference to compare the quantum models to in the next chapter.
+The results in this section act mainly as a point of reference to compare the quantum models with in the next chapter.

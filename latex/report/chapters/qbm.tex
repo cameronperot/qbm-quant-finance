@@ -4,15 +4,15 @@ The Quantum Boltzmann Machine detailed here is based on the work in \textit{Quan
 In this section we use spin eigenvalues \( +1 \) and \( -1 \) rather than binary values \( 0 \) and \( 1 \), respectively, in order to maintain consistency with the language of quantum mechanics.
 We start with the Hamiltonian
 \begin{align}
-    H = -\sum_i \Gamma_i \sigma_i^x -\sum_i b_i \sigma_i^z - \sum_{i,j} w_{ij} \sigma_i^z \sigma_j^z
+    H = -\sum_i \Gamma_i \sigma_i^x -\sum_i b_i \sigma_i^z - \sum_{i,j} w_{ij} \sigma_i^z \sigma_j^z,
 \end{align}
 where
 \begin{align}
 \begin{split}
     \sigma_i^x
-        &= I^{\otimes i-1} \otimes \sigma_x \otimes I^{\otimes n-i} \\
+        &= I^{\otimes i-1} \otimes \sigma_x \otimes I^{\otimes n-i}, \\
     \sigma_i^z
-        &= I^{\otimes i-1} \otimes \sigma_z \otimes I^{\otimes n-i}
+        &= I^{\otimes i-1} \otimes \sigma_z \otimes I^{\otimes n-i},
 \end{split}
 \end{align}
 with \( \sigma_x \) and \( \sigma_z \) being the Pauli \( x \) and \( z \) matrices, and \( I \) being the \( 2 \times 2 \) identity matrix.
@@ -20,27 +20,27 @@ We denote the first \( n_v \) qubits as the visible units and the last \( n_h \)
 
 The system's distribution is modeled by the density matrix
 \begin{align}
-    \rho = \frac{1}{Z} e^{-H}
+    \rho = \frac{1}{Z} e^{-H},
 \label{eq:density_operator}
 \end{align}
 where \( e^{-H} = \sum_n \frac{1}{n!} (-H)^n \) is the matrix exponential, and \( Z = \tr(e^{-H}) \) is the partition function.
 The probability to observe the system in state \( \ket{\vec{v},\vec{h}} \) is given by
 \begin{align}
     p(\vec{v},\vec{h})
-        &= \tr(\ket{\vec{v},\vec{h}}\bra{\vec{v},\vec{h}} \rho)
+        &= \tr(\ket{\vec{v},\vec{h}}\bra{\vec{v},\vec{h}} \rho),
 \end{align}
 and if we define the projection operator
 \begin{align}
-    \Lambda_\vec{v} = \ket{\vec{v}}\bra{\vec{v}} \otimes I^{\otimes n_h}
+    \Lambda_\vec{v} = \ket{\vec{v}}\bra{\vec{v}} \otimes I^{\otimes n_h},
 \end{align}
 then the marginal probability to measure the visible units in state \( \ket{\vec{v}} \) is given by
 \begin{align}
-    p(\vec{v}) = \tr(\Lambda_{\vec{v}}\rho)
+    p(\vec{v}) = \tr(\Lambda_{\vec{v}}\rho).
 \end{align}
 
 Using the probabilities above we can obtain an average log-likelihood, which for data set distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W}, \vec{a}, \vec{b}) \) is
 \begin{align}
-    \ell(\theta) = \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \tr(\Lambda_\vec{v}\rho)
+    \ell(\theta) = \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \tr(\Lambda_\vec{v}\rho).
 \end{align}
 
 \subsection{Optimizing a QBM}
@@ -48,17 +48,17 @@ When optimizing a QBM, it is preferable to maximize the lower bound of the log-l
 The reason for this is that the partial derivative of the log-likelihood with respect to the parameters has a term which is computationally expensive to compute, as discussed in \cref{app:qbm_log_likelihood_derivation}.
 The lower bound of the log-likelihood is given by (see \cref{app:qbm_log_likelihood_lower_bound} for derivation)
 \begin{align}
-    \tilde{\ell}(\theta) = \sum_{\vec{v}} \pdata(\vec{v}) \log \tr(\rho_\vec{v})
+    \tilde{\ell}(\theta) = \sum_{\vec{v}} \pdata(\vec{v}) \log \tr(\rho_\vec{v}),
 \end{align}
 where we have what is referred to as the \textit{clamped} Hamiltonian, which for a given visible vector \( \vec{v} \) is
 \begin{align}
     H_\vec{v}
-        &= \braket{\vec{v}|H|\vec{v}}
+        &= \braket{\vec{v}|H|\vec{v}},
 \end{align}
 with corresponding clamped density matrix
 \begin{align}
     \rho_\vec{v}
-        &= \frac{1}{Z_\vec{v}} e^{-H_\vec{v}}
+        &= \frac{1}{Z_\vec{v}} e^{-H_\vec{v}},
 \end{align}
 and \( Z_\vec{v} = \tr(e^{-H_\vec{v}}) \).
 
@@ -66,9 +66,9 @@ The associated derivatives with respect to the parameters of the lower bound are
 \begin{align}
 \begin{split}
     \partial_{w_{ij}} \tilde{\ell}(\theta)
-        &= \langle \sigma_i^z \sigma_j^z \rangle_\text{data} - \langle \sigma_i^z \sigma_j^z \rangle_\text{model} \\
+        &= \langle \sigma_i^z \sigma_j^z \rangle_\text{data} - \langle \sigma_i^z \sigma_j^z \rangle_\text{model}, \\
     \partial_{b_i} \tilde{\ell}(\theta)
-        &= \langle \sigma_i^z \rangle_\text{data} - \langle \sigma_i^z \rangle_\text{model}
+        &= \langle \sigma_i^z \rangle_\text{data} - \langle \sigma_i^z \rangle_\text{model},
 \end{split}
 \end{align}
 where \( \langle \ \cdot \ \rangle_\text{data} \) is the data set-averaged expectation value with respect to the clamped density matrix, and \( \langle \ \cdot \ \rangle_\text{model} \) is the expectation value with respect to the original density matrix.
@@ -79,16 +79,14 @@ This leads to positive phase expectation values of
 \begin{split}
     \langle \sigma_i^z \rangle_\text{data}
         &= \sum_\vec{v} \pdata(\vec{v}) v_i,
-        \ i \in \mathcal{I}_v \\
+        \ i \in \mathcal{I}_v, \\
+    \langle \sigma_i^z \rangle_\text{data}
+        &= \sum_\vec{v} \pdata(\vec{v}) \frac{b_i'(\vec{v})}{D_i(\vec{v})} \tanh\big(D_i(\vec{v})\big), \ i \in \mathcal{I}_h, \\
     \langle \sigma_i^z \sigma_j^z \rangle_\text{data}
         &= \sum_\vec{v} \pdata(\vec{v}) v_i v_j,
-        \ i, j \in \mathcal{I}_v \\
-    \langle \sigma_i^z \rangle_\text{data}
-        &= \sum_\vec{v} \pdata(\vec{v}) \frac{b_i'(\vec{v})}{D_i(\vec{v})} \tanh\big(D_i(\vec{v})\big),
-        \ i \in \mathcal{I}_h \\
+        \ i, j \in \mathcal{I}_v, \\
     \langle \sigma_i^z \sigma_j^z \rangle_\text{data}
-        &= \sum_\vec{v} \pdata(\vec{v}) v_i \frac{b_j'(\vec{v})}{D_j(\vec{v})} \tanh\big(D_j(\vec{v})\big),
-        \ i \in \mathcal{I}_v, \ j \in \mathcal{I}_h
+        &= \sum_\vec{v} \pdata(\vec{v}) v_i \frac{b_j'(\vec{v})}{D_j(\vec{v})} \tanh\big(D_j(\vec{v})\big), \ i \in \mathcal{I}_v, \ j \in \mathcal{I}_h,
 \end{split}
 \end{align}
 where \( b_i'(\vec{v}) = b_i + (\mat{W}^\intercal\vec{v})_i \), \( D_i(\vec{v}) = \sqrt{\Gamma_i^2 + b_i'(\vec{v})^2} \), \( \mathcal{I}_v = \{1, \dots, n_v\} \) represents the visible qubit indices, and \( \mathcal{I}_h = \{n_v + 1, \dots, n\} \) represents the hidden qubit indices.
@@ -98,18 +96,18 @@ Quantum annealing, also known as adiabatic quantum computing, is a branch of qua
 "A physical system remains in its instantaneous eigenstate if a given perturbation is acting on it slowly enough and if there is a gap between the eigenvalue and the rest of the Hamiltonian's spectrum."
 This can be achieved by implementing a Hamiltonian of the form~\cite{qc_lecture_notes}
 \begin{align}
-    H(s) = A(s) H_{\text{initial}} + B(s) H_{\text{final}}
+    H(s) = A(s) H_{\text{initial}} + B(s) H_{\text{final}},
 \end{align}
 where \( s \in [0, 1] \).
-For a linear anneal schedule \( s(t) = t / t_a \), with \( t_a \) being the total duration the system is annealed for.
+For a linear anneal schedule \( s(t) = t / t_a \), where \( t_a \) is the annealing time.
 \( H_{\text{initial}} \) is the initial Hamiltonian which describes the system at \( s = 0 \) and is responsible for introducing quantum fluctuations.
 \( H_{\text{final}} \) is the final Hamiltonian which describes the system at \( s = 1 \) and is responsible for encoding the problem defined by the user.
 
 The functions \( A(s) \) and \( B(s) \) must be such that they satisfy the relations
 \begin{align}
 \begin{split}
-    A(0) &\gg B(0) \\
-    A(1) &\ll B(1)
+    A(0) &\gg B(0), \\
+    A(1) &\ll B(1).
 \end{split}
 \end{align}
 
@@ -120,7 +118,7 @@ Therefore, when the qubits are measured they should correspond to an optimal sol
 \subsubsection{D-Wave Quantum Annealer}
 D-Wave quantum annealers implement a time-dependent Hamiltonian of the form~\cite{dwave_qa}
 \begin{align}
-    H(s) = A(s) \bigg( -\sum_i \sigma_i^x \bigg) + B(s) \bigg( \sum_i h_i \sigma_i^z + \sum_{i,j} J_{ij} \sigma_i^z \sigma_j^z \bigg)
+    H(s) = A(s) \bigg( -\sum_i \sigma_i^x \bigg) + B(s) \bigg( \sum_i h_i \sigma_i^z + \sum_{i,j} J_{ij} \sigma_i^z \sigma_j^z \bigg).
 \end{align}
 From this we see the initial Hamiltonian has a ground state where all of the qubits are aligned in the \( x \)-direction, i.e., \( \ket{+}^{\otimes n} \), which corresponds to an equal superposition of all possible states in the computational basis.
 The final Hamiltonian corresponds to the Ising model described by the \( h_i \) and \( J_{ij} \) values.
@@ -151,40 +149,40 @@ The default anneal schedule for the D-Wave Advantage 4.1 is shown in~\cref{fig:a
 \subsubsection{Mapping the QBM to the D-Wave Quantum Annealer}
 As stated in~\cite{amin_2018}, in order get a quantum annealer to sample from a quantum Boltzmann distribution, one would need to freeze the evolution at some point \( s^* \) during the annealing process and then perform the measurements.
 It goes on to say that this can be done in practice using a nonuniform \( s(t) \) that anneals slowly in the beginning, then quenches the system (completes the annealing as fast as possible) at the freeze out point \( s^* \), if \( s^* \) is in the quasistatic regime.
-In an earlier paper~\cite{amin_2015}, Amin showed that the quasistatic regime begins around 1 \si{\micro\second} for the D-Wave 2000Q, so it shouldn't be an issue to reach the quasistatic regime for annealing times longer than 5 \si{\micro\second}.
+In an earlier paper~\cite{amin_2015}, Amin showed that the quasistatic regime begins around 1 \si{\micro\second} for the D-Wave 2000Q, so it should not be an issue to reach the quasistatic regime for annealing times longer than 5 \si{\micro\second}.
 
 Since a quantum annealer is a real-world physical device, samples generated with it have an associated temperature called the effective temperature.
 To be more specific, the corresponding density operator is of the form
 \begin{align}
-    \rho(s, T) = \frac{1}{Z} e^{-\beta H(s)}
+    \rho(s, T) = \frac{1}{Z} e^{-\beta H(s)},
 \label{eq:effective_density_operator}
 \end{align}
-where \( \beta = \frac{1}{k_B T} \) is the effective inverse temperature.
+where \( \beta = 1/kT \) is the effective inverse temperature.
 In principle, \( \beta \) is an unknown quantity and must be determined in order to effectively use the annealer to generate samples from a quantum Boltzmann distribution.
 
 Comparing the density operator of the QBM in~\cref{eq:density_operator} to the one in~\cref{eq:effective_density_operator} at the freeze-out point \( s^* \), we find
 \begin{align}
 \begin{split}
     \Gamma_i
-        &= \beta A(s^*) \\
+        &= \beta A(s^*), \\
     b_i
-        &= -\beta B(s^*) h_i \\
+        &= -\beta B(s^*) h_i, \\
     w_{ij}
-        &= -\beta B(s^*) J_{ij}
+        &= -\beta B(s^*) J_{ij}.
     \label{eq:qbm_scaling}
 \end{split}
 \end{align}
-thus we can map the QBM to the annealer if \( \beta \) can be determined to some reasonable degree of accuracy.
+This enables us to map the QBM to the annealer if \( \beta \) can be determined to some reasonable degree of accuracy.
 
 \subsubsection{Learning the Effective Inverse Temperature}\label{sec:learning_beta}
 There is the possibility to treat \( \beta \) as a learnable parameter rather than having to choose a value empirically, as detailed by Xu and Oates in~\cite{xu_2021}.
 Their methodology is based on a log-likelihood maximization approach, and leads to iterative updates of the form (see \cref{app:learning_beta} for how one arrives at this result)
 \begin{align}
     \betahat^{(t)}
-        &= \betahat^{(t-1)} + \frac{\eta}{\big(\betahat^{(t-1)}\big)^2}\big(\langle E \rangle_\text{data} - \langle E \rangle_\text{model}\big)
+        &= \betahat^{(t-1)} + \frac{\eta}{\big(\betahat^{(t-1)}\big)^2}\big(\langle E \rangle_\text{data} - \langle E \rangle_\text{model}\big),
 \end{align}
-where \( \betahat = \frac{1}{k_B\hat{T}} \) is the estimator of the effective inverse temperature.
-We forego the factor of \( \betahat^2 \) downstairs in practice for simplicity and to keep a similar form to the other gradient updates.
+where \( \betahat = 1/k\hat{T} \) is the estimator of the effective inverse temperature.
+In practice we forego the factor of \( \betahat^2 \) in the denominator for simplicity and to keep a similar form to the other gradient updates.
 We must note though that this approach is only valid for classical Boltzmann distributions, but this fits our current use case as we will see later.
 
 \subsubsection{D-Wave Ocean SDK}
@@ -209,33 +207,33 @@ The \texttt{sample\_ising(h, J)} function has the keyword argument \texttt{autos
             \max\bigg\{\frac{\min\{h_i\}}{\min\{h_\text{range}\}},0\bigg\}, \\
             &\max\bigg\{\frac{\max\{J_{ij}\}}{\max\{J_\text{range}\}},0\bigg\},
             \max\bigg\{\frac{\min\{J_{ij}\}}{\min\{J_\text{range}\}},0\bigg\}
-        \Bigg\}
+        \Bigg\}.
 \end{split}
 \end{align}
-This is because the main use case of D-Wave annealers is to maximize the probability of measuring the ground state, thus the problem is rescaled so that the \( h_i \) and \( J_{ij} \) values fully utilize the allowed range of values, essentially decreasing the effective temperature.
+This is because the main use case of D-Wave annealers is to maximize the probability of measuring the ground state, thus the problem is rescaled so that the \( h_i \) and \( J_{ij} \) values fully utilize the allowed range of values, essentially decreasing the effective temperature; therefore we set \texttt{autoscale=False} to avoid this.
 For the Advantage 4.1 system the allowed value ranges are \( h_\text{range} = [-4, 4] \) and \( J_\text{range} = [-1, 1] \)~\cite{dwave_solver_properties}.
 
 \subsubsection{Generating More Robust Statistics}\label{sec:gauge}
-QPUs aren't perfect, and sometimes specific qubits or parts of the chip might have readout biases.
+QPUs are not perfect, and sometimes specific qubits or parts of the chip might have readout biases.
 One can perform a gauge transformation on the problem to mitigate such issues.
 If we have an \( n \)-qubit problem, then we can generate a random vector \( \vec{r} \in \{+1, -1\}^n \) which allows us to change the submission to the solver without actually changing the underlying problem.
 This is done by taking
 \begin{align}
 \begin{split}
     h_i
-        &\rightarrow r_i h_i \\
+        &\rightarrow r_i h_i, \\
     J_{ij}
-        &\rightarrow r_i r_j J_{ij} \\
+        &\rightarrow r_i r_j J_{ij}, \\
     (s_1, \dots, s_n)
-        &\rightarrow (r_1 s_1, \dots, r_n s_n)
+        &\rightarrow (r_1 s_1, \dots, r_n s_n),
 \end{split}
 \end{align}
-then transforming the results back using the third relation above, where \( s_i \) is the measured value of qubit \( i \).
+and then transforming the results back using the third relation above, where \( s_i \) is the measured value of qubit \( i \).
 
 \subsubsection{Previous Work in This Field}
 In recent years a number of researchers have dabbled in using D-Wave quantum annealers to train Boltzmann machines~\cite{adachi_2015,benedetti_2016,anschuetz_2019,wiebe_2019,rocutto_2020,dixit_2021,ilmo_2021,wilson_2021,xu_2021}.
 The most common approach is to train a classical RBM with quantum assistance, i.e., using the annealer to generate the samples in the negative phase rather than using Gibbs sampling.
-This isn't necessarily a fully quantum Boltzmann machine as per~\cite{amin_2018}, but the case where \( s^* = 1 \) reduces it to a classical RBM, as \( \lim_{s\rightarrow 1} \Gamma_i = 0 \) in~\cref{eq:qbm_scaling}.
+Classical RBMs trained with quantum assistance are a special case of the QBM, i.e., when \( s^* = 1 \) the problem reduces to a classical RBM, as \( \lim_{s\rightarrow 1} \Gamma_i = 0 \) in~\cref{eq:qbm_scaling}.
 
 One thing that stands out the most about some of the previous research is that very few discuss embeddings and anneal schedules, which as we will see in the next section are important for getting the best possible performance out of the annealer.
 Therefore, we aim to create a basic framework with which one can use to approach the problem of using a D-Wave annealer to sample from a (quantum) Boltzmann distribution.
@@ -247,31 +245,31 @@ The model was configured with 8 visible and 4 hidden units to act as a regulariz
 
 \subsection{Sampling From a Quantum Boltzmann Distribution}
 Before beginning to train models, we first needed to assess the D-Wave Advantage 4.1's ability to sample from quantum Boltzmann distributions.
-To this end we randomly generated the values of \( h_i \) and \( J_{ij} \) from a normal distribution with \( \mu = 0 \) and \( \sigma = 0.1 \), then used the KL divergence to compare samples generated by the annealer to the theoretical distributions.
+To this end we randomly generated the values of \( h_i \) and \( J_{ij} \) from a normal distribution with \( \mu = 0 \) and \( \sigma = 0.1 \), then used the KL divergence to compare samples generated by the annealer with the theoretical distributions.
 
 \subsubsection{Anneal Schedule Format}
 The \( A(s) \) and \( B(s) \) values for a D-Wave annealer are fixed and depend on the specific system~\cite{dwave_anneal_schedules}, but the Ocean SDK allows us to define a nonuniform \( s(t) \) using a list of \( (t, s) \) tuples, which then determine the \( A(s(t)) \) and \( B(s(t)) \) curves.
 In this section we used what we call pause-and-quench anneal schedules that
 \begin{enumerate}
-    \item Started at \( (t = 0, s = 0) \).
-    \item Paused the system at \( (\tpause, \spause) \) for a duration of \( \Deltapause \).
-    \item Quenched the system at \( (\tquench, \squench) \) over a duration of \( \Deltaquench \).
+    \item started at \( (t = 0, s = 0) \),
+    \item paused the system at \( (\tpause, \spause) \) for a duration of \( \Deltapause \),
+    \item quenched the system at \( (\tquench, \squench) \) over a duration of \( \Deltaquench \).
 \end{enumerate}
-thus the anneal schedules provided to the solver were of the form
+Thus, the anneal schedules provided to the solver were of the form
 \begin{align}
     [
         (0, 0),
         (\tpause, \spause),
         (\tquench, \squench),
         (\tquench + \Deltaquench, 1)
-    ]
+    ],
 \end{align}
 where
 \begin{align}
 \begin{split}
-    \squench &\equiv \spause \\
-    \tpause &= \spause \cdot \trelative \\
-    \tquench &= \tpause + \Deltapause
+    \squench &\equiv \spause, \\
+    \tpause &= \spause \cdot \trelative, \\
+    \tquench &= \tpause + \Deltapause.
 \end{split}
 \end{align}
 An annotated example of a custom pause-and-quench anneal schedule with \( \squench = 0.55 \), \( \trelative = 20 \ \si{\micro\second} \), and \( \Deltapause = 10 \ \si{\micro\second} \) is given in~\cref{fig:anneal_schedule_annotated}.
@@ -288,17 +286,18 @@ An annotated example of a custom pause-and-quench anneal schedule with \( \squen
 
 The minimum quench duration \( \Deltaquench \) is a function of \( \squench \) and is limited by the system's fastest anneal rate \( \alphaquench \)
 \begin{align}
-    \Deltaquench(\squench) = \frac{1 - \squench}{\alphaquench}
+    \Deltaquench(\squench) = \frac{1 - \squench}{\alphaquench}.
 \end{align}
 The Advantage 4.1 system allows a maximum of \( \alphaquench = 2 \ \si{\micro\second}^{-1} \)~\cite{dwave_solver_parameters}.
 
 \subsubsection{Verifying the Distribution}
-We used the KL divergence \( \DKL{\ptheory}{\psamples} \) to compare the probabilities of the energies computed from the samples returned by the annealer to the theoretical energy distributions for \( s = 0.01, 0.02, \dots, 1 \) and \( T = 10^{-3}, 2, 4, \dots, 200 \ \si{\milli\kelvin} \), which we visualized as heatmaps in~\cref{fig:dkl_min_heatmap}.
-More information on how the KL divergence was computed can be found in~\cref{app:kl_divergence_in_practice}.
+We used the KL divergence \( \DKL{\ptheory}{\psamples} \) to compare the probabilities of the energies computed from the samples returned by the annealer with the theoretical energy distributions for \( s = 0.01, 0.02, \dots, 1 \) and \( T = 10^{-3}, 2, 4, \dots, 200 \ \si{\milli\kelvin} \), which we visualized as heatmaps in~\cref{fig:dkl_min_heatmap}.
+More information on how the KL divergences were computed can be found in~\cref{app:kl_divergence_in_practice}, how the density matrix (from which the theoretical distributions were obtained) was computed in~\cref{app:exact_rho_computation}, and the required constants in~\cref{app:constants}.
+
 In the right heatmap, where \( \squench = 0.55 \), we observed a narrow band at which the annealer sampled close to a quantum Boltzmann distribution, and in fact it approximated multiple distributions, depending on the effective temperature.
-Similar results were obtained by Marshall et al.~\cite{marshall_2019} using a D-Wave 2000Q, in which they discussed how if the distribution returned by the annealer fits that of a quantum Boltzmann distribution late in the anneal process when \( A(s^*) / B(s^*) \ll 1 \), then the distribution at \( s^* \) should be close to a classical Boltzmann distribution, i.e.,
+Similar results were obtained by Marshall et al.~\cite{marshall_2019} using a D-Wave 2000Q, in which they discussed if the distribution returned by the annealer fits that of a quantum Boltzmann distribution late in the anneal process when \( A(s^*) / B(s^*) \ll 1 \), then the distribution at \( s^* \) should be close to a classical Boltzmann distribution, i.e.,
 \begin{align}
-    e^{-\beta H(s^*)} \approx e^{-\beta B(s^*) H_\text{final}}
+    e^{-\beta H(s^*)} \approx e^{-\beta B(s^*) H_\text{final}}.
 \end{align}
 This in turn means that not only is there one optimal \( s^* \) and effective temperature which models the distribution, but rather a set of them corresponding to a family of distributions for which \( \beta B(s^*) \) is constant.
 Therefore, this explains the streak pattern in the heatmaps.
@@ -325,7 +324,7 @@ In principle, higher effective temperatures are unwanted because they shrink the
 From analysis of the heatmaps and the fact that we could not produce distributions with \( s^* \lessapprox 0.45 \), we concluded that nontrivial dynamics were occurring while the system was quenching, i.e., the system could not quench fast enough.
 It is difficult to compare directly since the D-Wave 2000Q is a different system than the Advantage 4.1 studied here, but in~\cite{marshall_2019} they alluded to this as well.
 The 2000Q allowed for quenching with \( \alphaquench = 1 \), which is only a factor of two smaller than that allowed by the Advantage 4.1.
-Therefore, if as supposed in~\cite{marshall_2019} that the quench isn't fast enough, then likely such a small difference in how fast the system can be quenched wouldn't drastically change the results.
+Therefore, if as supposed in~\cite{marshall_2019} that the quench is not fast enough, then likely such a small difference in how fast the system can be quenched would not drastically change the results.
 
 If we take a second to think about it, the qubits are oscillating at a frequency in terms of gigahertz.
 This means that a quench duration of a few hundred nanoseconds still allows for a number of oscillations in the qubits, which is likely enough time for nontrivial dynamics to occur.
@@ -336,7 +335,7 @@ Therefore, the rest of this thesis focused on training models with \( s^* = 1 \)
 
 \subsubsection{Choosing an Embedding}
 We compared 10 different heuristically generated embeddings based on how well they approximated the desired distribution.
-This embedding comparison used only direct embeddings (no chains), and pause-and-quench anneal schedules with \( \trelative = 20 \ \si{\micro\second} \) and \( \Deltapause = 0 \ \si{\micro\second} \).
+This embedding comparison used only direct embeddings (no chains), so the embeddings only differed by where the problem was place on the chip, and pause-and-quench anneal schedules with \( \trelative = 20 \ \si{\micro\second} \) and \( \Deltapause = 0 \ \si{\micro\second} \).
 
 It was difficult to compare the heatmaps of all embeddings and quench points due to the higher dimensionality of the data, so we took the minimum KL divergence over \( s \) and \( T \), and plotted it as a function of \( \squench \) in~\cref{fig:dkl_mins_embeddings}.
 We immediately saw how varied the results were depending on the embedding and quench point, highlighting the importance of choosing a good embedding and anneal schedule.
@@ -346,7 +345,7 @@ We immediately saw how varied the results were depending on the embedding and qu
         \includegraphics[width=1\linewidth]{qbm/8x4/embedding_comparison/config_05/kl_divergence_mins.png}
     \end{center}
     \caption{
-        Comparison of \( \min\limits_{s,T}\big\{\DKL{\ptheory}{\psamples}\big\} \) for different embeddings and \( \squench \) values.
+        Comparison of \( \min_{s,T}\big\{\DKL{\ptheory}{\psamples}\big\} \) for different embeddings and \( \squench \) values.
         Data represents an ensemble average over 10 random gauge sample sets consisting of \( 10^4 \) samples each.
         Shaded regions represent one standard deviation.
     }
@@ -365,7 +364,7 @@ We started with the same anneal schedule formula as before, except we introduced
         \includegraphics[width=1\linewidth]{qbm/8x4/exact_analysis/config_05/embedding_10/kl_divergence_mins.png}
     \end{center}
     \caption{
-        Comparison of \( \min\limits_{s,T}\big\{\DKL{\ptheory}{\psamples}\big\} \) for various pause-and-quench anneal schedules using embedding 10.
+        Comparison of \( \min_{s,T}\big\{\DKL{\ptheory}{\psamples}\big\} \) for various pause-and-quench anneal schedules using embedding 10.
         Data represents an ensemble average over 10 random gauge sample sets consisting of \( 10^4 \) samples each.
         Shaded regions represent one standard deviation.
         Some of the sample sets with longer annealing times and pause durations had less than \( 10^4 \) samples as to satisfy the maximum allowed run time of the D-Wave Advantage 4.1.
@@ -391,8 +390,6 @@ The training data set consisted of 1500 samples, 1000 from a \( \mathcal{N}(-2, 
 
 \subsection{Simulation-based Model}
 The first step was training a model using a simulation in which the samples were generated using the probabilities obtained from computing \( \rho \) exactly.
-\cref{app:exact_rho_computation} contains more information on how the density matrix was computed in the simulation.
-
 Here we used a mini-batch size of 10, \( s^* = 1 \), and an initial learning rate of \( \eta = 0.1 \) with a schedule that exponentially decayed the learning rate every 10 epochs by a factor of 2 beginning at epoch 50 as defined in~\cref{app:lr_exp_decay}.
 The learning rate \( \eta_{\hat{\beta}} \) for the parameter \( \betahat \) followed a similar schedule, except it had a decay period of 20 as opposed to 10, to allow for more range of motion in the \( \betahat \) parameter later in the training process if the estimate needed to adapt more quickly to a new effective \( \beta \).
 
@@ -421,7 +418,7 @@ The results in the right plot of~\cref{fig:train_results_exact} confirm that it 
 
 Overall, the results show that the model learned to generate samples similar to the training distribution reasonably well when trained using the simulation, i.e., the best case scenario.
 Additionally, we were able to verify that the model can accurately learn an estimate of the effective temperature.
-We used the results of this model as a baseline to compare the models trained using the annealer in the next subsection.
+We used the results of this model as a baseline to compare the models trained using the annealer in the next subsection with.
 
 \subsection{D-Wave Advantage 4.1-based Model}
 Having shown that the BQRBM model worked when trained using samples generated via exact simulation, we then moved to switching the sample generation part to the annealer.
@@ -429,14 +426,14 @@ We took the same hyperparameters as the simulation, and an anneal schedule using
 We saw in~\cref{fig:dkl_min_heatmap} that \( \squench = 0.55 \) had an optimal temperature of around 90 \si{\milli\kelvin} for \( s^* = 1 \), thus we took \( \betahat = 0.5 \ \si{\giga\hertz}^{-1} \ (\hat{T} \approx 96 \ \si{\milli\kelvin}) \) as our initial guess for the effective \( \beta \), and let the model learn from there.
 
 \subsubsection{Results}\label{sec:qbm_annealer_results}
-The KL divergences in~\cref{fig:train_results_annealer} and~\cref{tbl:12_qubit_qbm_KL_divergences} show the model trained using the annealer was able to learn the training distribution to some extent, but still underperformed when compared to the simulation and the classically trained RBM.
+The KL divergences in~\cref{fig:train_results_annealer} and~\cref{tbl:12_qubit_qbm_KL_divergences} show the model trained using the annealer was able to learn the training distribution to some extent, but still underperformed when compared with the simulation and the classically trained RBM.
 This is possibly due to the information loss associated with using the D-Wave to approximate the distribution, which likely arose due to noise and errors (see~\cref{sec:challenges}), because after all real-world systems governed by quantum mechanics are highly sensitive to their environment.
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{qbm/8x4/Advantage_system4.1/train_results_annealer.png}
     \end{center}
     \caption{
-        Training results of the 12-qubit model trained using samples generated with the D-Wave Advantage 4.1 compared to that of the simulation and the final results of a classical RBM.
+        Training results of the 12-qubit model trained using samples generated with the D-Wave Advantage 4.1 compared with that of the simulation and the final results of a classical RBM.
         On the left is the KL divergence \( \DKL{\pdata}{\pmodel} \) plotted against the epochs; each data point was generated using \( 10^4 \) samples at the end of every epoch.
         On the right is the learned temperature estimator \( \hat{T} \) plotted against the epochs.
     }
@@ -449,7 +446,7 @@ This is possibly due to the information loss associated with using the D-Wave to
         \input{../tables/qbm/12_qubit_kl_divergences.tbl}
     \end{adjustbox}
     \caption{
-        KL divergences of the 12-qubit BQRBM models vs. the classical RBM.
+        KL divergences of the 12-qubit BQRBM models vs.~the classical RBM.
         The values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.
 }
     \label{tbl:12_qubit_qbm_KL_divergences}
@@ -464,8 +461,8 @@ We noticed that the Advantage 4.1-based model struggled most with learning the t
     \label{fig:qq_comparison}
 \end{figure}
 
-Although we couldn't track the true effective temperature throughout the training process, we were able to see how close the learned effective temperature estimate at the end matched that generated by samples using the final learned weights and biases.
-\cref{fig:learned_effective_temperature} shows that the annealer-based model was able to learn an effective temperature estimate of \( 97.8 \ \si{\milli\kelvin} \), quite close to the \( 95.6 \ \si{\milli\kelvin} \) computed from the optimal \( B(s) / T \) value.
+Although we could not track the true effective temperature throughout the training process, we were able to see how close the learned effective temperature estimate at the end matched that generated by samples using the final learned weights and biases.
+The heatmap shown in \cref{fig:learned_effective_temperature} confirms that the annealer-based model was able to learn an effective temperature estimate of \( 97.8 \ \si{\milli\kelvin} \), quite close to the \( 95.6 \ \si{\milli\kelvin} \) computed from the optimal \( B(s) / T \) value.
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=0.7\linewidth]{qbm/8x4/Advantage_system4.1/effective_temperature.png}
@@ -481,7 +478,7 @@ Although we couldn't track the true effective temperature throughout the trainin
 
 The results in this section showed that a BQRBM can indeed be trained using a D-Wave quantum annealer.
 The 12-qubit problem played a crucial role in our understanding of how one can use a D-Wave quantum annealer to generate Boltzmann distributed samples.
-Although the results aren't spectacular and underperform the simulation and classical model, they still show promise.
+Although the results are not spectacular and underperform the simulation and classical model, they still show promise.
 It will be interesting to rerun this analysis on the next generation of D-Wave quantum annealers to see how much they improve.
 
 \section{The Quantum Market Generator}\label{sec:quantum_market_generator}
@@ -489,13 +486,13 @@ Having gained a deeper insight into the workings of the BQRBM from the 12-qubit 
 All results in this section used the same baseline data set (B) as used in the classical market generator~\cref{sec:classical_market_generator}.
 
 \subsection{Setting the Annealer's Hyperparameters}\label{sec:qbm_hyperparameters}
-Unlike the 12-qubit problem, the larger problem restricted our ability to perform an in-depth analysis to compare the sample distributions produced by the annealer to that of theory.
+Unlike the 12-qubit problem, the larger problem restricted our ability to perform an in-depth analysis to compare the sample distributions produced by the annealer with that of theory.
 Therefore, we had to take a more practical approach when choosing some of the annealer hyperparameters such as the relative chain strength, quench point, and embedding.
 To this end, we trained a number of models with various settings of these hyperparameters for 20 epochs to get a read on the trend direction, then chose their values empirically.
 For this we used a mini-batch size of 10, \( s^* = 1 \), constant learning rates of \( \eta = 0.02 \) and \( \eta_{\hat{\beta}} = 0.01 \), and an initial value of \( \betahat = 0.25 \ \si{\giga\hertz}^{-1} \ (\hat{T} \approx 192 \ \si{\milli\kelvin}) \).
 
-The reason models were only trained for 20 epochs is that the epoch duration was found to be quite high (10-25 minutes) due to latency and load on the annealer, ergo it wasn't very feasible to train every model for a higher number of epochs.
-With an average epoch duration of around 15 minutes, a model trained for 20 epochs took roughly 5 hours, so training for 100 epochs would've taken around a day.
+The reason models were only trained for 20 epochs is that the epoch duration was found to be quite high (10-25 minutes) due to latency and load on the annealer, ergo it was not very feasible to train every model for a higher number of epochs.
+With an average epoch duration of around 15 minutes, a model trained for 20 epochs took roughly 5 hours, so training for 100 epochs would have taken around a day.
 
 \subsubsection{Choosing a Relative Chain Strength}\label{sec:qbm_rcs}
 The chain strength \( \gamma \) was computed using the relative chain strength \( \rcs \) as
@@ -503,7 +500,7 @@ The chain strength \( \gamma \) was computed using the relative chain strength \
     \gamma
         &= \rcs \cdot \min\Big\{
             \max\{J_\text{range}\}, \max\big\{\{\abs{h_i}\} \cup \{\abs{J_{ij}}\}\big\}
-        \Big\}
+        \Big\}.
 \end{align}
 
 We trained models using various values of \( \rcs \in [0.3, 2] \), and a pause-and-quench anneal schedule with \( \squench = 0.55 \), \( \trelative = 20 \ \si{\micro\second} \), and \( \Deltapause = 0 \ \si{\micro\second} \).
@@ -527,7 +524,7 @@ Therefore, we chose a value of \( \rcs = 2 \).
 \end{figure}
 
 \subsubsection{Choosing an Anneal Schedule}
-We decided to stick with \( \trelative = 20 \ \si{\micro\second} \) and \( \Deltapause = 0 \ \si{\micro\second} \), but wanted to see if a different value of \( \squench \) would produce improve performance.
+We decided to stick with \( \trelative = 20 \ \si{\micro\second} \) and \( \Deltapause = 0 \ \si{\micro\second} \), but wanted to see if a different value of \( \squench \) would improve performance.
 We tried values of \( \squench = 0.5, 0.55, 0.6 \) plotted in~\cref{fig:qbm_log_returns_s_quench_comparison}, and found that \( \squench = 0.55 \) led to the best KL divergence curve, and thus chose that value going forward.
 
 \begin{figure}[!htb]
@@ -571,7 +568,7 @@ Unfortunately, the training results indicated that BQRBM model significantly und
         \includegraphics[width=1\linewidth]{qbm/log_returns/full_run.png}
     \end{center}
     \caption{
-        Training results of the BQRBM compared to the final results of the classical RBM.
+        Training results of the BQRBM compared with the final results of the classical RBM.
         On the left is the mean marginal \( \DKL{\pdata}{\pmodel} \) value, i.e., the average of the KL divergences of the individual currency pairs.
         On the right is the learned estimate of the effective temperature.
     }
@@ -586,7 +583,7 @@ We see the KL divergences of the BQRBM are about eight times higher than that of
         \input{../tables/qbm/kl_divergences.tbl}
     \end{adjustbox}
     \caption{
-        KL divergences of the BQRBM model vs. the classical RBM.
+        KL divergences of the BQRBM model vs.~the classical RBM.
         The values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.
 }
     \label{tbl:qbm_KL_divergences}
@@ -607,7 +604,7 @@ The QQ plots in~\cref{fig:qbm_log_returns_qq} show that the BQRBM model struggle
     \begin{adjustbox}{max width=\textwidth}
         \input{../tables/qbm/correlation_coefficients.tbl}
     \end{adjustbox}
-    \caption{Correlation coefficients of the data set vs. samples generated by the BQRBM and classical RBM models. The BQRBM and RBM values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.}
+    \caption{Correlation coefficients of the data set vs.~samples generated by the BQRBM and classical RBM models. The BQRBM and RBM values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.}
     \label{tbl:qbm_correlation_coefficients}
 \end{table}
 
@@ -618,7 +615,7 @@ Interestingly, the BQRBM was able to reproduce the volatilities for the most par
         \input{../tables/qbm/volatilities.tbl}
     \end{adjustbox}
     \caption{
-        Historical volatilities of the data set vs. samples generated by the BQRBM and classical RBM models.
+        Historical volatilities of the data set vs.~samples generated by the BQRBM and classical RBM models.
         The BQRBM and RBM values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.
     }
     \label{tbl:qbm_volatilities}
@@ -632,7 +629,7 @@ The was further confirmed by the tail concentration functions in~\cref{fig:qbm_l
         \input{../tables/qbm/tails.tbl}
     \end{adjustbox}
     \caption{
-        Lower and upper tails, i.e., 1st and 99th percentiles, of the data set vs. samples generated by the BQRBM and classical RBM models.
+        Lower and upper tails, i.e., 1st and 99th percentiles, of the data set vs.~samples generated by the BQRBM and classical RBM models.
         The BQRBM and RBM values are shown in the format mean \(\pm\) one standard deviation from an ensemble of 100 sample sets consisting of \( 10^4 \) samples each.
     }
     \label{tbl:qbm_tails}
@@ -642,13 +639,13 @@ The was further confirmed by the tail concentration functions in~\cref{fig:qbm_l
     \begin{center}
         \includegraphics[width=1\linewidth]{qbm/log_returns/tail_concentrations.png}
     \end{center}
-    \caption{Tail concentration functions of the data set vs. samples generated by the BQRBM and classical RBM models.}
+    \caption{Tail concentration functions of the data set vs.~samples generated by the BQRBM and classical RBM models.}
     \label{fig:qbm_log_returns_tail_concentrations}
 \end{figure}
 
 \subsection{Summary}
-Overall, the BQRBM model trained using the D-Wave Advantage 4.1 produced lackluster results when compared to the classical RBM, and did not motivate training additional models on the transformed and volatility indicator enhanced data sets.
-This could possibly be due to hyperparameters, as our grid search of the space wasn't the most optimal due to training time requirements, but it wasn't really clear if there was a better way to do this.
+Overall, the BQRBM model trained using the D-Wave Advantage 4.1 produced lackluster results when compared with the classical RBM, and did not motivate training additional models on the transformed and volatility indicator enhanced data sets.
+This could possibly be due to hyperparameters, as our grid search of the space was not the most optimal due to training time requirements, but it was not really clear if there was a better way to do this.
 This could also be due to the fact that the model was so large that it used a significant portion of the QPU and required chains with such lengths of up to 7, which added complexity.
 
 In conclusion, it does not appear that the Advantage 4.1-trained BQRBM can produce results good enough to replace the classical RBM.
@@ -662,7 +659,7 @@ Around the time this project was started, Pochart et al. released a paper~\cite{
 
 \subsection{Choosing an Embedding}
 Mapping the logical qubits to physical qubits is a nontrivial task.
-D-Wave provides a heuristic method to find embeddings, but in practice it can't be guaranteed that the returned embedding is optimal.
+D-Wave provides a heuristic method to find embeddings, but in practice it cannot be guaranteed that the returned embedding is optimal.
 As we saw first hand, different embeddings can produce different results.
 Therefore, it is recommended to generate multiple embeddings and compare them against each other, and choose the one that performs the best.
 Additionally, it is worth noting that an optimal embedding on one QPU might not be optimal on another of the same generation.
@@ -676,15 +673,15 @@ It is best to do a comparison in the beginning to get an idea of what a good rel
 \subsection{Sampling the Proper Distribution}
 The most important thing when using a quantum annealer to train a Boltzmann machine is making sure the annealer is sampling from the proper distribution.
 In the case of the quantum Boltzmann machine we need samples generated according to \( \rho = \frac{1}{Z} e^{-\beta H(s^*)} \).
-For smaller problems it is easy to compare results obtained from the annealer to an exact computed distribution (as we did for the 12-qubit problem), but it is not so straight forward for larger problems.
-For larger problems there is the possibility to use advanced methods, such as they did in~\cite{marshall_2019} with the use of an entropic sampling technique~\cite{barash_2019} based on population annealing to estimate the degeneracies, and in turn use those to compute a classical Boltzmann distribution to compare to, but that might not always be practical.
+For smaller problems it is easy to compare results obtained from the annealer with an exact computed distribution (as we did for the 12-qubit problem), but it is not as trivial for larger problems.
+For larger problems there is the possibility to use advanced methods, such as they did in~\cite{marshall_2019} with the use of an entropic sampling technique~\cite{barash_2019} based on population annealing to estimate the degeneracies, and in turn use those to compute a classical Boltzmann distribution to compare with, but that might not always be practical.
 Alternatively, one can try a hyperparameter grid search as we did in~\cref{sec:qbm_hyperparameters}
 
 \subsubsection{Effective Temperature}
 One of the most important hyperparameters is that of the effective inverse temperature \( \beta \).
 In practice we divide our weights and biases by a factor of \( -\betahat B(s^*) \) (as per~\cref{eq:qbm_scaling}) in order to cancel out the effective temperature so that we can sample the problem we wish to, thus it is crucial for proper parameter scaling.
 For the case of \( s^* = 1 \) we have the ability to treat the effective temperature as a learnable parameter (as in~\cref{sec:learning_beta}), for which we use \( \betahat \) as an estimator of.
-This isn't so straight forward for \( s^* < 1 \) though, because of the initial Hamiltonian and the D-Wave's inability to measure the qubits in the \( x \)-direction.
+This is not so straightforward for \( s^* < 1 \) though, because of the initial Hamiltonian and the D-Wave's inability to measure the qubits in the \( x \)-direction.
 
 \subsubsection{Anneal Schedules}
 The ability to configure the anneal schedule as allowed by the D-Wave annealer means that there are a number of different ways one can tweak the annealing process such that the results returned minimize the KL divergence between the theoretical distribution one wishes to approximate and the samples returned by the annealer.
@@ -700,24 +697,25 @@ It is possible for some areas of the chip to perform better than others, or for 
 \subsubsection{Maximum Sample Set Size}
 One of the main limitations of the D-Wave annealer for this purpose is that of the maximum sample set size.
 When sampling the D-Wave one can only generate sample sets with a maximum size of \( 10^4 \) samples, which is adequate for the intended purpose of optimization, but can fall short when one wants to use it as a sampler for a QBM.
-It is natural to think that one could just combine the results from multiple sample sets, but this isn't necessarily the case.
+It is natural to think that one could just combine the results from multiple sample sets, but this is not necessarily the case.
 Due to the spin-bath polarization effect (see error sources below), one cannot combine sample sets because of the possibility of previous samples affecting future ones~\cite{pochart_2021}.
 
 \subsubsection{Time Requirements}
 Another issue is the time requirements.
 Most models trained here required little QPU access time, around 5-10 minutes, but this can add up and get expensive if one is doing a hyperparameter grid search.
 Additionally, there is the total training time, which as we saw can be quite substantial due the latency to the cloud platform combined with the load queue of the solver.
-To illustrate this point, training the simulation-based 12-qubit model took less than two seconds per epoch (the majority of which was spent computing the density matrix), whereas the Advantage 4.1-based model took around three minutes per epoch.
+To illustrate this point, training the simulation-based 12-qubit model took roughly 2 seconds per epoch (the majority of which was spent computing the density matrix), whereas the Advantage 4.1-based model took 2-5 minutes per epoch.
 
 \subsubsection{Error Sources}
 There are a number of sources from which errors can arise on a D-Wave quantum annealer.
-The D-Wave documentation does an excellent job at detailing these errors in their documentation~\cite{dwave_ice_errors,dwave_other_errors}, so we will only briefly touch on them here with high-level information obtained from the aforementioned citations.
+The D-Wave documentation does an excellent job at detailing these errors in their documentation~\cite{dwave_ice_errors,dwave_other_errors}, so we will only briefly touch on them here with high-level information obtained from the aforementioned references.
 \begin{itemize}
     \item \textbf{Integrated Control Errors (ICE)} are errors due to the accuracy at which the \( h_i \) and \( J_{ij} \) values can be implemented.
         In mathematical terms this is because the problem the QPU solves is closer to
         \begin{align}
-            H_{\text{Ising}}^\delta(s) = \sum_i (h_i + \delta_{h_i}) \sigma_i^z + \sum_{i,j} (J_{ij} + \delta_{J_{ij}}) \sigma_i^z \sigma_j^z
+            H_{\text{Ising}}^\delta(s) = \sum_i (h_i + \delta_{h_i}) \sigma_i^z + \sum_{i,j} (J_{ij} + \delta_{J_{ij}}) \sigma_i^z \sigma_j^z,
         \end{align}
+        for some small \( \delta_{h_i} \) and \( \delta_{J_{ij}} \).
     \item \textbf{Temperature} errors arise due to fluctuations in the physical temperature of the device, which can change depending on how frequently the QPU is programmed.
     \item \textbf{High-Energy Photon Flux} errors can occur in the presence of photons with energies higher than that expected at the effective temperature dependent equilibrium, which can lead to higher energy solutions. These photons originate from cryogenic filtering at higher temperature phases.
     \item \textbf{Readout Fidelity} errors can occur when the bit string returned by the annealer differs from that arrived at by the QPU by one or more bit flips.
