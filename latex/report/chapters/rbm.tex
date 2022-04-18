@@ -4,7 +4,7 @@ The restricted Boltzmann machine (RBM) is an energy-based model defined by the e
 \begin{split}
     \label{eq:rbm_energy}
     E(\vec{v}, \vec{h})
-        &= -\sum_i a_i v_i - \sum_j b_j h_j - \sum_{i,j} v_i w_{ij} h_j \\
+        &= -\sum_{i=1}^{n_v} a_i v_i - \sum_{j=1}^{n_h} b_j h_j - \sum_{i=1}^{n_v} \sum_{j=1}^{n_h} v_i w_{ij} h_j \\
         &= -\vec{a}^\intercal\vec{v} - \vec{b}^\intercal\vec{h} - \vec{v}^\intercal\mat{W}\vec{h},
 \end{split}
 \end{align}
@@ -34,16 +34,17 @@ The probability to find the system in the configuration \( (\vec{v},\vec{h}) \) 
 with intractable~\cite{long_servedio_2010} partition function
 \begin{align}
     \label{eq:rbm_partition_function}
-    Z = \sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})}.
+    Z = \sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})},
 \end{align}
+where \( \sum_{\vec{v},\vec{h}} \) denotes the sum over all possible configurations of \( \vec{v} \) and \( \vec{h} \).
 
 The imposed restrictions on intra-layer connections enable us to write the conditional probabilities of the layers as the product of the individual units' probabilities~\footnote{Here \( \sigma(x) \) is the element-wise logistic sigmoid function and \( \odot \) denotes element-wise multiplication.} (see \cref{app:conditional_probabilities_derivation} for derivation)
 \begin{align}
 \begin{split}
     p(\vec{h} | \vec{v})
-        &= \prod_j \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j, \\
+        &= \prod_{j=1}^{n_h} \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j, \\
     p(\vec{v} | \vec{h})
-        &= \prod_i \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i.
+        &= \prod_{i=1}^{n_v} \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i.
 \end{split}
 \end{align}
 

@@ -1,9 +1,9 @@
 \section{Theory}
 The Quantum Boltzmann Machine detailed here is based on the work in \textit{Quantum Boltzmann Machine} by Amin et al.~\cite{amin_2018}.
 In this section we use spin eigenvalues \( +1 \) and \( -1 \) rather than binary values \( 0 \) and \( 1 \), respectively, in order to maintain consistency with the language of quantum mechanics.
-We start with the Hamiltonian
+We start with the \( n \)-qubit Hamiltonian
 \begin{align}
-    H = -\sum_i \Gamma_i \sigma_i^x -\sum_i b_i \sigma_i^z - \sum_{i,j} w_{ij} \sigma_i^z \sigma_j^z,
+    H = -\sum_{i=1}^{n} \Gamma_i \sigma_i^x -\sum_{i=1}^{n} b_i \sigma_i^z - \sum_{i=1}^{n}\sum_{j=i+1}^{n} w_{ij} \sigma_i^z \sigma_j^z,
 \end{align}
 where
 \begin{align}
@@ -22,7 +22,7 @@ The system's distribution is modeled by the density matrix
     \rho = \frac{1}{Z} e^{-H},
 \label{eq:density_operator}
 \end{align}
-where \( e^{-H} = \sum_n \frac{1}{n!} (-H)^n \) is the matrix exponential, and \( Z = \tr(e^{-H}) \) is the partition function.
+where \( e^{-H} = \sum_{n=0}^{\infty} \frac{1}{n!} (-H)^n \) is the matrix exponential, and \( Z = \tr(e^{-H}) \) is the partition function.
 The probability to observe the system in state \( \ket{\vec{v},\vec{h}} \) is given by
 \begin{align}
     p(\vec{v},\vec{h})
@@ -39,8 +39,9 @@ then the marginal probability to measure the visible units in state \( \ket{\vec
 
 Using the probabilities above we can obtain an average log-likelihood, which for data set distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W}, \vec{a}, \vec{b}) \) is
 \begin{align}
-    \ell(\theta) = \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \tr(\Lambda_\vec{v}\rho).
+    \ell(\theta) = \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \tr(\Lambda_\vec{v}\rho),
 \end{align}
+where \( \sum_{\vec{v}} \) denotes the sum over all possible configurations of \( \vec{v} \).
 
 \subsection{Optimizing a QBM}
 When optimizing a QBM, it is preferable to maximize the lower bound of the log-likelihood rather than maximizing the log-likelihood itself.
@@ -117,7 +118,7 @@ Therefore, when the qubits are measured they should correspond to an optimal sol
 \subsubsection{D-Wave Quantum Annealer}
 D-Wave quantum annealers implement a time-dependent Hamiltonian of the form~\cite{dwave_qa}
 \begin{align}
-    H(s) = A(s) \bigg( -\sum_i \sigma_i^x \bigg) + B(s) \bigg( \sum_i h_i \sigma_i^z + \sum_{i,j} J_{ij} \sigma_i^z \sigma_j^z \bigg).
+    H(s) = A(s) \bigg( -\sum_{i=1}^{n} \sigma_i^x \bigg) + B(s) \bigg( \sum_{i=1}^{n} h_i \sigma_i^z + \sum_{i=1}^{n}\sum_{j=i+1}^{n} J_{ij} \sigma_i^z \sigma_j^z \bigg).
 \end{align}
 From this we see the initial Hamiltonian has a ground state where all of the qubits are aligned in the \( x \)-direction, i.e., \( \ket{+}^{\otimes n} \), which corresponds to an equal superposition of all possible states in the computational basis.
 The final Hamiltonian corresponds to the Ising model described by the \( h_i \) and \( J_{ij} \) values.
@@ -712,7 +713,7 @@ The D-Wave documentation does an excellent job at detailing these errors in thei
     \item \textbf{Integrated Control Errors (ICE)} are errors due to the accuracy at which the \( h_i \) and \( J_{ij} \) values can be implemented.
         In mathematical terms this is because the problem the QPU solves is closer to
         \begin{align}
-            H_{\text{Ising}}^\delta(s) = \sum_i (h_i + \delta_{h_i}) \sigma_i^z + \sum_{i,j} (J_{ij} + \delta_{J_{ij}}) \sigma_i^z \sigma_j^z,
+            H_{\text{Ising}}^\delta(s) = \sum_{i=1}^{n} (h_i + \delta_{h_i}) \sigma_i^z + \sum_{i=1}^{n}\sum_{j=i+1}^n (J_{ij} + \delta_{J_{ij}}) \sigma_i^z \sigma_j^z,
         \end{align}
         for some small \( \delta_{h_i} \) and \( \delta_{J_{ij}} \).
     \item \textbf{Temperature} errors arise due to fluctuations in the physical temperature of the device, which can change depending on how frequently the QPU is programmed.

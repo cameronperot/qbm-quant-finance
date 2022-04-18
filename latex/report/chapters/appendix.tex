@@ -18,7 +18,7 @@ The Spearman correlation coefficient is also less sensitive to outliers than the
 
 The Kendall rank correlation coefficient is defined as
 \begin{align}
-    \tau = \frac{2}{n(n-1)} \sum_{i<j} \text{sign}(x_i - x_j) \text{sign}(y_i - y_j) \in [-1, 1],
+    \tau = \frac{2}{n(n-1)} \sum_{i=1}^{n}\sum_{j=i+1}^{n} \text{sign}(x_i - x_j) \text{sign}(y_i - y_j) \in [-1, 1],
 \end{align}
 where \( (x_1, y_1), \dots, (x_n, y_n) \) are pairs of observations of the random variables \( X \) and \( Y \).
 
@@ -64,8 +64,9 @@ The Kullback-Leibler divergence~\cite{kullback_1951} is a measure of how much th
 It is defined as
 \begin{align}
     \DKL{p}{q}
-        &= \sum_{x} p(x) \log\frac{p(x)}{q(x)}.
+        &= \sum_{x\in\mathcal{X}} p(x) \log\frac{p(x)}{q(x)},
 \end{align}
+where \( \mathcal{X} \) is the probability space.
 It can be interpreted as the amount of information loss associated with using \( q \) to approximate \( p \).
 It must also be noted that the KL divergence is a distance, but not a metric (rather a divergence), because of the asymmetry that \( \DKL{p}{q} \ne \DKL{q}{p} \).
 
@@ -159,8 +160,8 @@ From this we can derive the conditional probability using~\cref{eq:rbm_energy,eq
     p(\vec{h} | \vec{v})
         &= \frac{p(\vec{v},\vec{h})}{p(\vec{v})} \\
         &= \frac{1}{p(\vec{v})} \frac{1}{Z} \exp( \vec{a}^\intercal\vec{v} + \vec{b}^\intercal\vec{h} + \vec{v}^\intercal\mat{W}\vec{h} ) \\
-        &= \frac{1}{Z'} \exp\bigg( \sum_j b_j h_j + \sum_j (\vec{v}^\intercal\mat{W})_j h_j \bigg) \\
-        &= \frac{1}{Z'} \prod_j \exp\big( b_j h_j + (\vec{v}^\intercal\mat{W})_j h_j \big),
+        &= \frac{1}{Z'} \exp\bigg( \sum_{j=1}^{n_h} b_j h_j + \sum_{j=1}^{n_h} (\vec{v}^\intercal\mat{W})_j h_j \bigg) \\
+        &= \frac{1}{Z'} \prod_{j=1}^{n_h} \exp\big( b_j h_j + (\vec{v}^\intercal\mat{W})_j h_j \big),
 \end{split}
 \end{align}
 where
@@ -178,12 +179,12 @@ This leads us to
 \end{align}
 Finally, we have
 \begin{align}
-    p(\vec{h} | \vec{v}) = \prod_j \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j.
+    p(\vec{h} | \vec{v}) = \prod_{j=1}^{n_h} \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j.
 \end{align}
 
 Analogously for \( p(\vec{v} | \vec{h}) \) one finds
 \begin{align}
-    p(\vec{v} | \vec{h}) = \prod_i \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i.
+    p(\vec{v} | \vec{h}) = \prod_{i=1}^{n_v} \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i.
 \end{align}
 
 \section{Log-Likelihood Derivative}\label{app:rbm_log_likelihood_derivation}
@@ -342,16 +343,16 @@ Plugging in our parameters we get
 When restrictions are imposed on connections within the hidden layer, the clamped Hamiltonian reduces to
 \begin{align}
     H_\vec{v}
-        &= -\sum_i \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big),
+        &= -\sum_{i=1}^{n} \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big),
 \end{align}
 where \( b_i'(\vec{v}) = b_i + (\mat{W}^\intercal\vec{v})_i \).
 This allows one to rewrite the clamped density matrix as
 \begin{align}
 \begin{split}
     \rho_\vec{v}
-        &= \frac{1}{Z_\vec{v}} \exp\bigg( \sum_i \big(\Gamma_i \sigma_i^x + h_i'(\vec{v}) \sigma_i^z\big) \bigg) \\
-        &= \frac{1}{Z_\vec{v}} \prod_i \exp \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big) \\
-        &= \prod_i \rho_\vec{v}^{(i)}.
+        &= \frac{1}{Z_\vec{v}} \exp\bigg( \sum_{i=1}^{n} \big(\Gamma_i \sigma_i^x + h_i'(\vec{v}) \sigma_i^z\big) \bigg) \\
+        &= \frac{1}{Z_\vec{v}} \prod_{i=1}^{n} \exp \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big) \\
+        &= \prod_{i=1}^{n} \rho_\vec{v}^{(i)}.
 \end{split}
 \end{align}
 With this we can compute the expectation values as
