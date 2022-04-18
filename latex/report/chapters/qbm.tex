@@ -176,12 +176,12 @@ This enables us to map the QBM to the annealer if \( \beta \) can be determined 
 
 \subsubsection{Learning the Effective Inverse Temperature}\label{sec:learning_beta}
 There is the possibility to treat \( \beta \) as a learnable parameter rather than having to choose a value empirically, as detailed by Xu and Oates in~\cite{xu_2021}.
-Their methodology is based on a log-likelihood maximization approach, and leads to iterative updates of the form (see \cref{app:learning_beta} for how one arrives at this result)
+The method is based on a log-likelihood maximization approach leading to parameter updates of the form (see \cref{app:learning_beta} for how one arrives at this result)
 \begin{align}
-    \betahat^{(t)}
-        &= \betahat^{(t-1)} + \frac{\eta}{\big(\betahat^{(t-1)}\big)^2}\big(\langle E \rangle_\text{data} - \langle E \rangle_\text{model}\big),
+    \Delta\betahat
+        &= \frac{\eta_{\betahat}}{\betahat^2}\big(\langle E \rangle_\text{data} - \langle E \rangle_\text{model}\big),
 \end{align}
-where \( \betahat = 1/k\hat{T} \) is the estimator of the effective inverse temperature.
+where \( \betahat = 1/k\hat{T} \) is the estimator of the effective inverse temperature, and \( \eta_{\betahat} \) is the associated learning rate.
 In practice we forego the factor of \( \betahat^2 \) in the denominator for simplicity and to keep a similar form to the other gradient updates.
 We must note though that this approach is only valid for classical Boltzmann distributions, but this fits our current use case as we will see later.
 

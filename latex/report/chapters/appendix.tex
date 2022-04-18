@@ -164,10 +164,11 @@ From this we can derive the conditional probability using~\cref{eq:rbm_energy,eq
         &= \frac{1}{Z'} \prod_{j=1}^{n_h} \exp\big( b_j h_j + (\vec{v}^\intercal\mat{W})_j h_j \big),
 \end{split}
 \end{align}
-where
+with
 \begin{align}
-    Z' = \sum_\vec{h} \exp( \vec{b}^\intercal\vec{h} + \vec{v}^\intercal\mat{W}\vec{h} ).
+    Z' = \sum_\vec{h} \exp( \vec{b}^\intercal\vec{h} + \vec{v}^\intercal\mat{W}\vec{h} ),
 \end{align}
+where \( \sum_{\vec{h}} \) denotes the sum over all possible configurations of \( \vec{h} \).
 This leads us to
 \begin{align}
 \begin{split}
@@ -181,7 +182,6 @@ Finally, we have
 \begin{align}
     p(\vec{h} | \vec{v}) = \prod_{j=1}^{n_h} \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j.
 \end{align}
-
 Analogously for \( p(\vec{v} | \vec{h}) \) one finds
 \begin{align}
     p(\vec{v} | \vec{h}) = \prod_{i=1}^{n_v} \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i.
@@ -198,7 +198,7 @@ For the data set distribution \( p_\text{data} \) and parameters \( \theta = (\m
         &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \sum_\vec{h} e^{-E(\vec{v},\vec{h})} - \log \sum_{\vec{v},\vec{h}} e^{-E(\vec{v},\vec{h})}.
 \end{split}
 \end{align}
-Taking the gradient we find
+Taking the partial derivative we find
 \begin{align}
 \begin{split}
     \partial_{\theta} \ell(\theta)
@@ -230,9 +230,10 @@ We start with the data set-averaged log-likelihood
     \ell(\theta)
         &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log p(\vec{v}) \\
         &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \frac{\tr(\Lambda_\vec{v} e^{-H})}{\tr(e^{-H})} \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \Big[ \log\tr(\Lambda_\vec{v} e^{-H}) - \log\tr(e^{-H}) \Big].
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \Big[ \log\tr(\Lambda_\vec{v} e^{-H}) - \log\tr(e^{-H}) \Big],
 \end{split}
 \end{align}
+where \( \sum_{\vec{v}} \) denotes the sum over all possible configurations of \( \vec{v} \).
 Taking the partial derivative yields
 \begin{align}
     \label{eq:qbm_log_likelihood_derivative}
@@ -244,7 +245,7 @@ Due to the noncommutativity of \( H \) and \( \partial_\theta H \), we need to u
     \partial_\theta e^{-H}
         &= -\sum_{m=1}^{n} e^{-m\delta\tau H} \delta\tau \partial_\theta He^{-(n-m)\delta\tau H} + \mathcal{O}(\delta\tau^2).
 \end{align}
-Taking the limit as \( n \rightarrow \infty \) of both sides gives
+partial derivative the limit as \( n \rightarrow \infty \) of both sides gives
 \begin{align}
 \begin{split}
     \partial_\theta e^{-H}
@@ -332,14 +333,17 @@ Taking the partial derivative of the log-likelihood lower bound yields
 Plugging in our parameters we get
 \begin{align}
 \begin{split}
+    \label{eq:qbm_log_likelihood_partials}
     \partial_{w_{ij}} \tilde{\ell}(\theta)
         &= \overline{\langle \sigma_i^z \sigma_j^z \rangle_\vec{v}} - \langle \sigma_i^z \sigma_j^z \rangle \\
         &= \langle \sigma_i^z \sigma_j^z \rangle_\text{data} - \langle \sigma_i^z \sigma_j^z \rangle_\text{model}, \\
     \partial_{b_i} \tilde{\ell}(\theta)
         &= \overline{\langle \sigma_i^z \rangle_\vec{v}} - \langle \sigma_i^z \rangle \\
-        &= \langle \sigma_i^z \rangle_\text{data} - \langle \sigma_i^z \rangle_\text{model}.
+        &= \langle \sigma_i^z \rangle_\text{data} - \langle \sigma_i^z \rangle_\text{model},
 \end{split}
 \end{align}
+where \( \langle \ \cdot \ \rangle_{\text{data}} \) denotes the expectation value with respect to the data set distribution, and \( \langle \ \cdot \ \rangle_{\text{model}} \) denotes the expectation value with respect to the model distribution.
+
 When restrictions are imposed on connections within the hidden layer, the clamped Hamiltonian reduces to
 \begin{align}
     H_\vec{v}
@@ -373,22 +377,23 @@ The last equality above is obtained by using that for traceless \( A \) with \( 
 This is obtained by using Cayley-Hamilton theorem along with the series expansion of the matrix exponential and grouping the terms.
 
 \section{Effective \( \beta \) as a Learnable Parameter}\label{app:learning_beta}
-Following along the lines of~\cite{xu_2021} we have
+This derivation follows along the lines of that laid out in~\cite{xu_2021}.
+Suppose the D-Wave annealer samples according to a classical Boltzmann distribution \( p_\text{DW} \) of energies \( E_\text{DW} = E / \beta \), i.e.,
 \begin{align}
 \begin{split}
     p_\text{DW}
         &= \frac{1}{Z_\text{DW}} e^{-E_\text{DW}} \\
-        &= \frac{1}{Z_\text{DW}} e^{-E / \beta},
+        &= \frac{1}{Z_\text{DW}} e^{-E / \beta}.
 \end{split}
 \end{align}
-which leads to a log-likelihood derivative of
+Then we can take the partial derivative of the corresponding log-likelihood
 \begin{align}
-    \frac{\partial \log p_\text{DW}}{\partial\beta}
+    \partial_{\beta} \log p_\text{DW}
         &= \frac{1}{\beta^2} (E - \langle E \rangle),
 \end{align}
-and after averaging over the training data set we have
+and after averaging over all configurations and multiplying by the learning rate \( \eta \) we get
 \begin{align}
     \Delta\beta
-        &= \frac{\eta}{\beta^2}\big(\langle E \rangle_\text{data} - \langle E \rangle_\text{model}\big).
+        &= \frac{\eta}{\beta^2}\big(\langle E \rangle_\text{data} - \langle E \rangle_\text{model}\big),
 \end{align}
-
+which we can use to treat the effective inverse temperature as a learnable parameter.
