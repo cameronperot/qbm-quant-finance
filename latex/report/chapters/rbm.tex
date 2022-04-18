@@ -68,18 +68,6 @@ with gradients (see \cref{app:rbm_log_likelihood_derivation} for derivation)
         &= \langle h_j \rangle_{\text{data}} - \langle h_j \rangle_{\text{model}}.
 \end{split}
 \end{align}
-Therefore, the parameters at step \( t \) are given by
-\begin{align}
-\begin{split}
-    \mat{W}^{(t)}
-        &= \mat{W}^{(t-1)} + \eta(\langle \vec{v} \vec{h}^\intercal \rangle_{\text{data}} - \langle \vec{v} \vec{h}^\intercal \rangle_{\text{model}}), \\
-    \vec{a}^{(t)}
-        &= \vec{a}^{(t-1)} + \eta(\langle \vec{v} \rangle_{\text{data}} - \langle \vec{v} \rangle_{\text{model}}), \\
-    \vec{b}^{(t)}
-        &= \vec{b}^{(t-1)} + \eta(\langle \vec{h} \rangle_{\text{data}} - \langle \vec{h} \rangle_{\text{model}}),
-\end{split}
-\end{align}
-where \( \eta \) is the learning rate hyperparameter.
 
 The part of the gradient using the data set distribution is referred to as the \textit{positive} phase, and the part using the model distribution is referred to as the \textit{negative} phase.
 It is trivial to compute the expectation values in the positive phase, but not so much in the negative phase because \( p(\vec{v}) \) cannot be sampled directly.
