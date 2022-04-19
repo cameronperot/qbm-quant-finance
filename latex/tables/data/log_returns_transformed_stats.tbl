@@ -1,5 +1,5 @@
 \begin{tabular}{l r r}
-\multicolumn{3}{c}{\textbf{Transformed Log Return Sample Statistics}} \\
+\multicolumn{3}{c}{\textbf{Transformed Log Return Data Set Statistics}} \\
 \toprule
 Currency Pair & Mean & Standard Deviation \\
 \midrule

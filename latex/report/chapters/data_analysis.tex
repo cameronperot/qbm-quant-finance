@@ -1,5 +1,5 @@
 \section{Data Analysis}
-Our data set consists of the daily open, high, low, and close (OHLC) values for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs
+Our raw data set consists of the daily open, high, low, and close (OHLC) values for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs
 \begin{itemize}
     \item EURUSD - Euro € / U.S. Dollar \$
     \item GBPUSD - British Pound Sterling £ / U.S. Dollar \$
@@ -182,7 +182,7 @@ In these, we observed the appearance of "shoulders" around the threshold \( \tau
 \subsection{Additional Information}
 As mentioned in~\cite{kondratyev_2019}, one can use additional binary indicator variables to enrich the training data set.
 One such bit of information is the rolling volatility relative to the historical median (see~\cref{app:annualized_volatility} for definition of annualized volatility).
-If the 3-month rolling volatility was (below) above the historical median it was assigned a value of 0 (1) to indicate the low (high) volatility regime.
+If the 3-month rolling volatility was below (above) the historical median it was assigned a value of 0 (1) to indicate the low (high) volatility regime.
 We plotted the 3-month rolling volatilities versus their historical medians in~\cref{fig:rolling_volatility}.
 
 These additional binary indicator variables were then concatenated onto the training data set and fed to the model to make it more flexible by allowing for the model outputs to be conditioned on a specific volatility regime.
