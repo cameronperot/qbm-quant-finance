@@ -7,7 +7,7 @@ Our raw data set consists of the daily open, high, low, and close (OHLC) values 
     \item USDJPY - U.S. Dollar \$ / Japanese Yen ¥
 \end{itemize}
 obtained from Dukascopy historical data feed~\cite{dukascopy}.
-The data set was filtered to remove days where any of the currencies had zero volume, as well as NYSE and LSE holidays.
+The data set was filtered to remove days when any of the currencies had zero volume, as well as NYSE and LSE holidays.
 This resulted in a data set of 5165 training samples.
 Here we use the notation \( x_\text{open} \), \( x_\text{high} \), \( x_\text{low} \), and \( x_\text{close} \) to denote the open, high, low, and close values of a currency pair on a particular day.
 
@@ -17,7 +17,7 @@ The natural way to do so is to use the returns
     r = \frac{x_\text{close} - x_\text{open}}{x_\text{open}}.
 \end{align}
 However, this is not necessarily the best way to approach this.
-Instead we opted to use the log returns
+Instead, we opted to use the log returns
 \begin{align}
     \tilde{r}
         = \log(1+r)
@@ -65,8 +65,8 @@ In the final training data set we chose to remove outliers greater than \( 10\si
 
 Next we examined the correlations between the currency pairs to get an idea of the interdependencies between them.
 We visualized this with scatter plots shown in~\cref{fig:scatters} where we observed a clear positive correlation between EURUSD/GBPUSD, and clear negative correlations between EURUSD/USDCAD and GBPUSD/USDCAD.
-We verified this by examining the Pearson \( r \), Spearman \( \rho \), and Kendall \( \tau \) correlation coefficients laid out in~\cref{tbl:data_correlation_coefficients}.
-We found the correlation coefficients to be positive for pairs of the form \( X \)USD/\( Y \)USD, and negative for pairs of the form \( X \)USD/USD\( Y \), for \( X,Y \in \) \{EUR, GBP, CAD, JPY\}, as expected.
+This was verified this by examining the Pearson \( r \), Spearman \( \rho \), and Kendall \( \tau \) correlation coefficients laid out in~\cref{tbl:data_correlation_coefficients}.
+Furthermore, we found the correlation coefficients to be positive for pairs of the form \( X \)USD/\( Y \)USD, and negative for pairs of the form \( X \)USD/USD\( Y \), for \( X,Y \in \) \{EUR, GBP, CAD, JPY\}, as expected.
 Details on how the correlation coefficients were computed and how to interpret them can be found in~\cref{app:correlation_coefficients}.
 \begin{figure}[!htb]
     \begin{center}
@@ -115,7 +115,7 @@ The discretization errors associated with this conversion and data set are on th
 Due to how the data was linearly converted to a discrete form before rounding, it opened up the possibility of the discretized data being clustered in the mid-range values if large outliers were present.
 To mitigate this, we came up with a transformation to reduce the gap between outliers by scaling outliers beyond a certain threshold \( \tau \), as detailed in~\cref{alg:transformation}.
 We call this the \textit{outlier power transformation}.
-In practice we took \( \tau = 1 \) and \( \alpha = 0.5 \), thus the standardized data points above one standard deviation were mapped to their square root, as illustrated in~\cref{fig:data_transformation}.
+In practice, we took \( \tau = 1 \) and \( \alpha = 0.5 \), thus the standardized data points above one standard deviation were mapped to their square root, as illustrated in~\cref{fig:data_transformation}.
 We did explore a few other combinations of \( \tau \) and \( \alpha \), but found these values to produce the best results out of those we tried; of course this could likely be further optimized.
 This transformation is invertible when \( \bar{x} \), \( \sigma_x \), and \( \delta \) are saved.
 

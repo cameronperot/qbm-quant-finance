@@ -26,7 +26,7 @@ It is important to keep in mind how one interprets the correlation coefficients.
 The sign of the correlation coefficient determines whether or not it is negatively or positively correlated, and the magnitude determines how strong the correlation effects are.
 As a loose guide, correlation coefficient values of 0.1, 0.3, and 0.5 can be termed small, medium, and large, respectively~\cite{research_design_and_statistical_analysis}.
 In general, one must be careful when interpreting the correlation coefficients; it is important to understand what the values mean, and what they do not.
-Section 3.4.2 "Interpreting the Correlation Coefficient" of~\cite{research_design_and_statistical_analysis} offers further insight and points out some of the pitfalls to watch out for.
+Section 3.4.2 "Interpreting the Correlation Coefficient" of~\cite{research_design_and_statistical_analysis} offers further insight and points out some pitfalls to watch out for.
 
 In this thesis the correlation coefficients were computed using the respective functions from the SciPy Python package~\cite{python_scipy}.
 
@@ -68,7 +68,7 @@ It is defined as
 \end{align}
 where \( \mathcal{X} \) is the probability space.
 It can be interpreted as the amount of information loss associated with using \( q \) to approximate \( p \).
-It must also be noted that the KL divergence is a distance, but not a metric (rather a divergence), because of the asymmetry that \( \DKL{p}{q} \ne \DKL{q}{p} \).
+We also note that the KL divergence is a distance, but not a metric (rather a divergence), because of the asymmetry that \( \DKL{p}{q} \ne \DKL{q}{p} \).
 
 \subsection{Kullback-Leibler Divergence in Practice}\label{app:kl_divergence_in_practice}
 Due to the limited maximum sample size of \( 10^4 \) when using a D-Wave annealer and the inability to concatenate sample sets due to spin-bath polarization effects~\cite{pochart_2021}, it made computation of the KL divergence quite difficult because we could not get a proper read on the probability distribution when the number of possible states was high.
@@ -79,13 +79,14 @@ Therefore, in this thesis we chose to take a histogram-based approach to approxi
 All KL divergences were computed using 32 bins since this was close to the number of bins computed using the Freedman-Diaconis rule on some of the sample sets for the 12-qubit problem.
 
 When computing the \( q \) distribution from a sample set of limited size, it was inevitable that some of the probabilities came out to zero, which in turn led to issues computing the KL divergence due to zeros in the denominator of the argument of the log.
-Luckily there was a way around this if we knew the true probability of measuring such a state to be nonzero.
-Due to the quantum nature of this problem and the fact that no state had a truly zero probability (although some infinitesimally small), we could take such an approach.
+Luckily, there is a way around this if we know the true probability of measuring such a state to be nonzero.
+Due to the quantum nature of this problem and the fact that no state has a truly zero probability (although some infinitesimally small), we could take such an approach.
 
-The method we used to mitigate this problem is called smoothing~\cite{han_kl_divergence}, where we added some small probability \( \epsilon \) to the \( q \) distribution probabilities that were observed to be zero, then took the sum of the added probabilities and evenly subtracted it from the nonzero probabilities in order to ensure the distribution remain normalized.
+The method we used to mitigate this problem is called smoothing~\cite{han_kl_divergence}, in which we add some small probability \( \epsilon \) to the \( q \) distribution probabilities that are observed to be zero, then take the sum of the added probabilities and evenly subtract it from the nonzero probabilities in order to ensure the distribution remains normalized.
 For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the smoothed distribution would be \( \{q_1 = 1/3 - \epsilon, q_2 = 2/3 - \epsilon, q_3 = \epsilon, q_4 = \epsilon\} \).
 
-Furthermore, call it \textit{relative} smoothing when the smoothed probabilities were taken to be relative to the reference distribution \( p \), which was found to be useful when it was difficult to choose a constant value of \( \epsilon \), e.g. when the reference distribution probabilities varied widely and could sometimes coincide with \( \epsilon \).
+Furthermore, we call it \textit{relative} smoothing when the smoothed probabilities are taken to be relative to the reference distribution \( p \).
+This is useful when it is difficult to choose a constant value of \( \epsilon \), e.g. when the reference distribution probabilities vary widely and can coincide with \( \epsilon \).
 For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the relative smoothed distribution would be \( \{q_1 = 1/3 - \epsilon (p_3 + p_4)/2, q_2 = 2/3 - \epsilon (p_3 + p_4)/2, q_3 = \epsilon p_3, q_4 = \epsilon p_4\} \).
 
 We took a value of \( \epsilon = 10^{-6} \) when computing \( \DKL{\pdata}{\pmodel} \) because it was small enough that it would not coincide with any of the \( \pdata \) values since the data sets contained only a few thousand samples, thus the smallest value of \( \pdata \) was roughly on the order of \( 10^{-4} \).
@@ -112,7 +113,7 @@ where \( U_1 \) and \( U_2 \) uniform random variables on the interval \( [0, 1]
 
 In practice we computed \( U_1 \) and \( U_2 \) as the normalized rank of the observations of the random variables \( X \) and \( Y \), respectively.
 The way to interpret the concentration functions is that they represent the probability that \( X \) and \( Y \) simultaneously take on extreme values.
-When plotted, the lower tail concentration function is used for \( 0 \le z \le 0.5 \) and the upper for \( 0.5 \le z \le 1 \).
+When plotted, the lower tail concentration function is used for \( 0 \le z \le 0.5 \) and the upper for \( 0.5 < z \le 1 \).
 
 A nice explanation with animations can be found at~\cite{charpentier_2012}.
 
@@ -245,7 +246,7 @@ Due to the noncommutativity of \( H \) and \( \partial_\theta H \), we need to u
     \partial_\theta e^{-H}
         &= -\sum_{m=1}^{n} e^{-m\delta\tau H} \delta\tau \partial_\theta He^{-(n-m)\delta\tau H} + \mathcal{O}(\delta\tau^2).
 \end{align}
-partial derivative the limit as \( n \rightarrow \infty \) of both sides gives
+Taking the limit as \( n \rightarrow \infty \) of both sides gives
 \begin{align}
 \begin{split}
     \partial_\theta e^{-H}
@@ -297,7 +298,7 @@ where
 \begin{align}
     H_\vec{v} &= \braket{\vec{v} | H | \vec{v}},
 \end{align}
-with \( H_\vec{v} \) being the \textit{clamped} Hamiltonian.
+is the \textit{clamped} Hamiltonian.
 This is called clamped because the visible qubits are held to the classical state of the visible vector \( \vec{v} \) due to an infinite energy penalty imposed by the \( \log(\Lambda_\vec{v} + \epsilon) \) term.
 Using this we can write the inequality
 \begin{align}
@@ -324,10 +325,10 @@ Taking the partial derivative of the log-likelihood lower bound yields
     \label{eq:qbm_log_likelihood_derivative_lower_bound}
     \partial_\theta \tilde{\ell}(\theta)
         &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \bigg[ \frac{\tr(\partial_\theta e^{-H_\vec{v}})}{\tr(e^{-H_\vec{v}})} - \frac{\tr(\partial_\theta e^{-H})}{\tr(e^{-H})} \bigg] \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \bigg[ \frac{\tr(e^{-H_\vec{v}} \partial_\theta H_\vec{v})}{\tr(e^{-H_\vec{v}})} - \frac{\tr(e^{-H} \partial_\theta H)}{\tr(e^{-H})} \bigg] \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) [ \tr(\rho_\vec{v} \partial_\theta H_\vec{v}) - \tr(\rho \partial_\theta H) ] \\
-        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) [ \langle \partial_\theta H_\vec{v} \rangle_\vec{v} - \langle \partial_\theta H \rangle ] \\
-        &= \overline{\langle \partial_\theta H_\vec{v} \rangle_\vec{v}} - \langle \partial_\theta H \rangle.
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \bigg[ \frac{\tr(-e^{-H_\vec{v}} \partial_\theta H_\vec{v})}{\tr(e^{-H_\vec{v}})} - \frac{\tr(-e^{-H} \partial_\theta H)}{\tr(e^{-H})} \bigg] \\
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) [ \tr(-\rho_\vec{v} \partial_\theta H_\vec{v}) - \tr(-\rho \partial_\theta H) ] \\
+        &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) [ \langle -\partial_\theta H_\vec{v} \rangle_\vec{v} - \langle -\partial_\theta H \rangle ] \\
+        &= \overline{\langle -\partial_\theta H_\vec{v} \rangle_\vec{v}} - \langle -\partial_\theta H \rangle.
 \end{split}
 \end{align}
 Plugging in our parameters we get
