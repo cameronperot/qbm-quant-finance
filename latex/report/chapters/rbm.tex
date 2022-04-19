@@ -135,7 +135,7 @@ Applying the algorithm to a mini-batch is essentially the same except that one d
 
 \section{The Classical Market Generator}\label{sec:classical_market_generator}
 In \textit{The Market Generator}~\cite{kondratyev_2019} by Kondratyev and Schwarz, they showed how an RBM could be used as a generative model to produce synthetic market data.
-Specifically, they studied how it performed on the log returns of forex data for the same currencies as we analyzed here for the time period 1999-2019.
+Specifically, they studied how it performed on the log returns of forex data for the same currency pairs we use here for the time period 1999-2019.
 In this section we use a lot of the same metrics so that we can verify our models achieved similar performance to theirs, as well as give us a good reference point to compare our quantum models with in~\cref{ch:qbm}.
 
 \subsection{Models}
@@ -283,6 +283,7 @@ Laid out in~\cref{tbl:rbm_conditional_volatilities}, we observed that the sample
 The classical RBM results arrived at in this section were found to be in line with those obtained by Kondratyev and Schwarz in~\cite{kondratyev_2019}, and the differences could likely accounted for by the different data sets used in training (e.g. different sources, different filtering, etc.), model hyperparameters, and the stochastic nature of the models.
 This further confirms that the RBM is performant and can be used to generate synthetic data from distributions with intricate structures, such as the correlations and volatilities seen here.
 
-Overall it is difficult to say if one of the models performs better than the others, as it depends on the desired use case, but the models trained on the transformed data sets do offer evidence that the results might be able to be further improved through the use of more advanced data preprocessing methods.
+Overall it is difficult to say if one of the models performs better than the others, as it depends on the desired use case, but the models trained on the transformed data sets do yield lower KL divergence values and capture more of the correlations between currency pairs.
+This offers evidence that the results might be able to be further improved through the use of more advanced data preprocessing methods.
 We did not investigate these possibilities any further though, given that this was not the main scope of this thesis.
 The results in this section act mainly as a point of reference to compare the quantum models with in the next chapter.
