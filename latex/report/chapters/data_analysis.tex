@@ -49,12 +49,11 @@ From visual examination we saw that the log returns are roughly normally distrib
     \label{tbl:data_log_returns_raw_stats}
 \end{table}
 
-We also visualized the log returns in a violin and box plot in~\cref{fig:violin_raw}, which allowed us to identify outliers and see how they are distributed.
-Immediately we noticed the major outlier to the downside for the GBPUSD currency pair.
-Further analysis indicated that this \( 11.1\sigma \) event occurred on 2016-06-24, corresponding to the results of the Brexit referendum in the UK~\cite{brexit_gov_uk}.
-The other outlier we looked into was the one to the upside for the USDJPY currency pair on 2008-10-28.
-This \( 8.3\sigma \) event occurred right in midst of the financial crisis when people were talking about the end of the Yen carry trade~\cite{jpy_carry_trade_nyt}.
-In the final training data set we chose to remove outliers greater than \( 10\sigma \) from the mean, which resulted in only removing the day corresponding to the Brexit referendum results.
+We also visualized the log returns in a violin and box plot in~\cref{fig:violin_raw} to identify outliers and see how they are distributed.
+Two major outliers clearly stand out from the rest: one to the downside for the GBPUSD pair, and the other to the upside for the USDJPY pair.
+The former occurred on 2016-06-24, the day the Brexit referendum result was announced~\cite{brexit_gov_uk}.
+The latter occurred on 2008-10-28, right in the midst of the financial crisis when people were talking about the end of the Yen carry trade~\cite{jpy_carry_trade_nyt}.
+In the final training data set, we chose to remove outliers greater than \( 10\sigma \) from the mean, which resulted in only removing the day corresponding to the Brexit referendum result, which lies \( 11.1\sigma \) below the mean.
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{data_analysis/violin.png}
@@ -64,7 +63,7 @@ In the final training data set we chose to remove outliers greater than \( 10\si
 \end{figure}
 
 Next we examined the correlations between the currency pairs to get an idea of the interdependencies between them.
-We visualized this with scatter plots shown in~\cref{fig:scatters} where we observed a clear positive correlation between EURUSD/GBPUSD, and clear negative correlations between EURUSD/USDCAD and GBPUSD/USDCAD.
+We visualized this with scatter plots shown in~\cref{fig:scatters} where we observed a clear positive correlation between EURUSD/GBPUSD, and clear negative correlations between EURUSD/USDCAD and GBPUSD/USDCAD, where the / is used to denote the pairs being compared against each other.
 This was verified this by examining the Pearson \( r \), Spearman \( \rho \), and Kendall \( \tau \) correlation coefficients laid out in~\cref{tbl:data_correlation_coefficients}.
 Furthermore, we found the correlation coefficients to be positive for pairs of the form \( X \)USD/\( Y \)USD, and negative for pairs of the form \( X \)USD/USD\( Y \), for \( X,Y \in \) \{EUR, GBP, CAD, JPY\}, as expected.
 Details on how the correlation coefficients were computed and how to interpret them can be found in~\cref{app:correlation_coefficients}.
@@ -116,7 +115,7 @@ Due to how the data was linearly converted to a discrete form before rounding, i
 To mitigate this, we came up with a transformation to reduce the gap between outliers by scaling outliers beyond a certain threshold \( \tau \), as detailed in~\cref{alg:transformation}.
 We call this the \textit{outlier power transformation}.
 In practice, we took \( \tau = 1 \) and \( \alpha = 0.5 \), thus the standardized data points above one standard deviation were mapped to their square root, as illustrated in~\cref{fig:data_transformation}.
-We did explore a few other combinations of \( \tau \) and \( \alpha \), but found these values to produce the best results out of those we tried; of course this could likely be further optimized.
+We did explore a few other combinations of \( \tau \) and \( \alpha \), but found these values to produce the best model results out of those we tried; of course this could likely be further optimized.
 This transformation is invertible when \( \bar{x} \), \( \sigma_x \), and \( \delta \) are saved.
 
 \begin{algorithm}

@@ -54,7 +54,7 @@ For a time series \( x_1, \dots, x_n \), the lag-\( k \) autocorrelation functio
         &= \frac{\text{cov}(x_t, x_{t+k})}{\sigma_{x}^2}.
 \end{align}
 The autocorrelation function is essentially a correlation coefficient, except instead of comparing two different variables it compares the same variable at different times.
-In this thesis we used the statsmodels Python package~\cite{python_statsmodels} to compute the autocorrelation function as there are some caveats when computing it in practice with large chains, e.g. there are some tricks such as using a Fourier transformation to make the computations more efficient.
+In this thesis we used the statsmodels Python package~\cite{python_statsmodels} to compute the autocorrelation function as there are some caveats when computing it in practice with large chains, e.g., there are some tricks such as using a Fourier transformation to make the computations more efficient.
 
 The integrated autocorrelation time is a reasonable estimate of how many steps in between samples we should have before we can consider them to be (to a degree) statistically independent.
 In this thesis we used the emcee Python package~\cite{python_emcee} to estimate the integrated autocorrelation time, which follows the approach laid out by Goodman and Weare in~\cite{goodman_weare_2010}.
@@ -86,7 +86,7 @@ The method we used to mitigate this problem is called smoothing~\cite{han_kl_div
 For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the smoothed distribution would be \( \{q_1 = 1/3 - \epsilon, q_2 = 2/3 - \epsilon, q_3 = \epsilon, q_4 = \epsilon\} \).
 
 Furthermore, we call it \textit{relative} smoothing when the smoothed probabilities are taken to be relative to the reference distribution \( p \).
-This is useful when it is difficult to choose a constant value of \( \epsilon \), e.g. when the reference distribution probabilities vary widely and can coincide with \( \epsilon \).
+This is useful when it is difficult to choose a constant value of \( \epsilon \), e.g., when the reference distribution probabilities vary widely and can coincide with \( \epsilon \).
 For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the relative smoothed distribution would be \( \{q_1 = 1/3 - \epsilon (p_3 + p_4)/2, q_2 = 2/3 - \epsilon (p_3 + p_4)/2, q_3 = \epsilon p_3, q_4 = \epsilon p_4\} \).
 
 We took a value of \( \epsilon = 10^{-6} \) when computing \( \DKL{\pdata}{\pmodel} \) because it was small enough that it would not coincide with any of the \( \pdata \) values since the data sets contained only a few thousand samples, thus the smallest value of \( \pdata \) was roughly on the order of \( 10^{-4} \).
@@ -189,7 +189,7 @@ Analogously for \( p(\vec{v} | \vec{h}) \) one finds
 \end{align}
 
 \section{Log-Likelihood Derivative}\label{app:rbm_log_likelihood_derivation}
-For the data set distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W}, \vec{a}, \vec{b}) \) the average log-likelihood is given by
+For the data set distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W}, \vec{a}, \vec{b}) \) the log-likelihood is given by
 \begin{align}
 \begin{split}
     \ell(\theta)
@@ -225,7 +225,7 @@ where \( \langle \ \cdot \ \rangle_{\text{data}} \) denotes the expectation valu
 \chapter{Quantum Boltzmann Machine}
 \section{Log-Likelihood Derivative}\label{app:qbm_log_likelihood_derivation}
 This derivation follows along the lines of that laid out in~\cite{amin_2018}.
-We start with the data set-averaged log-likelihood
+We start with the log-likelihood
 \begin{align}
 \begin{split}
     \ell(\theta)
