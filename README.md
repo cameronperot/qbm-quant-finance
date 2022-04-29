@@ -5,10 +5,11 @@ The `qbm` Python package designed for training and analyzing QBMs has been moved
 
 ## Abstract
 In this thesis we explore using the D-Wave Advantage 4.1 quantum annealer to sample from quantum Boltzmann distributions and train quantum Boltzmann machines (QBMs).
-We focus on the real-world problem of using QBMs as generative models to produce synthetic foreign exchange market data and analyze how the results stack up against classical models based on restricted Boltzmann machines.
-Additionally, we study a small 12-qubit problem which we use to compare samples obtained from the annealer with theory, and in the process gain vital insights into how well the Advantage 4.1 can sample quantum Boltzmann random variables and be used to train QBMs.
-Through this we are able to show that the D-Wave Advantage 4.1 can sample classical Boltzmann random variables to some extent, but is limited in its ability to sample from quantum Boltzmann distributions.
-Our findings indicate that models trained using the annealer are much noisier than simulations and struggle to perform at the same level as classical models.
+We focus on the real-world problem of using QBMs as generative models to produce synthetic foreign exchange market data and analyze how the results stack up against classical models based on restricted Boltzmann machines (RBMs).
+Additionally, we study a small 12-qubit problem which we use to compare samples obtained from the Advantage 4.1 with theory, and in the process gain vital insights into how well the Advantage 4.1 can sample quantum Boltzmann random variables and be used to train QBMs.
+Through this, we are able to show that the Advantage 4.1 can sample classical Boltzmann random variables to some extent, but is limited in its ability to sample from quantum Boltzmann distributions.
+Our findings indicate that QBMs trained using the Advantage 4.1 are much noisier than those trained using simulations and struggle to perform at the same level as classical RBMs.
+However, there is the potential for QBMs to outperform classical RBMs if future generation annealers can generate samples closer to the desired theoretical distributions.
 
 ## Installation
 This code in this thesis is best used with the predefined conda environment, which can be installed by running
@@ -28,7 +29,7 @@ pip install --no-build-isolation git+https://github.com/cameronperot/scikit-lear
 ```
 The thesis package can be installed by running
 ```
-git clone git@jugit.fz-juelich.de:c.perot/quantum-boltzmann-machines.git
-cd quantum-boltzmann-machines
+git clone git@jugit.fz-juelich.de:qip/qbm-quant-finance.git
+cd qbm-quant-finance
 pip install .
 ```
