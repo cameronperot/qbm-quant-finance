@@ -193,7 +193,7 @@ The results in the rest of this section are derived from an ensemble of 100 samp
 To get an idea of how well the models perform, we examine the KL divergences of the marginal distributions of each currency pair in~\cref{tbl:rbm_KL_divergences}.
 Here we observe that all models reproduce the marginal distributions quite well, but the models trained on the transformed data sets perform slightly better, particularly on the USDCAD marginal.
 The performance of the models on the marginal distributions is also visualized with Q-Q plots in~\cref{fig:rbm_qq_plots}.
-More information on how the KL divergences were computed can be found in~\cref{app:kl_divergence_in_practice}.
+More information on how the KL divergences are computed can be found in~\cref{app:kl_divergence_in_practice}.
 \begin{table}[!htb]
     \centering
     \begin{adjustbox}{max width=\textwidth}
@@ -228,7 +228,7 @@ We find that the models reproduce the structure of the correlation coefficients 
 \end{table}
 
 \subsubsection{Volatilities}
-Examining the historical volatilities in~\cref{tbl:rbm_volatilities} confirms the models can produce synthetic data with similar volatility structures, albeit marginally higher than that of the data set in all cases.
+Examining the historical volatilities in~\cref{tbl:rbm_volatilities} confirms the models can produce synthetic data with similar volatilities to the training data set, albeit marginally higher in all cases.
 \begin{table}[!htb]
     \centering
     \begin{adjustbox}{max width=\textwidth}
@@ -253,7 +253,6 @@ It is difficult to say overall if one model performs better than another here, a
 
 We also study the tail concentration functions (see~\cref{app:tail_concentration_functions} for definitions and interpretations) between currency pairs in~\cref{fig:rbm_tail_concentrations}.
 Here we see that all models perform quite well for the most part except for a few of the extreme regions in the EURUSD/GBPUSD, EURUSD/USDJPY, and GBPUSD/USDJPY plots.
-The differences are not so stark here between the RBM models, but Kondratyev and Schwarz's comparison of the RBM to the parametric model they used makes it clear that the RBM is the better performer.
 \begin{figure}[!htb]
     \begin{center}
         \includegraphics[width=1\linewidth]{rbm/tail_concentrations.png}
