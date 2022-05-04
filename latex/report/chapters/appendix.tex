@@ -71,26 +71,26 @@ It can be interpreted as the amount of information loss associated with using \(
 We also note that the KL divergence is a distance, but not a metric (rather a divergence), because of the asymmetry that \( \DKL{p}{q} \ne \DKL{q}{p} \).
 
 \subsection{Kullback-Leibler Divergence in Practice}\label{app:kl_divergence_in_practice}
-Due to the limited maximum sample size of \( 10^4 \) when using a D-Wave annealer and the inability to concatenate sample sets due to spin-bath polarization effects~\cite{pochart_2021}, it made computation of the KL divergence quite difficult because we could not get a proper read on the probability distribution when the number of possible states was high.
-Even for the small 12-qubit problem there were still \( 2^{12} = 4096 \) possible states, thus \( 10^4 \) samples were not entirely representative of the true distribution.
-This problem was only exacerbated when working with larger system sizes.
+Due to the limited maximum sample size of \( 10^4 \) when using a D-Wave annealer and the inability to concatenate sample sets due to spin-bath polarization effects~\cite{pochart_2021}, it makes computation of the KL divergence quite difficult because we cannot get a proper read on the probability distribution when the number of possible states is high.
+Even for the small 12-qubit problem there are still \( 2^{12} = 4096 \) possible states, thus \( 10^4 \) samples are not entirely representative of the true distribution.
+This problem is only exacerbated when working with larger system sizes.
 
-Therefore, in this thesis we chose to take a histogram-based approach to approximate the KL divergence.
-All KL divergences were computed using 32 bins since this was close to the number of bins computed using the Freedman-Diaconis rule on some of the sample sets for the 12-qubit problem.
+Therefore, in this thesis we take a histogram-based approach to approximate the KL divergence.
+All KL divergences are computed using 32 bins since this is close to the number of bins computed using the Freedman-Diaconis rule on some of the sample sets for the 12-qubit problem.
 
-When computing the \( q \) distribution from a sample set of limited size, it was inevitable that some of the probabilities came out to zero, which in turn led to issues computing the KL divergence due to zeros in the denominator of the argument of the log.
+When computing the \( q \) distribution from a sample set of limited size, it is inevitable that some of the probabilities come out to zero, which in turn leads to issues computing the KL divergence due to zeros in the denominator of the argument of the log.
 Luckily, there is a way around this if we know the true probability of measuring such a state to be nonzero.
-Due to the quantum nature of this problem and the fact that no state has a truly zero probability (although some infinitesimally small), we could take such an approach.
+Due to the quantum nature of this problem and the fact that no state has a truly zero probability (although some infinitesimally small), we can take such an approach.
 
-The method we used to mitigate this problem is called smoothing~\cite{han_kl_divergence}, in which we add some small probability \( \epsilon \) to the \( q \) distribution probabilities that are observed to be zero, then take the sum of the added probabilities and evenly subtract it from the nonzero probabilities in order to ensure the distribution remains normalized.
-For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the smoothed distribution would be \( \{q_1 = 1/3 - \epsilon, q_2 = 2/3 - \epsilon, q_3 = \epsilon, q_4 = \epsilon\} \).
+The method we use to mitigate this problem is called smoothing~\cite{han_kl_divergence}, in which we add some small probability \( \epsilon \) to the \( q \) distribution probabilities that are observed to be zero, then take the sum of the added probabilities and evenly subtract it from the nonzero probabilities in order to ensure the distribution remains normalized.
+For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the corresponding smoothed distribution is \( \{q_1 = 1/3 - \epsilon, q_2 = 2/3 - \epsilon, q_3 = \epsilon, q_4 = \epsilon\} \).
 
 Furthermore, we call it \textit{relative} smoothing when the smoothed probabilities are taken to be relative to the reference distribution \( p \).
 This is useful when it is difficult to choose a constant value of \( \epsilon \), e.g., when the reference distribution probabilities vary widely and can coincide with \( \epsilon \).
-For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the relative smoothed distribution would be \( \{q_1 = 1/3 - \epsilon (p_3 + p_4)/2, q_2 = 2/3 - \epsilon (p_3 + p_4)/2, q_3 = \epsilon p_3, q_4 = \epsilon p_4\} \).
+For example, if \( \{q_1 = 1/3, q_2 = 2/3, q_3 = 0, q_4 = 0\} \), then the corresponding relative smoothed distribution is \( \{q_1 = 1/3 - \epsilon (p_3 + p_4)/2, q_2 = 2/3 - \epsilon (p_3 + p_4)/2, q_3 = \epsilon p_3, q_4 = \epsilon p_4\} \).
 
-We took a value of \( \epsilon = 10^{-6} \) when computing \( \DKL{\pdata}{\pmodel} \) because it was small enough that it would not coincide with any of the \( \pdata \) values since the data sets contained only a few thousand samples, thus the smallest value of \( \pdata \) was roughly on the order of \( 10^{-4} \).
-When computing \( \DKL{\ptheory}{\psamples} \) though, we opted to use relative smoothing with a value of \( \epsilon = 10^{-6} \) since sometimes some probabilities of \( \ptheory \) could be close to \( \epsilon \) and give a false sense of agreement with the smoothed \( \psamples \).
+We take a value of \( \epsilon = 10^{-6} \) when computing \( \DKL{\pdata}{\pmodel} \) because it is small enough that it will not coincide with any of the \( \pdata \) values since the data sets contain only a few thousand samples, thus the smallest value of \( \pdata \) is roughly on the order of \( 10^{-4} \).
+When computing \( \DKL{\ptheory}{\psamples} \) though, we opt to use relative smoothing with a value of \( \epsilon = 10^{-6} \) since sometimes some probabilities of \( \ptheory \) can be close to \( \epsilon \) and give a false sense of agreement with the smoothed \( \psamples \).
 
 \section{Tail Concentration Functions}\label{app:tail_concentration_functions}
 The lower tail concentration function is defined as~\cite{venter_2002}
