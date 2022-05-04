@@ -1,9 +1,9 @@
 \section{Summary}
 We started with an analysis of the forex log returns data set in~\cref{ch:data_analysis}, analyzing the data from a number of aspects to get an understanding of the intricacies.
 After that, we moved to training classical RBM models in~\cref{ch:rbm}, where we were able to produce good results similar to those in~\cite{kondratyev_2019}.
-The outlier power transformation we detailed in~\cref{sec:outlier_transform} shows much promise, as models trained on the transformed data sets perform noticeably better than those trained on the base data sets.
+The outlier power transformation detailed in~\cref{sec:outlier_transform} shows much promise, as models trained on the transformed data sets perform noticeably better than those trained on the base data sets.
 
-After establishing a classical baseline to compare our quantum models with, we moved to studying a small 12-qubit problem in~\cref{sec:qbm_12_qubit_problem}, through which we gained a deeper understanding of how to sample quantum Boltzmann random variables using a D-Wave quantum annealer, specifically the Advantage 4.1.
+After establishing a classical baseline to compare our quantum models with, we studied a small 12-qubit problem in~\cref{sec:qbm_12_qubit_problem}, through which we gained a deeper understanding of how to sample quantum Boltzmann random variables using a D-Wave quantum annealer, specifically the Advantage 4.1.
 There we were able to match sample distributions returned by the annealer to theoretical distributions from the family of distributions corresponding to the density operator \( \rho(s,T) = \frac{1}{Z}e^{-\beta H(s)} \).
 Our findings indicate that, with the anneal schedules and parameters used here, the Advantage 4.1 is not able to sample from just any quantum Boltzmann distribution, rather only those that are classical Boltzmann-like in nature.
 To be more specific, the samples we obtained from the annealer resemble a subset of the family of distributions that satisfies \( B(s) / T = \text{constant} \), as indicated by the streak patterns observed in~\cref{fig:dkl_min_heatmap}.
@@ -11,15 +11,15 @@ This occurs when the distribution is similar to one late in the anneal process, 
 This is likely due to the annealer not being able to quench the system fast enough, allowing for nontrivial dynamics to occur, as the shortest allowed quench durations are still quite long relative to the qubit oscillation frequency in terms of gigahertz.
 How closely the annealer can approximate a desired classical Boltzmann distribution was found to be dependent on both the embedding as well as the anneal schedule, thus it is highly recommended to tune these accordingly.
 
-With the information that we could only reliably sample classical Boltzmann distributions, we moved to training a bound-based quantum restricted Boltzmann machine (BQRBM), essentially reducing the problem to a classical RBM trained using quantum assistance.
+With the information that we can only reliably sample classical Boltzmann distributions, we moved to training a bound-based quantum restricted Boltzmann machine (BQRBM) with a freeze-out point of \( s^* = 1 \), essentially reducing the problem to a classical RBM trained using quantum assistance.
 The difficulty of choosing the effective temperature was in this case easily circumvented by treating \( \beta \) as a learnable parameter as described in~\cref{sec:learning_beta} and verified in~\cref{sec:qbm_simulation_results}.
-We trained BQRBM models using both a simulation and the Advantage 4.1 annealer, allowing us to compare exactly how close the annealer trained model was to the theory.
+We trained BQRBM models using both a simulation and the Advantage 4.1 annealer, allowing us to compare exactly how close the Advantage 4.1-trained model is to the theory.
 Additionally, we trained a classical RBM to use as a reference point.
-In short, the BQRBM model trained using the quantum annealer underperforms both the classical RBM as well as the simulation, as seen in~\cref{sec:qbm_annealer_results}.
+In short, the BQRBM model trained using the Advantage 4.1 underperforms both the classical RBM as well as the simulation, as seen in~\cref{sec:qbm_annealer_results}.
 The simulation-based model shows promise though, outperforming the classical RBM, offering hope for future annealer-trained models if annealers can further reduce the information loss associated with sampling (quantum) Boltzmann distributions.
 
 Finally, we used the knowledge gained about how to train a small BQRBM and applied it to training a larger one in~\cref{sec:quantum_market_generator} using the log returns data set, mapping 94 logical qubits to 398 physical qubits with chain lengths of up to 7.
-This model proved to be more challenging to train because setting the annealer hyperparameters (chain strength, anneal schedule, and embedding) could not be done as in the 12-qubit problem due to the fact that we could not simulate such a large system.
+This model proved to be more challenging to train because setting the annealer hyperparameters (chain strength, anneal schedule, and embedding) can not be done as in the 12-qubit problem due to the fact that we can not simulate such a large system.
 In practice, we had to choose these values by doing a limited hyperparameter scan, which was difficult due to increased training times that averaged around 15 minutes per epoch.
 Longer epoch times originated from a combination of solver load and latency from Europe to the North American West Coast.
 This meant that training a model for 100 epochs would have taken around a day, and if we wanted to fully train the models for all hyperparameters in our scan it would have taken weeks.
@@ -27,13 +27,12 @@ This meant that training a model for 100 epochs would have taken around a day, a
 The results in~\cref{sec:qbm_log_returns_results} show that the BQRBM was able to learn to produce synthetic data similar to the log returns data set distribution to some extent, but drastically underperforms the classical RBM.
 This could likely have been improved with a more exhaustive hyperparameter scan, but that was not necessarily feasible given the time requirements, and it is unclear if the results would have been significantly better given that even the 12-qubit BQRBM trained on the annealer underperforms the classical RBM.
 
-In this thesis we laid out a framework with which one can train quantum Boltzmann machines using both simulation and D-Wave quantum annealers.
+In this thesis we laid out a framework with which one can train quantum Boltzmann machines using both simulations and D-Wave quantum annealers.
 As part of this thesis, the Python package \texttt{qbm}~\cite{qbm} was developed to make it easy to train and study QBMs.
 This package is open source and available to the public to encourage further study of QBMs.
 
 Overall, this thesis furthered not only our understanding of QBMs, but that of D-Wave annealer sampling in general.
 We hope that this work will be useful for future research and development.
-
 
 \section{Future Directions}
 Throughout this thesis we came across several directions which we would have liked to explore more in depth but did not have the time to.
@@ -45,7 +44,7 @@ The discretization procedure for converting continuous data into bit vectors cou
 As we saw in~\cref{sec:classical_market_generator}, the models that used the outlier power-transformed data sets had lower KL divergences and better reproduced the correlations between the currency pairs.
 
 Of most interest is simulating the time-dependent Schr\"odinger equation of the D-Wave annealer to determine how fast the system needs to quench in order to freeze out the dynamics.
-This would give us a good idea of how much quantum annealers need to improve in order to be able to sample from truly quantum Boltzmann distributions.
+This would give a good indication of how much quantum annealers need to improve in order to be able to sample from truly quantum Boltzmann distributions.
 
 Studying additional anneal schedule formats would also be a very interesting direction.
 Reverse annealing was tested to a very small extent here only to see if it produced drastically different results than forward annealing, but was left out of the final research because the results did not show any significant improvements and led to added complexity due to the need to choose what state the system was initialized in and if the system was reinitialized to the same state after each measurement or not.

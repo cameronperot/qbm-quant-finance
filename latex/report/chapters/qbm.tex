@@ -149,7 +149,7 @@ The default anneal schedule for the D-Wave Advantage 4.1 is shown in~\cref{fig:a
 
 \subsubsection{Mapping the QBM to the D-Wave Quantum Annealer}
 As stated in~\cite{amin_2018}, in order get a quantum annealer to sample from a quantum Boltzmann distribution, one would need to freeze the evolution at some point \( s^* \) during the annealing process and then perform the measurements.
-The authors go on to say that this can be done in practice using a nonuniform \( s(t) \) that anneals slowly in the beginning, then quenches the system (completes the annealing as fast as possible) at the freeze out point \( s^* \), if \( s^* \) is in the quasistatic regime.
+The authors go on to say that this can be done in practice using a nonuniform \( s(t) \) that anneals slowly in the beginning, then quenches the system (completes the annealing as fast as possible) at the freeze-out point \( s^* \), if \( s^* \) is in the quasistatic regime.
 In an earlier paper~\cite{amin_2015}, Amin showed that the quasistatic regime begins around 1 \si{\micro\second} for the D-Wave 2000Q, so it should not be an issue to reach the quasistatic regime for annealing times longer than 5 \si{\micro\second}.
 
 Since a quantum annealer is a real-world physical device, samples generated with it have an associated temperature called the effective temperature.
