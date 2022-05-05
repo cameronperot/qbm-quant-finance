@@ -7,11 +7,11 @@ Our raw data set consists of the daily open, high, low, and close (OHLC) values 
     \item USDJPY - U.S. Dollar \$ / Japanese Yen ¥
 \end{itemize}
 obtained from Dukascopy historical data feed~\cite{dukascopy}.
-We filter the data set to remove days when any of the currencies had zero volume, as well as NYSE and LSE holidays, resulting in 5165 training samples.
+We filter the data set to remove days with zero volume, as well as NYSE and LSE holidays, resulting in 5165 training samples.
 Here we use the notation \( x_\text{open} \), \( x_\text{high} \), \( x_\text{low} \), and \( x_\text{close} \) to denote the open, high, low, and close values of a currency pair on a particular day.
 
 Given that the raw data values are on an absolute basis, we need to convert them to relative terms in order to be able to compare data from different time periods on a more equal footing.
-The natural way to do so is to use the returns
+The natural way to do so is to use the intraday returns
 \begin{align}
     r = \frac{x_\text{close} - x_\text{open}}{x_\text{open}}.
 \end{align}
@@ -22,12 +22,7 @@ Instead, we opt to use the log returns
         = \log(1+r)
         = \log\bigg( \frac{x_\text{close}}{x_\text{open}} \bigg)
 \end{align}
-due to several advantages~\cite{quantivity_2012}
-\begin{itemize}
-    \item Log-normality: if \( r \sim \mathcal{N}(\mu, \sigma^2) \) then \( \tilde{r} \sim \mathcal{N}(\tilde{\mu}, \tilde{\sigma}^2) \).
-    \item Small \( r \) approximation: the expansion \( \log (1 + r) = r + \mathcal{O}(r^2) \approx r \) for \( r \ll 1 \).
-    \item Time-additivity: instead of having to multiply one plus the returns to compound them, using log returns allows one to simply add them.
-\end{itemize}
+due to several advantages, such as log-normality and small \( r \) approximation~\cite{quantivity_2012}.
 
 We begin our analysis by taking a look at the histograms depicted in~\cref{fig:histograms_raw}.
 From visual examination we see that the log returns are roughly normally distributed with the statistics given in~\cref{tbl:data_log_returns_raw_stats}.
@@ -49,7 +44,7 @@ From visual examination we see that the log returns are roughly normally distrib
 \end{table}
 
 We also visualize the log returns in a violin and box plot in~\cref{fig:violin_raw} to identify outliers and see how they are distributed.
-Two major outliers clearly stand out from the rest: one to the downside for the GBPUSD pair, and the other to the upside for the USDJPY pair.
+Two major outliers clearly stand out from the rest: one to the downside for the GBPUSD pair, and another to the upside for the USDJPY pair.
 The former occurred on 2016-06-24, the day the Brexit referendum result was announced~\cite{brexit_gov_uk}.
 The latter occurred on 2008-10-28, right in the midst of the financial crisis when people were talking about the end of the Yen carry trade~\cite{jpy_carry_trade_nyt}.
 In the final training data set, we remove outliers greater than \( 10\sigma \) from the mean, resulting in only removing the day corresponding to the Brexit referendum result, which lies \( 11.1\sigma \) below the mean.

@@ -70,7 +70,7 @@ with gradients (see \cref{app:rbm_log_likelihood_derivation} for derivation)
 \end{split}
 \end{align}
 
-The part of the gradient using the data set distribution is referred to as the \textit{positive} phase, and the part using the model distribution is referred to as the \textit{negative} phase.
+The part of the gradient under the data set distribution is referred to as the \textit{positive} phase, and the part under the model distribution is referred to as the \textit{negative} phase.
 It is trivial to compute the expectation values in the positive phase, but not so much in the negative phase because \( p(\vec{v}) \) cannot be sampled directly.
 
 In practice the negative phase expectation values are sampled using a Markov chain Monte Carlo (MCMC) method.

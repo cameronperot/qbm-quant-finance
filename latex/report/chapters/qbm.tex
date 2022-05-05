@@ -253,7 +253,7 @@ The \( A(s) \) and \( B(s) \) values for a D-Wave annealer are fixed and depend 
 In this section we use what we call pause-and-quench anneal schedules that
 \begin{enumerate}
     \item start at \( (t = 0, s = 0) \),
-    \item paus the system at \( (\tpause, \spause) \) for a duration of \( \Deltapause \),
+    \item pause the system at \( (\tpause, \spause) \) for a duration of \( \Deltapause \),
     \item quench the system at \( (\tquench, \squench) \) over a duration of \( \Deltaquench \).
 \end{enumerate}
 Thus, the anneal schedules provided to the solver are of the form
@@ -368,7 +368,7 @@ We start with the same anneal schedule formula as before, except we introduce pa
         Comparison of \( \min_{s,T}\big\{\DKL{\ptheory}{\psamples}\big\} \) for various pause-and-quench anneal schedules using embedding 10.
         Data represents an ensemble average over 10 random gauge sample sets consisting of \( 10^4 \) samples each.
         Shaded regions represent one standard deviation.
-        Some of the sample sets with longer annealing times and pause durations had less than \( 10^4 \) samples as to satisfy the maximum allowed run time of the D-Wave Advantage 4.1.
+        Some of the sample sets with longer annealing times and pause durations contain less than \( 10^4 \) samples as to satisfy the maximum allowed run time of the D-Wave Advantage 4.1.
     }
     \label{fig:dkl_mins_embedding_05}
 \end{figure}
@@ -478,7 +478,7 @@ The heatmap shown in \cref{fig:learned_effective_temperature} confirms that the 
 \end{figure}
 
 The results in this section show that a BQRBM can indeed be trained using a D-Wave quantum annealer.
-The 12-qubit problem played a crucial role in our understanding of how one can use a D-Wave quantum annealer to generate Boltzmann distributed samples.
+The 12-qubit problem plays a crucial role in our understanding of how one can use a D-Wave quantum annealer to generate Boltzmann distributed samples.
 Although the results are not spectacular, and underperform the simulation and classical model, they still show promise.
 It will be interesting to rerun this analysis on the next generation of D-Wave quantum annealers to see how much they improve.
 
@@ -646,7 +646,7 @@ This is further confirmed by the tail concentration functions in~\cref{fig:qbm_l
 
 \subsection{Summary}
 Overall, the BQRBM model trained using the Advantage 4.1 produces lackluster results when compared with the classical RBM, and does not motivate training additional models on the transformed and volatility indicator enhanced data sets.
-This could possibly be due to hyperparameters, as our grid search of the space was not the most optimal due to training time requirements, but it is not immediately clear if there is a better way to do this.
+This could possibly be due to hyperparameters, as our grid search of the space was limited by the training time requirements, but it is not immediately clear if there is a better way to do this.
 This could also be due to the fact that the model is so large that it uses a significant portion of the QPU and requires chains with lengths of up to 7, resulting in added complexity.
 
 In conclusion, it does not appear that the Advantage 4.1-trained BQRBM can produce results good enough to replace the classical RBM.
@@ -674,9 +674,9 @@ It is best to do a comparison in the beginning to get an idea of what a good rel
 \subsection{Sampling the Proper Distribution}
 The most important thing when using a quantum annealer to train a Boltzmann machine is making sure the annealer is sampling from the proper distribution.
 In the case of the quantum Boltzmann machine we need samples generated according to \( \rho = \frac{1}{Z} e^{-\beta H(s^*)} \).
-For smaller problems it is easy to compare results obtained from the annealer with exact computed distributions (as we did for the 12-qubit problem), but it is not as simple for larger problems.
+For smaller problems it is easy to compare results obtained from the annealer with exact computed distributions (as in the 12-qubit problem), but it is not as simple for larger problems.
 For larger problems there is the possibility to use advanced methods, such as they did in~\cite{marshall_2019} with the use of an entropic sampling technique~\cite{barash_2019} based on population annealing to estimate degeneracies, and in turn use those to compute classical Boltzmann distributions to compare with, but that might not always be practical.
-Alternatively, one can try a hyperparameter grid search as we did in~\cref{sec:qbm_hyperparameters}
+Alternatively, one can try a hyperparameter grid search as in~\cref{sec:qbm_hyperparameters}
 
 \subsubsection{Effective Temperature}
 One of the most important hyperparameters is that of the effective inverse temperature \( \beta \).
@@ -697,13 +697,13 @@ It is possible for some areas of the chip to perform better than others, or for 
 
 \subsubsection{Maximum Sample Set Size}
 One of the main limitations of the D-Wave annealer for this purpose is that of the maximum sample set size.
-When sampling the D-Wave one can only generate sample sets with a maximum size of \( 10^4 \) samples, which is adequate for the intended purpose of optimization, but can fall short when one wants to use it as a sampler for a QBM.
+When sampling, the D-Wave one can only generate sample sets with a maximum size of \( 10^4 \) samples, which is adequate for the intended purpose of optimization, but can fall short when one wants to use it as a sampler for a QBM.
 It is natural to think that one could just combine the results from multiple sample sets, but this is not necessarily the case.
 Due to the spin-bath polarization effect (see error sources below), one cannot combine sample sets because of the possibility of previous samples affecting future ones~\cite{pochart_2021}.
 
 \subsubsection{Time Requirements}
 Another issue is the time requirements.
-Most models detailed here require little QPU access time, around 5-10 minutes, but this can add up and get expensive if one is doing a hyperparameter grid search.
+Most models detailed here require little QPU access time to train, around 5-10 minutes, but this can add up and get expensive if one is doing a hyperparameter grid search.
 Additionally, there is the total training time, which as we saw can be quite substantial due the latency to the cloud platform combined with the load queue of the solver.
 To illustrate this point, training the simulation-based 12-qubit model takes roughly 2 seconds per epoch (the majority of which is spent computing the density matrix), whereas the Advantage 4.1-based model takes 2-5 minutes per epoch.
 

@@ -4,7 +4,7 @@ After that, we moved to training classical RBM models in~\cref{ch:rbm}, where we
 The outlier power transformation detailed in~\cref{sec:outlier_transform} shows much promise, as models trained on the transformed data sets perform noticeably better than those trained on the base data sets.
 
 After establishing a classical baseline to compare our quantum models with, we studied a small 12-qubit problem in~\cref{sec:qbm_12_qubit_problem}, through which we gained a deeper understanding of how to sample quantum Boltzmann random variables using a D-Wave quantum annealer, specifically the Advantage 4.1.
-There we were able to match sample distributions returned by the annealer to theoretical distributions from the family of distributions corresponding to the density operator \( \rho(s,T) = \frac{1}{Z}e^{-\beta H(s)} \).
+There, we were able to match sample distributions returned by the annealer to theoretical distributions from the family of distributions corresponding to the density operator \( \rho(s,T) = \frac{1}{Z}e^{-\beta H(s)} \).
 Our findings indicate that, with the anneal schedules and parameters used here, the Advantage 4.1 is not able to sample from just any quantum Boltzmann distribution, rather only those that are classical Boltzmann-like in nature.
 To be more specific, the samples we obtained from the annealer resemble a subset of the family of distributions that satisfies \( B(s) / T = \text{constant} \), as indicated by the streak patterns observed in~\cref{fig:dkl_min_heatmap}.
 This occurs when the distribution is similar to one late in the anneal process, i.e., when \( e^{-\beta H(s^*)} \approx e^{-\beta B(s^*) H_\text{final}} \).
@@ -38,13 +38,13 @@ We hope that this work will be useful for future research and development.
 Throughout this thesis we came across several directions which we would have liked to explore more in depth but did not have the time to.
 
 It would be interesting to investigate if adding technical indicators to the log returns data set could increase model performance.
-Given that the log returns data set only took into account the currency pairs' behavior over one day (excluding the volatility indicators), technical indicators calculated using data over a historical window could enrich the data set with vital information to help the model better learn the complexities of the distribution.
+Given that the log returns data set used here only takes into account the currency pairs' behavior over one day (excluding the volatility indicators), technical indicators calculated using data over a historical window could enrich the data set with vital information to help the model better learn the complexities of the distribution.
 
 The discretization procedure for converting continuous data into bit vectors could probably be further improved.
-As we saw in~\cref{sec:classical_market_generator}, the models that used the outlier power-transformed data sets had lower KL divergences and better reproduced the correlations between the currency pairs.
+As we saw in~\cref{sec:classical_market_generator}, the models that used the outlier power-transformed data sets generate samples with lower KL divergences and better reproduced the correlations between the currency pairs.
 
 Of most interest is simulating the time-dependent Schr\"odinger equation of the D-Wave annealer to determine how fast the system needs to quench in order to freeze out the dynamics.
-This would give a good indication of how much quantum annealers need to improve in order to be able to sample from truly quantum Boltzmann distributions.
+This would give a good indication of how much quantum annealers need to improve in order to be able to sample from arbitrary quantum Boltzmann distributions.
 
 Studying additional anneal schedule formats would also be a very interesting direction.
 Reverse annealing was tested to a very small extent here only to see if it produced drastically different results than forward annealing, but was left out of the final research because the results did not show any significant improvements and led to added complexity due to the need to choose what state the system was initialized in and if the system was reinitialized to the same state after each measurement or not.
