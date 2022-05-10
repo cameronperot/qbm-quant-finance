@@ -176,7 +176,7 @@ In these, we observe the appearance of "shoulders" around the threshold \( \tau 
 As mentioned in~\cite{kondratyev_2019}, one can use additional binary indicator variables to enrich the training data set.
 One such bit of information is the rolling volatility relative to the historical median (see~\cref{app:annualized_volatility} for definition of annualized volatility).
 If the 3-month rolling volatility is below (above) the historical median it is assigned a value of 0 (1) to indicate the low (high) volatility regime.
-The 3-month rolling volatilities versus their historical medians are plotted in in~\cref{fig:rolling_volatility}.
+The 3-month rolling volatilities versus their historical medians are plotted in~\cref{fig:rolling_volatility}.
 
 These additional binary indicator variables are then concatenated onto the training data set and fed to the model to make it more flexible by allowing for the model outputs to be conditioned on a specific volatility regime.
 Adding one indicator for each of the four currency pairs increases the number of rows in our training data set by four, thus the volatility-concatenated data set is in the space \( \binset^{68 \times N} \).

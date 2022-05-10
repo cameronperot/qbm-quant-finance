@@ -23,7 +23,7 @@ The Kendall rank correlation coefficient is defined as
 where \( (x_1, y_1), \dots, (x_n, y_n) \) are pairs of observations of the random variables \( X \) and \( Y \).
 
 It is important to keep in mind how one interprets the correlation coefficients.
-The sign of the correlation coefficient determines whether or not it is negatively or positively correlated, and the magnitude determines how strong the correlation effects are.
+The sign of the correlation coefficient determines whether it is negatively or positively correlated, and the magnitude determines how strong the correlation effects are.
 As a loose guide, correlation coefficient values of 0.1, 0.3, and 0.5 can be termed small, medium, and large, respectively~\cite{research_design_and_statistical_analysis}.
 In general, one must be careful when interpreting the correlation coefficients; it is important to understand what the values mean, and what they do not.
 Section 3.4.2 "Interpreting the Correlation Coefficient" of~\cite{research_design_and_statistical_analysis} offers further insight and points out some pitfalls to watch out for.
@@ -78,7 +78,7 @@ This problem is only exacerbated when working with larger system sizes.
 Therefore, in this thesis we take a histogram-based approach to approximate the KL divergence.
 All KL divergences are computed using 32 bins since this is close to the number of bins computed using the Freedman-Diaconis rule on some of the sample sets for the 12-qubit problem.
 
-When computing the \( q \) distribution from a sample set of limited size, it is inevitable that some of the probabilities come out to zero, which in turn leads to issues computing the KL divergence due to zeros in the denominator of the argument of the log.
+When computing the \( q \) distribution from a sample set of limited size, it is often the case that some probabilities come out to zero, which in turn leads to issues computing the KL divergence due to zeros in the denominator of the argument of the log.
 Luckily, there is a way around this if we know the true probability of measuring such a state to be nonzero.
 Due to the quantum nature of this problem and the fact that no state has a truly zero probability (although some infinitesimally small), we can take such an approach.
 
@@ -111,7 +111,7 @@ and the upper as
 \end{align}
 where \( U_1 \) and \( U_2 \) uniform random variables on the interval \( [0, 1] \), and \( C(u_1, u_2) \) is the copula of \( (U_1, U_2) \).
 
-In practice we compute \( U_1 \) and \( U_2 \) as the normalized rank of the observations of the random variables \( X \) and \( Y \), respectively.
+In practice, we compute \( U_1 \) and \( U_2 \) as the normalized rank of the observations of the random variables \( X \) and \( Y \), respectively.
 The way to interpret the concentration functions is that they represent the probability that \( X \) and \( Y \) simultaneously take on extreme values.
 When plotted, the lower tail concentration function is used for \( 0 \le z \le 0.5 \) and the upper for \( 0.5 < z \le 1 \).
 

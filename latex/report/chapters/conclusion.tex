@@ -9,13 +9,13 @@ Our findings indicate that, with the anneal schedules and parameters used here, 
 To be more specific, the samples we obtained from the annealer resemble a subset of the family of distributions that satisfies \( B(s) / T = \text{constant} \), as indicated by the streak patterns observed in~\cref{fig:dkl_min_heatmap}.
 This occurs when the distribution is similar to one late in the anneal process, i.e., when \( e^{-\beta H(s^*)} \approx e^{-\beta B(s^*) H_\text{final}} \).
 This is likely due to the annealer not being able to quench the system fast enough, allowing for nontrivial dynamics to occur, as the shortest allowed quench durations are still quite long relative to the qubit oscillation frequency in terms of gigahertz.
-How closely the annealer can approximate a desired classical Boltzmann distribution was found to be dependent on both the embedding as well as the anneal schedule, thus it is highly recommended to tune these accordingly.
+How closely the annealer can approximate a desired classical Boltzmann distribution was found to be dependent on both the embedding and the anneal schedule, thus it is highly recommended to tune these accordingly.
 
 With the information that we can only reliably sample classical Boltzmann distributions, we moved to training a bound-based quantum restricted Boltzmann machine (BQRBM) with a freeze-out point of \( s^* = 1 \), essentially reducing the problem to a classical RBM trained using quantum assistance.
 The difficulty of choosing the effective temperature was in this case easily circumvented by treating \( \beta \) as a learnable parameter as described in~\cref{sec:learning_beta} and verified in~\cref{sec:qbm_simulation_results}.
 We trained BQRBM models using both a simulation and the Advantage 4.1 annealer, allowing us to compare exactly how close the Advantage 4.1-trained model is to the theory.
 Additionally, we trained a classical RBM to use as a reference point.
-In short, the BQRBM model trained using the Advantage 4.1 underperforms both the classical RBM as well as the simulation, as seen in~\cref{sec:qbm_annealer_results}.
+In short, the BQRBM model trained using the Advantage 4.1 underperforms both the classical RBM and the simulation, as seen in~\cref{sec:qbm_annealer_results}.
 The simulation-based model shows promise though, outperforming the classical RBM, offering hope for future annealer-trained models if annealers can further reduce the information loss associated with sampling (quantum) Boltzmann distributions.
 
 Finally, we used the knowledge gained about how to train a small BQRBM and applied it to training a larger one in~\cref{sec:quantum_market_generator} using the log returns data set, mapping 94 logical qubits to 398 physical qubits with chain lengths of up to 7.
