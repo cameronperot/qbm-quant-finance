@@ -28,7 +28,7 @@ As a loose guide, correlation coefficient values of 0.1, 0.3, and 0.5 can be ter
 In general, one must be careful when interpreting the correlation coefficients; it is important to understand what the values mean, and what they do not.
 Section 3.4.2 "Interpreting the Correlation Coefficient" of~\cite{research_design_and_statistical_analysis} offers further insight and points out some pitfalls to watch out for.
 
-In this thesis the correlation coefficients were computed using the respective functions from the SciPy Python package~\cite{python_scipy}.
+In this thesis the correlation coefficients are computed using the respective functions from the SciPy Python package~\cite{python_scipy}.
 
 \section{Annualized Volatility}\label{app:annualized_volatility}
 In finance, the annualized volatility of a time series vector \( \vec{x} \) is computed as
@@ -53,11 +53,11 @@ For a time series \( x_1, \dots, x_n \), the lag-\( k \) autocorrelation functio
     \rho_k
         &= \frac{\text{cov}(x_t, x_{t+k})}{\sigma_{x}^2}.
 \end{align}
-The autocorrelation function is essentially a correlation coefficient, except instead of comparing two different variables it compares the same variable at different times.
-In this thesis we used the statsmodels Python package~\cite{python_statsmodels} to compute the autocorrelation function as there are some caveats when computing it in practice with large chains, e.g., there are some tricks such as using a Fourier transformation to make the computations more efficient.
+The autocorrelation function is essentially the Pearson correlation coefficient, except instead of comparing two different variables it compares the same variable at different times.
+In this thesis we use the statsmodels Python package~\cite{python_statsmodels} to compute the autocorrelation function as there are some caveats when computing it in practice with large chains, e.g., there are some tricks such as using a Fourier transformation to make the computations more efficient.
 
 The integrated autocorrelation time is a reasonable estimate of how many steps in between samples we should have before we can consider them to be (to a degree) statistically independent.
-In this thesis we used the emcee Python package~\cite{python_emcee} to estimate the integrated autocorrelation time, which follows the approach laid out by Goodman and Weare in~\cite{goodman_weare_2010}.
+In this thesis we use the emcee Python package~\cite{python_emcee} to estimate the integrated autocorrelation time, which follows the approach laid out by Goodman and Weare in~\cite{goodman_weare_2010}.
 
 \section{Kullback-Leibler Divergence}\label{app:kl_divergence}
 The Kullback-Leibler divergence~\cite{kullback_1951} is a measure of how much the probability distribution \( q \) differs from the reference probability distribution \( p \).
@@ -111,7 +111,7 @@ and the upper as
 \end{align}
 where \( U_1 \) and \( U_2 \) uniform random variables on the interval \( [0, 1] \), and \( C(u_1, u_2) \) is the copula of \( (U_1, U_2) \).
 
-In practice we computed \( U_1 \) and \( U_2 \) as the normalized rank of the observations of the random variables \( X \) and \( Y \), respectively.
+In practice we compute \( U_1 \) and \( U_2 \) as the normalized rank of the observations of the random variables \( X \) and \( Y \), respectively.
 The way to interpret the concentration functions is that they represent the probability that \( X \) and \( Y \) simultaneously take on extreme values.
 When plotted, the lower tail concentration function is used for \( 0 \le z \le 0.5 \) and the upper for \( 0.5 < z \le 1 \).
 
@@ -129,10 +129,10 @@ we can compute this as
 \end{align}
 where
 \begin{align}
-    A = \text{diag}\Big(e^{-\beta(\lambda_1 - \min\{\lambda_i\})}, \dots, e^{-\beta(\lambda_{2^n} - \min\{\lambda_i\})}\Big),
+    A = \text{diag}\Big(e^{-\beta(\lambda_1 - \min_i\{\lambda_i\})}, \dots, e^{-\beta(\lambda_{2^n} - \min_i\{\lambda_i\})}\Big),
 \end{align}
 where \( \{\lambda_i\} \) are the eigenvalues of \( H \), and \( S \) is the matrix of eigenvectors that transforms \( H \) to and from its eigenspace.
-We subtract \( \min\{\lambda_i\} \) from the eigenvalues in practice to avoid computing the exponential of a large number which can lead to divergence in floating point calculations.
+We subtract \( \min_i\{\lambda_i\} \) from the eigenvalues in practice to avoid computing the exponential of a large number which can lead to divergence in floating point calculations.
 
 \section{Constants}\label{app:constants}
 The values of \( A(s) \) and \( B(s) \) are in terms of \si{\giga\hertz}, and consequently so is the Hamiltonian.
@@ -296,7 +296,7 @@ Taking the limit \( \epsilon \rightarrow 0 \) yields
 \end{align}
 where
 \begin{align}
-    H_\vec{v} &= \braket{\vec{v} | H | \vec{v}},
+    H_\vec{v} &= \braket{\vec{v} | H | \vec{v}}
 \end{align}
 is the \textit{clamped} Hamiltonian.
 This is called clamped because the visible qubits are held to the classical state of the visible vector \( \vec{v} \) due to an infinite energy penalty imposed by the \( \log(\Lambda_\vec{v} + \epsilon) \) term.
