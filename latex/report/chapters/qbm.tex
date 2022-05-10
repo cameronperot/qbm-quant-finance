@@ -37,7 +37,7 @@ then the marginal probability to measure the visible units in state \( \ket{\vec
     p(\vec{v}) = \tr(\Lambda_{\vec{v}}\rho).
 \end{align}
 
-Using the probabilities above we can obtain an average log-likelihood, which for data set distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W}, \vec{a}, \vec{b}) \) is
+Using the probabilities above we can obtain the log-likelihood, which for data set distribution \( p_\text{data} \) and parameters \( \theta = (\mat{W}, \vec{a}, \vec{b}) \) is
 \begin{align}
     \ell(\theta) = \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log \tr(\Lambda_\vec{v}\rho),
 \end{align}
@@ -124,7 +124,7 @@ D-Wave quantum annealers implement a time-dependent Hamiltonian of the form~\cit
 From this we see the initial Hamiltonian has the ground state where all qubits are aligned in the \( x \)-direction, i.e., \( \ket{+}^{\otimes n} \), which corresponds to an equal superposition of all possible states in the computational basis.
 The final Hamiltonian corresponds to the Ising model described by the \( h_i \) and \( J_{ij} \) values.
 
-The quantum processing unit (QPU) is made up of superconducting qubits under the influence of external magnetic fluxes~\cite{qc_lecture_notes} which change the Hamiltonian from the initial to the final over the duration of the annealing process.
+The quantum processing unit (QPU) is made up of superconducting qubits under the influence of external magnetic fluxes~\cite{qc_lecture_notes} that change the Hamiltonian from the initial to the final over the duration of the annealing process.
 These qubits are arranged in a graph structure similar to that seen in~\cref{fig:p4_unitcells}.
 The default anneal schedule for the D-Wave Advantage 4.1 is shown in~\cref{fig:anneal_schedule_default}
 \begin{figure}[!htb]
@@ -211,12 +211,12 @@ The \texttt{sample\_ising(h, J)} function has the keyword argument \texttt{autos
         \Bigg\}.
 \end{split}
 \end{align}
-This is because the main use case of D-Wave annealers is to maximize the probability of measuring the ground state, thus the problem is rescaled so that the \( h_i \) and \( J_{ij} \) values fully utilize the allowed range of values, essentially decreasing the effective temperature; therefore we set \texttt{autoscale=False} to avoid this.
+This is because the main use case of D-Wave annealers is to maximize the probability of measuring the ground state, thus the problem is rescaled so that the \( h_i \) and \( J_{ij} \) values fully utilize the allowed range of values, essentially decreasing the effective temperature; therefore, we set \texttt{autoscale=False} to avoid this.
 For the Advantage 4.1 system the allowed value ranges are \( h_\text{range} = [-4, 4] \) and \( J_\text{range} = [-1, 1] \)~\cite{dwave_solver_properties}.
 
 \subsubsection{Generating More Robust Statistics}\label{sec:gauge}
 QPUs are not perfect, and sometimes specific qubits or parts of the chip might have readout biases.
-One can perform a gauge transformation on the problem to mitigate such issues.
+To mitigate such issues, one can perform a gauge transformation on the problem.
 If we have an \( n \)-qubit problem, then we can generate a random vector \( \vec{r} \in \{+1, -1\}^n \) which allows us to change the submission to the solver without actually changing the underlying problem.
 This is done by taking
 \begin{align}
@@ -232,9 +232,9 @@ This is done by taking
 and then transforming the results back using the third relation above, where \( s_i \) is the measured value of qubit \( i \).
 
 \subsubsection{Previous Work in This Field}
-In recent years, a number of researchers have dabbled in using D-Wave quantum annealers to train Boltzmann machines~\cite{adachi_2015,benedetti_2016,anschuetz_2019,wiebe_2019,rocutto_2020,dixit_2021,ilmo_2021,wilson_2021,xu_2021}.
+In recent years, a number of researchers have studied using D-Wave quantum annealers to train Boltzmann machines~\cite{adachi_2015,benedetti_2016,anschuetz_2019,wiebe_2019,rocutto_2020,dixit_2021,ilmo_2021,wilson_2021,xu_2021}.
 The most common approach is to train a classical RBM with quantum assistance, i.e., using the annealer to generate the samples in the negative phase rather than using Gibbs sampling.
-Classical RBMs trained with quantum assistance are a special case of the QBM, i.e., when \( s^* = 1 \) the problem reduces to a classical RBM, as \( \lim_{s\rightarrow 1} \Gamma_i = 0 \) in~\cref{eq:qbm_scaling}.
+Classical RBMs trained with quantum assistance are a special case of the QBM, i.e., when \( s^* = 1 \) the problem reduces to a classical RBM because \( \lim_{s\rightarrow 1} \Gamma_i = 0 \) in~\cref{eq:qbm_scaling}.
 
 One thing that stands out the most about some of the previous research is that very few discuss embeddings and anneal schedules, which as we will see in the next section are important for getting the best possible performance out of the annealer.
 Therefore, we aim to create a basic framework with which one can use to approach the problem of using a D-Wave annealer to sample from a (quantum) Boltzmann distribution.
@@ -493,7 +493,7 @@ To this end, we train a number of models with various settings of these hyperpar
 For this, we use a mini-batch size of 10, \( s^* = 1 \), constant learning rates of \( \eta = 0.02 \) and \( \eta_{\hat{\beta}} = 0.01 \), and an initial value of \( \betahat = 0.25 \ \si{\giga\hertz}^{-1} \ (\hat{T} \approx 192 \ \si{\milli\kelvin}) \).
 
 The reason we only train for 20 epochs is that the epoch duration is quite high (10-25 minutes) due to latency and load on the annealer, ergo it is not very feasible to train every model for a higher number of epochs.
-With an average epoch duration of around 15 minutes, a model trained for 20 epochs takes roughly 5 hours, so training for 100 epochs would take around a day.
+With an average epoch duration of around 15 minutes, training a model for 20 epochs takes roughly 5 hours, so training for 100 epochs would take around a day.
 
 \subsubsection{Choosing a Relative Chain Strength}\label{sec:qbm_rcs}
 The chain strength \( \gamma \) is computed using the relative chain strength \( \rcs \) as
@@ -698,7 +698,7 @@ With that said, the annealer can still be used to assist in the training of a cl
 \subsection{QPU Limitations and Imperfections}
 The properties of the QPU itself must also be taken into account.
 There is no doubt that D-Wave is a top-notch manufacturer of quantum annealers, but even with all of their expertise the QPUs are still subject to imperfections and errors.
-It is possible for some areas of the chip to perform better than others, or for some of the qubits to have readout biases (although biases can be mitigated by using gauge transforms as detailed in~\cref{sec:gauge}).
+It is possible for some areas of the chip to perform better than others, or for some of the qubits to have readout biases (although biases can be mitigated by using gauge transformations as detailed in~\cref{sec:gauge}).
 
 \subsubsection{Maximum Sample Set Size}
 One of the main limitations of the D-Wave annealer for this purpose is that of the maximum sample set size.
@@ -727,5 +727,5 @@ D-Wave does an excellent job at detailing these errors in their documentation~\c
     \item \textbf{Readout Fidelity} errors can occur when the bit string returned by the annealer differs from that arrived at by the QPU by one or more bit flips.
         For reference, D-Wave annealers have a readout fidelity of >99\%.
     \item \textbf{Programming Errors} can occur when the problem implemented by the QPU suffers from programming issues resulting in the implemented problem's low-energy subspace not having an overlap with that of the desired problem.
-    \item \textbf{Spin-Bath Polarization Effect} errors can arise when the current flowing through the qubits during the annealing process cause the spins to obtain a polarization which can bias the measurements.
+    \item \textbf{Spin-Bath Polarization Effect} errors can arise when the current flowing through the qubits during the annealing process causes the spins to obtain a polarization which can bias the measurements.
 \end{itemize}

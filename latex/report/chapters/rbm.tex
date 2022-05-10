@@ -23,7 +23,7 @@ where
     \label{fig:rbm_diagram}
 \end{figure}
 
-It is termed \textit{restricted} due to the fact that there are no intra-layer connections, i.e., visible units are only connected to hidden units, and vice versa.
+It is termed \textit{restricted} due to the fact that there are no intralayer connections, i.e., visible units are only connected to hidden units, and vice versa.
 An example diagram is depicted in~\cref{fig:rbm_diagram}.
 
 The probability to find the system in the configuration \( (\vec{v},\vec{h}) \) is given by the Boltzmann distribution (with \( \beta = 1/kT = 1 \))
@@ -38,7 +38,7 @@ with intractable~\cite{long_servedio_2010} partition function
 \end{align}
 where \( \sum_{\vec{v},\vec{h}} \) denotes the sum over all possible configurations of \( \vec{v} \) and \( \vec{h} \).
 
-The imposed restrictions on intra-layer connections enable us to write the conditional probabilities of the layers as the product of the individual units' probabilities~\footnote{Here \( \sigma(x) \) is the element-wise logistic sigmoid function and \( \odot \) denotes element-wise multiplication.} (see \cref{app:conditional_probabilities_derivation} for derivation)
+The imposed restrictions on intralayer connections enable us to write the conditional probabilities of the layers as the product of the individual units' probabilities~\footnote{Here \( \sigma(x) \) is the element-wise logistic sigmoid function and \( \odot \) denotes element-wise multiplication.} (see \cref{app:conditional_probabilities_derivation} for derivation)
 \begin{align}
 \begin{split}
     p(\vec{h} | \vec{v})
@@ -99,7 +99,7 @@ The algorithm is presented in a vectorized format for brevity.
 \end{algorithmic}
 \label{alg:Gibbs}
 \end{algorithm}
-The Uniform$(a, b, n)$ function in \cref{alg:Gibbs} produces a length \( n \) vector of uniform i.i.d. random variables on the interval $[a, b)$, and the \( < \) operator returns a binary output with \( (\text{true}, \text{false}) \mapsto (1, 0) \).
+The Uniform$(a, b, n)$ function in \cref{alg:Gibbs} produces a length \( n \) vector of uniform i.i.d. random variables on the interval $[a, b)$, and the \( < \) operator acts element-wise with \( (\text{true}, \text{false}) \mapsto (1, 0) \).
 
 \begin{figure}
     \begin{center}
@@ -262,7 +262,6 @@ Here we see that all models perform quite well for the most part except for a fe
 \end{figure}
 
 \subsubsection{Conditional Sampling}
-One of the advantages of the RBM is its ability to perform conditional sampling.
 For the data sets with additional volatility indicators, we have the ability to condition on these indicators to sample from a specific volatility regime.
 This is useful, for example, if we are trying to generate real-world data that fits the current volatility landscape.
 
