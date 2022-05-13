@@ -108,8 +108,10 @@ The discretization errors associated with this conversion and data set are on th
 Due to how the data is linearly converted to a discrete form before rounding, it opens up the possibility of the discretized data being clustered in the mid-range values if large outliers are present.
 To mitigate this, we use a transformation to reduce the gap between outliers by scaling outliers beyond a certain threshold \( \tau \) using the procedure detailed in~\cref{alg:transformation}.
 We call this the \textit{outlier power transformation}.
+
 In practice, we take \( \tau = 1 \) and \( \alpha = 0.5 \), thus the standardized data points above one standard deviation are mapped to their square roots, as illustrated in~\cref{fig:data_transformation}.
 We tested a few other combinations of \( \tau \) and \( \alpha \), but found these values to produce the best model results out of those we tried; of course this could likely be further optimized.
+The effect this transformation has on the model results versus the base dataset can be seen in~\cref{sec:rbm_results}.
 This transformation is invertible when \( \bar{x} \), \( \sigma_x \), and \( \delta \) are saved.
 
 \begin{algorithm}
