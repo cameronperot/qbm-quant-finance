@@ -19,7 +19,7 @@ In short, the BQRBM model trained using the Advantage 4.1 underperforms both the
 The simulation-based model shows promise though, outperforming the classical RBM, offering hope for future annealer-trained models if annealers can further reduce the information loss associated with sampling (quantum) Boltzmann distributions.
 
 Finally, we used the knowledge gained about how to train a small BQRBM and applied it to training a larger one in~\cref{sec:quantum_market_generator} using the log returns data set, mapping 94 logical qubits to 398 physical qubits with chain lengths of up to 7.
-This model proved to be more challenging to train because setting the annealer hyperparameters (chain strength, anneal schedule, and embedding) can not be done as in the 12-qubit problem due to the fact that we can not simulate such a large system.
+This model proved to be more challenging to train because setting the annealer hyperparameters (chain strength, anneal schedule, and embedding) cannot be done as in the 12-qubit problem due to the fact that we cannot simulate such a large system.
 In practice, we had to choose these values by doing a limited hyperparameter scan, which was difficult due to increased training times that averaged around 15 minutes per epoch.
 Longer epoch times originated from a combination of solver load and latency from Europe to the North American West Coast.
 This meant that training a model for 100 epochs would have taken around a day, and if we wanted to fully train the models for all hyperparameters in our scan it would have taken weeks.
@@ -28,7 +28,7 @@ The results in~\cref{sec:qbm_log_returns_results} show that the BQRBM was able t
 This could likely have been improved with a more exhaustive hyperparameter scan, but that was not necessarily feasible given the time requirements, and it is unclear if the results would have been significantly better given that even the 12-qubit BQRBM trained on the annealer underperforms the classical RBM.
 
 In this thesis we laid out a framework with which one can train quantum Boltzmann machines using both simulations and D-Wave quantum annealers.
-As part of this thesis, the Python package \texttt{qbm}~\cite{qbm} was developed to make it easy to train and study QBMs.
+As part of this thesis, the Python package \texttt{qbm}~\cite{qbm} was developed to make it easier to train and study QBMs.
 This package is open source and available to the public to encourage further study of QBMs.
 
 Overall, this thesis furthered not only our understanding of QBMs, but that of D-Wave annealer sampling in general.

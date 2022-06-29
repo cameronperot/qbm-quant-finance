@@ -90,7 +90,7 @@ This leads to positive phase expectation values of
         &= \sum_\vec{v} \pdata(\vec{v}) v_i \frac{b_j'(\vec{v})}{D_j(\vec{v})} \tanh\big(D_j(\vec{v})\big), \ i \in \mathcal{I}_v, \ j \in \mathcal{I}_h,
 \end{split}
 \end{align}
-where \( b_i'(\vec{v}) = b_i + (\mat{W}^\intercal\vec{v})_i \), \( D_i(\vec{v}) = \sqrt{\Gamma_i^2 + b_i'(\vec{v})^2} \), \( \mathcal{I}_v = \{1, \dots, n_v\} \) represents the visible qubit indices, and \( \mathcal{I}_h = \{n_v + 1, \dots, n\} \) represents the hidden qubit indices.
+where \( b_i'(\vec{v}) = b_i + (\mat{W}\T\vec{v})_i \), \( D_i(\vec{v}) = \sqrt{\Gamma_i^2 + b_i'(\vec{v})^2} \), \( \mathcal{I}_v = \{1, \dots, n_v\} \) represents the visible qubit indices, and \( \mathcal{I}_h = \{n_v + 1, \dots, n\} \) represents the hidden qubit indices.
 
 \subsection{Quantum Annealing}\label{sec:quantum_annealing}
 Quantum annealing, also known as adiabatic quantum computing, is a branch of quantum computing that is based on the adiabatic theorem, which in the (translated) words of Born and Fock~\cite{born_fock_1928}:
@@ -152,7 +152,7 @@ As stated in~\cite{amin_2018}, in order get a quantum annealer to sample from a 
 The authors go on to say that this can be done in practice using a nonuniform \( s(t) \) that anneals slowly in the beginning, then quenches the system (completes the annealing as fast as possible) at the freeze-out point \( s^* \), if \( s^* \) is in the quasistatic regime.
 In an earlier paper~\cite{amin_2015}, Amin showed that the quasistatic regime begins around 1 \si{\micro\second} for the D-Wave 2000Q, so it should not be an issue to reach the quasistatic regime for annealing times longer than 5 \si{\micro\second}.
 
-Since a quantum annealer is a real-world physical device, samples generated with it have an associated temperature called the effective temperature.
+Because a quantum annealer is a real-world physical device, samples generated with it have an associated temperature called the effective temperature.
 To be more specific, the corresponding density operator is of the form
 \begin{align}
     \rho(s, T) = \frac{1}{Z} e^{-\beta H(s)},
@@ -184,7 +184,7 @@ The method is based on a log-likelihood maximization approach leading to paramet
 \end{align}
 where \( \betahat = 1/k\hat{T} \) is the estimator of the effective inverse temperature, and \( \eta_{\betahat} \) is the associated learning rate.
 In practice, we forego the factor of \( \betahat^2 \) in the denominator for simplicity and to keep a similar form to the other gradient updates.
-We must note though that this approach is only valid for classical Boltzmann distributions, but this fits our current use case as we will see in~\cref{sec:qbm_verifying_distribution}.
+We must note though, that this approach is only valid for classical Boltzmann distributions, but this fits our current use case as we will see in~\cref{sec:qbm_verifying_distribution}.
 
 \subsubsection{D-Wave Ocean SDK}
 D-Wave offers an easy-to-use Python package called Ocean SDK~\cite{dwave_ocean} to interact with their Leap~\cite{dwave_leap} cloud-based quantum annealing platform, which allows users to access various quantum annealers and other solvers around the globe.
@@ -304,7 +304,7 @@ This in turn means that not only is there one optimal \( s^* \) and effective te
 Therefore, this explains the streak pattern in the heatmaps.
 
 Furthermore, we observe that the left heatmap, where \( \squench = 0.25 \), is quite similar to the right one where \( \squench = 0.55 \), but with higher KL divergence values and temperatures.
-This indicates that quenching at \( \squench = 0.25 \) produces samples that are distributed more as a classical Boltzmann distribution, and that we cannot generate samples from quantum Boltzmann distributions with \( s^* \lessapprox 0.45 \), at least with the anneal schedules we use here.
+This indicates that quenching at \( \squench = 0.25 \) produces samples that are distributed more as a classical Boltzmann distribution, and that we cannot generate samples from quantum Boltzmann distributions with \( s^* \lessapprox 0.45 \), at least not with the anneal schedules we use here.
 
 \begin{figure}[!htb]
     \begin{center}
@@ -373,7 +373,7 @@ We start with the same anneal schedule formula as before, except we introduce pa
     \label{fig:dkl_mins_embedding_05}
 \end{figure}
 
-\cref{fig:dkl_mins_embedding_05} illustrates that pausing and longer annealing times has little effect, and that quenching in the range of \( \squench \in [0.55, 0.6] \) produces the best results.
+\cref{fig:dkl_mins_embedding_05} illustrates that pausing and longer annealing times have little effect, and that quenching in the range of \( \squench \in [0.55, 0.6] \) produces the best results.
 With this information, we opt to use an anneal schedule with \( \squench = 0.55 \), \( \trelative = 20 \ \si{\micro\second} \), and \( \Deltapause = 0 \ \si{\micro\second} \), as it offers a good balance between performance and QPU usage time.
 
 \subsection{Training Data}
@@ -423,7 +423,7 @@ We use the results of this model as a baseline to compare the models trained usi
 
 \subsection{D-Wave Advantage 4.1-based Model}
 Having successfully trained the 12-qubit BQRBM using samples generated via exact simulation, we move to switching the sample generation part to the Advantage 4.1.
-We take the same hyperparameters as the simulation, and an anneal schedule using \( \squench = 0.55 \), \( \trelative = 20 \ \si{\micro\second} \), and \( \Deltapause = 0 \ \si{\micro\second} \).
+We take the same hyperparameters as the simulation and an anneal schedule using \( \squench = 0.55 \), \( \trelative = 20 \ \si{\micro\second} \), and \( \Deltapause = 0 \ \si{\micro\second} \).
 We see in~\cref{fig:dkl_min_heatmap} that \( \squench = 0.55 \) has an optimal temperature of around 90 \si{\milli\kelvin} for \( s^* = 1 \), thus we take \( \betahat = 0.5 \ \si{\giga\hertz}^{-1} \ (\hat{T} \approx 96 \ \si{\milli\kelvin}) \) as our initial guess for the effective \( \beta \), and let the model learn from there.
 
 \subsubsection{Results}\label{sec:qbm_annealer_results}

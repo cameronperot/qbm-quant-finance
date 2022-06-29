@@ -5,7 +5,7 @@ Quantum computing is not only trying to advance the theory and technology, but a
 There are two main branches of quantum computing: universal quantum computing, i.e., gate-based quantum computing, and adiabatic quantum computing, i.e., quantum annealing.
 In our work here we focus on the latter, as current generation devices are slightly more mature and have much higher numbers of qubits than the former.
 We discuss the theory behind quantum annealing later in~\cref{sec:quantum_annealing}.
-One such cloud-based quantum computing service is D-Wave's Leap platform~\cite{dwave_leap}, which allows users to access quantum annealers and other solvers from anywhere in the world with an internet connection.
+One such cloud-based quantum computing service is D-Wave's Leap platform~\cite{dwave_leap}, which allows users to access quantum annealers and other solvers across the world.
 
 D-Wave is a pioneer in this field, having been researching and developing quantum annealers since 1999.
 They revolutionized the field with the release of the world's first commercially available quantum annealer in 2011~\cite{zyga_2011}.
@@ -24,14 +24,14 @@ Forex markets had a daily volume of \$6.6T in 2019~\cite{bis_2019}, the majority
 In the 2019 paper \textit{The Market Generator}~\cite{kondratyev_2019}, Kondratyev and Schwarz detail how a classical restricted Boltzmann machine (RBM) can be used to generate synthetic forex data, and the advantages it offers over traditional parametric models.
 We use their work as a basis to build our classical models upon, which we then use as a reference to compare our quantum models with.
 
-In~\cref{ch:data_analysis} we start by visualizing the data set in various ways to get an idea how it is distributed.
+In~\cref{ch:data_analysis}, we start by visualizing the data set in various ways to get an idea how it is distributed.
 We further analyze quantitative metrics to get a better understanding of some of the intricacies of the data set.
 Finally, we go through and detail how we preprocess the data set into a model-friendly format.
 
-With the data set in hand, we move to explaining the theory behind the classical RBM in~\cref{ch:rbm}, and describing some of the difficulties associated with training and using classical RBMs.
-We then train several classical models on the data set discussed in~\cref{ch:data_analysis} using different preprocessing methods, and compare them with each other using visualizations and a number of quantitative metrics.
+With the data set in hand, we move to explaining the theory behind the classical RBM in~\cref{ch:rbm} and describing some of the difficulties associated with training and using classical RBMs.
+We then train several classical models on the data set discussed in~\cref{ch:data_analysis} using different preprocessing methods and compare them with each other using visualizations and a number of quantitative metrics.
 
-In~\cref{ch:qbm} we start from the theory of quantum Boltzmann machines, detailing how they work and their connection to quantum annealing.
+In~\cref{ch:qbm}, we start from the theory of quantum Boltzmann machines, detailing how they work and their connection to quantum annealing.
 We study a small 12-qubit problem which we can simulate, allowing us to compare annealer performance with that of theory, and gaining key insights into how to train and use QBMs.
 With those insights, we move to the final stage of training a model using the data set from~\cref{ch:data_analysis}, then assessing the performance versus the classical models from~\cref{ch:rbm}.
 Additionally, we cover some of the challenges of using D-Wave quantum annealers to train QBMs in~\cref{sec:challenges}.

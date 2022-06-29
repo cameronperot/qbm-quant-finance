@@ -164,3 +164,16 @@
         1
     \end{bmatrix}
 }
+
+% Transpose
+\makeatletter
+\newcommand*{\transpose}{%
+  {\mathpalette\@transpose{}}%
+}
+\newcommand*{\@transpose}[2]{%
+  % #1: math style
+  % #2: unused
+  \raisebox{\depth}{$\m@th#1\intercal$}%
+}
+\makeatother
+\newcommand{\T}{^{\transpose}}

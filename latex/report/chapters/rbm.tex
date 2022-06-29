@@ -5,7 +5,7 @@ The restricted Boltzmann machine (RBM) is an energy-based model defined by the e
     \label{eq:rbm_energy}
     E(\vec{v}, \vec{h})
         &= -\sum_{i=1}^{n_v} a_i v_i - \sum_{j=1}^{n_h} b_j h_j - \sum_{i=1}^{n_v} \sum_{j=1}^{n_h} v_i w_{ij} h_j \\
-        &= -\vec{a}^\intercal\vec{v} - \vec{b}^\intercal\vec{h} - \vec{v}^\intercal\mat{W}\vec{h},
+        &= -\vec{a}\T\vec{v} - \vec{b}\T\vec{h} - \vec{v}\T\mat{W}\vec{h},
 \end{split}
 \end{align}
 where
@@ -42,7 +42,7 @@ The imposed restrictions on intralayer connections enable us to write the condit
 \begin{align}
 \begin{split}
     p(\vec{h} | \vec{v})
-        &= \prod_{j=1}^{n_h} \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j, \\
+        &= \prod_{j=1}^{n_h} \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}\T\vec{v}) \big)_j, \\
     p(\vec{v} | \vec{h})
         &= \prod_{i=1}^{n_v} \sigma\big( (2\vec{v} - 1) \odot (\vec{a} + \mat{W}\vec{h}) \big)_i.
 \end{split}
@@ -88,7 +88,7 @@ The algorithm is presented in a vectorized format for brevity.
         \State $n_h \gets$ length$(\vec{b})$
         \For{$k$ in 1 to $n$}
             \State $\vec{r} \sim$ Uniform$(0, 1, n_h)$
-            \State $\vec{h} \gets \vec{r} < \sigma(\vec{b} + \mat{W}^\intercal\vec{v})$
+            \State $\vec{h} \gets \vec{r} < \sigma(\vec{b} + \mat{W}\T\vec{v})$
                 \Comment $\sigma, <$ applied element-wise
             \State $\vec{r} \sim$ Uniform$(0, 1, n_v)$
             \State $\vec{v} \gets \vec{r} < \sigma(\vec{a} + \mat{W}\vec{h})$
@@ -118,12 +118,12 @@ Applying the algorithm to a mini-batch is essentially the same except that one d
 \begin{algorithmic}[1]
     \Procedure{CD}{$\vec{v}_+,n,\mat{W},\vec{a},\vec{b},\eta$}
         \Comment $\vec{v}_+$ is a training sample
-        \State $\vec{h}_+ \gets \sigma(\vec{b} + \mat{W}^\intercal\vec{v}_+)$
+        \State $\vec{h}_+ \gets \sigma(\vec{b} + \mat{W}\T\vec{v}_+)$
             \Comment $\sigma$ applied element-wise
         \State $\vec{v}_- \gets$ Gibbs$(\vec{v}_+,n,\mat{W},\vec{a},\vec{b})$
-        \State $\vec{h}_- \gets \sigma(\vec{b} + \mat{W}^\intercal\vec{v}_-)$
+        \State $\vec{h}_- \gets \sigma(\vec{b} + \mat{W}\T\vec{v}_-)$
             \Comment $\sigma$ applied element-wise
-        \State $\mat{W} \gets \mat{W} + \eta(\vec{v}_+ \vec{h}_+^\intercal - \vec{v}_- \vec{h}_-^\intercal)$
+        \State $\mat{W} \gets \mat{W} + \eta(\vec{v}_+ \vec{h}_+\T - \vec{v}_- \vec{h}_-\T)$
         \State $\vec{a} \gets \vec{a} + \eta(\vec{v}_+ - \vec{v}_-)$
         \State $\vec{b} \gets \vec{b} + \eta(\vec{h}_+ - \vec{h}_-)$
         \State \Return $\mat{W}, \vec{a}, \vec{b}$

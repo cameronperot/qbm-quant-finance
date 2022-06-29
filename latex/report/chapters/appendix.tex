@@ -23,7 +23,7 @@ The Kendall rank correlation coefficient is defined as
 where \( (x_1, y_1), \dots, (x_n, y_n) \) are pairs of observations of the random variables \( X \) and \( Y \).
 
 It is important to keep in mind how one interprets the correlation coefficients.
-The sign of the correlation coefficient determines whether it is negatively or positively correlated, and the magnitude determines how strong the correlation effects are.
+The sign of the correlation coefficient determines whether the variables are negatively or positively correlated, and the magnitude determines how strong the correlation effects are.
 As a loose guide, correlation coefficient values of 0.1, 0.3, and 0.5 can be termed small, medium, and large, respectively~\cite{research_design_and_statistical_analysis}.
 In general, one must be careful when interpreting the correlation coefficients; it is important to understand what the values mean, and what they do not.
 Section 3.4.2 "Interpreting the Correlation Coefficient" of~\cite{research_design_and_statistical_analysis} offers further insight and points out some pitfalls to watch out for.
@@ -109,7 +109,7 @@ and the upper as
         &= \frac{1 - 2z + C(z,z)}{1-z},
 \end{split}
 \end{align}
-where \( U_1 \) and \( U_2 \) uniform random variables on the interval \( [0, 1] \), and \( C(u_1, u_2) \) is the copula of \( (U_1, U_2) \).
+where \( U_1 \) and \( U_2 \) are uniform random variables on the interval \( [0, 1] \), and \( C(u_1, u_2) \) is the copula of \( (U_1, U_2) \).
 
 In practice, we compute \( U_1 \) and \( U_2 \) as the normalized rank of the observations of the random variables \( X \) and \( Y \), respectively.
 The way to interpret the concentration functions is that they represent the probability that \( X \) and \( Y \) simultaneously take on extreme values.
@@ -160,14 +160,14 @@ From this we can derive the conditional probability using~\cref{eq:rbm_energy,eq
 \begin{split}
     p(\vec{h} | \vec{v})
         &= \frac{p(\vec{v},\vec{h})}{p(\vec{v})} \\
-        &= \frac{1}{p(\vec{v})} \frac{1}{Z} \exp( \vec{a}^\intercal\vec{v} + \vec{b}^\intercal\vec{h} + \vec{v}^\intercal\mat{W}\vec{h} ) \\
-        &= \frac{1}{Z'} \exp\bigg( \sum_{j=1}^{n_h} b_j h_j + \sum_{j=1}^{n_h} (\vec{v}^\intercal\mat{W})_j h_j \bigg) \\
-        &= \frac{1}{Z'} \prod_{j=1}^{n_h} \exp\big( b_j h_j + (\vec{v}^\intercal\mat{W})_j h_j \big),
+        &= \frac{1}{p(\vec{v})} \frac{1}{Z} \exp( \vec{a}\T\vec{v} + \vec{b}\T\vec{h} + \vec{v}\T\mat{W}\vec{h} ) \\
+        &= \frac{1}{Z'} \exp\bigg( \sum_{j=1}^{n_h} b_j h_j + \sum_{j=1}^{n_h} (\vec{v}\T\mat{W})_j h_j \bigg) \\
+        &= \frac{1}{Z'} \prod_{j=1}^{n_h} \exp\big( b_j h_j + (\vec{v}\T\mat{W})_j h_j \big),
 \end{split}
 \end{align}
 with
 \begin{align}
-    Z' = \sum_\vec{h} \exp( \vec{b}^\intercal\vec{h} + \vec{v}^\intercal\mat{W}\vec{h} ),
+    Z' = \sum_\vec{h} \exp( \vec{b}\T\vec{h} + \vec{v}\T\mat{W}\vec{h} ),
 \end{align}
 where \( \sum_{\vec{h}} \) denotes the sum over all possible configurations of \( \vec{h} \).
 This leads us to
@@ -175,13 +175,13 @@ This leads us to
 \begin{split}
     p(h_j = 1 | \vec{v})
         &= \frac{\tilde{p}(h_j = 1 | \vec{v})}{\tilde{p}(h_j = 0 | \vec{v}) + \tilde{p}(h_j = 1 | \vec{v})} \\
-        &= \frac{\exp\big( b_j + (\vec{v}^\intercal\mat{W})_j \big)}{1 + \exp\big( b_j + (\vec{v}^\intercal\mat{W})_j \big)} \\
-        &= \sigma\big( b_j + (\vec{v}^\intercal\mat{W})_j \big).
+        &= \frac{\exp\big( b_j + (\vec{v}\T\mat{W})_j \big)}{1 + \exp\big( b_j + (\vec{v}\T\mat{W})_j \big)} \\
+        &= \sigma\big( b_j + (\vec{v}\T\mat{W})_j \big).
 \end{split}
 \end{align}
 Finally, we have
 \begin{align}
-    p(\vec{h} | \vec{v}) = \prod_{j=1}^{n_h} \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}^\intercal\vec{v}) \big)_j.
+    p(\vec{h} | \vec{v}) = \prod_{j=1}^{n_h} \sigma\big( (2\vec{h} - 1) \odot (\vec{b} + \mat{W}\T\vec{v}) \big)_j.
 \end{align}
 Analogously for \( p(\vec{v} | \vec{h}) \) one finds
 \begin{align}
@@ -350,7 +350,7 @@ When restrictions are imposed on connections within the hidden layer, the clampe
     H_\vec{v}
         &= -\sum_{i=1}^{n} \big(\Gamma_i \sigma_i^x + b_i'(\vec{v}) \sigma_i^z\big),
 \end{align}
-where \( b_i'(\vec{v}) = b_i + (\mat{W}^\intercal\vec{v})_i \).
+where \( b_i'(\vec{v}) = b_i + (\mat{W}\T\vec{v})_i \).
 This allows one to rewrite the clamped density matrix as
 \begin{align}
 \begin{split}
