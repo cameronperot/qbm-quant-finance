@@ -32,7 +32,7 @@ pages:
       - report.svg
 report:
   stage: deploy
-  image: texlive/texlive:latest
+  image: texlive/texlive:TL2021-historic
   script:
     - cd latex/report
     - latexmk -pdf main.tex
