@@ -52,7 +52,7 @@
 \subsection{Data Analysis}
 \begin{frame}
     \frametitle{Foreign Exchange Log Returns Data Set}
-    Data set consisted of the daily log returns for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs
+    Data set consists of the intraday log returns for the time period 1999-01-01 through 2019-12-31 of the following major currency pairs
     \begin{itemize}
         \item EURUSD - Euro € / U.S. Dollar \$
         \item GBPUSD - British Pound Sterling £ / U.S. Dollar \$
@@ -109,26 +109,26 @@
 
 \end{frame}
 
-\begin{frame}
-    \frametitle{Preprocessing Outlier Transformation}
-    \begin{figure}
-        \includegraphics[width=1\linewidth]{data_analysis/data_transformation.png}
-    \end{figure}
-\end{frame}
+%\begin{frame}
+    %\frametitle{Preprocessing Outlier Transformation}
+    %\begin{figure}
+        %\includegraphics[width=1\linewidth]{data_analysis/data_transformation.png}
+    %\end{figure}
+%\end{frame}
 
-\begin{frame}
-    \frametitle{Transformed Histograms}
-    \begin{figure}
-        \includegraphics[width=1\linewidth]{data_analysis/histograms_transformed.png}
-    \end{figure}
-\end{frame}
+%\begin{frame}
+    %\frametitle{Transformed Histograms}
+    %\begin{figure}
+        %\includegraphics[width=1\linewidth]{data_analysis/histograms_transformed.png}
+    %\end{figure}
+%\end{frame}
 
-\begin{frame}
-    \frametitle{Transformed Violin/Box Plot}
-    \begin{figure}
-        \includegraphics[width=1\linewidth]{data_analysis/violin_transformed.png}
-    \end{figure}
-\end{frame}
+%\begin{frame}
+    %\frametitle{Transformed Violin/Box Plot}
+    %\begin{figure}
+        %\includegraphics[width=1\linewidth]{data_analysis/violin_transformed.png}
+    %\end{figure}
+%\end{frame}
 
 \begin{frame}
     \frametitle{Historical Volatility}
@@ -176,27 +176,27 @@
     \end{figure}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Log-Likelihood Maximization}
-    Log-likelihood
-    \begin{align}
-    \begin{split}
-        \ell(\theta)
-            &= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log p(\vec{v})
-    \end{split}
-    \end{align}
-    with partial derivatives
-    \begin{align}
-    \begin{split}
-        \partial_{w_{ij}} \ell(\theta)
-            &= \langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{model}} \\
-        \partial_{a_i} \ell(\theta)
-            &= \langle v_i \rangle_{\text{data}} - \langle v_i \rangle_{\text{model}} \\
-        \partial_{b_j} \ell(\theta)
-            &= \langle h_j \rangle_{\text{data}} - \langle h_j \rangle_{\text{model}}
-    \end{split}
-    \end{align}
-\end{frame}
+%\begin{frame}
+    %\frametitle{Log-Likelihood Maximization}
+    %Log-likelihood
+    %\begin{align}
+    %\begin{split}
+        %\ell(\theta)
+            %&= \sum_{\vec{v}} p_{\text{data}}(\vec{v}) \log p(\vec{v})
+    %\end{split}
+    %\end{align}
+    %with partial derivatives
+    %\begin{align}
+    %\begin{split}
+        %\partial_{w_{ij}} \ell(\theta)
+            %&= \langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{model}} \\
+        %\partial_{a_i} \ell(\theta)
+            %&= \langle v_i \rangle_{\text{data}} - \langle v_i \rangle_{\text{model}} \\
+        %\partial_{b_j} \ell(\theta)
+            %&= \langle h_j \rangle_{\text{data}} - \langle h_j \rangle_{\text{model}}
+    %\end{split}
+    %\end{align}
+%\end{frame}
 
 \begin{frame}
     \frametitle{Gibbs Sampling and Contrastive Divergence}
@@ -222,12 +222,12 @@
     All values computed from an ensemble of 100 sample sets with \( 10^4 \) samples each.
 \end{frame}
 
-\begin{frame}
-    \frametitle{Autocorrelation Functions}
-    \begin{figure}
-        \includegraphics[width=0.9\linewidth]{rbm/autocorrelation_functions.png}
-    \end{figure}
-\end{frame}
+%\begin{frame}
+    %\frametitle{Autocorrelation Functions}
+    %\begin{figure}
+        %\includegraphics[width=0.9\linewidth]{rbm/autocorrelation_functions.png}
+    %\end{figure}
+%\end{frame}
 
 \begin{frame}
     \frametitle{QQ Plots}
@@ -256,42 +256,42 @@
     %\end{table}
 %\end{frame}
 
-\begin{frame}
-    \frametitle{Correlation Coefficients}
-    \begin{figure}
-        \includegraphics[width=0.9\linewidth]{rbm/correlation_coefficients.png}
-    \end{figure}
-\end{frame}
+%\begin{frame}
+    %\frametitle{Correlation Coefficients}
+    %\begin{figure}
+        %\includegraphics[width=0.9\linewidth]{rbm/correlation_coefficients.png}
+    %\end{figure}
+%\end{frame}
 
-\begin{frame}
-    \frametitle{Volatilities}
-    \begin{table}[!htb]
-        \centering
-        \begin{adjustbox}{max width=\textwidth}
-            \input{../../tables/rbm/volatilities.tbl}
-        \end{adjustbox}
-    \end{table}
-\end{frame}
+%\begin{frame}
+    %\frametitle{Volatilities}
+    %\begin{table}[!htb]
+        %\centering
+        %\begin{adjustbox}{max width=\textwidth}
+            %\input{../../tables/rbm/volatilities.tbl}
+        %\end{adjustbox}
+    %\end{table}
+%\end{frame}
 
-\begin{frame}
-    \frametitle{Tails}
-    \begin{table}[!htb]
-        \centering
-        \begin{adjustbox}{max width=\textwidth}
-            \input{../../tables/rbm/tails.tbl}
-        \end{adjustbox}
-    \end{table}
-\end{frame}
+%\begin{frame}
+    %\frametitle{Tails}
+    %\begin{table}[!htb]
+        %\centering
+        %\begin{adjustbox}{max width=\textwidth}
+            %\input{../../tables/rbm/tails.tbl}
+        %\end{adjustbox}
+    %\end{table}
+%\end{frame}
 
-\begin{frame}
-    \frametitle{Conditional Sampling}
-    \begin{table}[!htb]
-        \centering
-        \begin{adjustbox}{max width=\textwidth}
-            \input{../../tables/rbm/conditional_volatilities.tbl}
-        \end{adjustbox}
-    \end{table}
-\end{frame}
+%\begin{frame}
+    %\frametitle{Conditional Sampling}
+    %\begin{table}[!htb]
+        %\centering
+        %\begin{adjustbox}{max width=\textwidth}
+            %\input{../../tables/rbm/conditional_volatilities.tbl}
+        %\end{adjustbox}
+    %\end{table}
+%\end{frame}
 
 %----------------------------------------------------------------------------------------
 % Quantum Boltzmann Machines
@@ -313,53 +313,60 @@
     where \( Z = \tr(e^{-H}) \) is the partition function.
 \end{frame}
 
-\begin{frame}
-    \frametitle{QBM Optimization}
-    Log-likelihood lower bound
-    \begin{align}
-        \tilde{\ell}(\theta) = \sum_{\vec{v}} \pdata(\vec{v}) \log \tr(\rho_\vec{v})
-    \end{align}
-    Clamped Hamiltonian
-    \begin{align}
-        H_\vec{v}
-            &= \braket{\vec{v}|H|\vec{v}}
-    \end{align}
-    and corresponding density operator
-    \begin{align}
-        \rho_\vec{v}
-            &= \frac{1}{Z_\vec{v}} e^{-H_\vec{v}}
-    \end{align}
-\end{frame}
+%\begin{frame}
+    %\frametitle{RBM Diagram}
+    %\begin{figure}
+        %\includegraphics[width=1\linewidth]{rbm_diagram.png}
+    %\end{figure}
+%\end{frame}
 
-\begin{frame}
-    \frametitle{QBM Optimization}
-    Log-likelihood lower bound partial derivatives
-    \begin{align}
-    \begin{split}
-        \partial_{w_{ij}} \tilde{\ell}(\theta)
-            &= \langle \sigma_i^z \sigma_j^z \rangle_\text{data} - \langle \sigma_i^z \sigma_j^z \rangle_\text{model} \\
-        \partial_{b_i} \tilde{\ell}(\theta)
-            &= \langle \sigma_i^z \rangle_\text{data} - \langle \sigma_i^z \rangle_\text{model}
-    \end{split}
-    \end{align}
-    where
-    \begin{align}
-    \begin{split}
-        \langle \sigma_i^z \rangle_\text{data}
-            &= \sum_\vec{v} \pdata(\vec{v}) v_i,
-            \ i \in \mathcal{I}_v \\
-        \langle \sigma_i^z \sigma_j^z \rangle_\text{data}
-            &= \sum_\vec{v} \pdata(\vec{v}) v_i v_j,
-            \ i, j \in \mathcal{I}_v \\
-        \langle \sigma_i^z \rangle_\text{data}
-            &= \sum_\vec{v} \pdata(\vec{v}) \frac{b_i'(\vec{v})}{D_i(\vec{v})} \tanh\big(D_i(\vec{v})\big),
-            \ i \in \mathcal{I}_h \\
-        \langle \sigma_i^z \sigma_j^z \rangle_\text{data}
-            &= \sum_\vec{v} \pdata(\vec{v}) v_i \frac{b_j'(\vec{v})}{D_j(\vec{v})} \tanh\big(D_j(\vec{v})\big),
-            \ i \in \mathcal{I}_v, \ j \in \mathcal{I}_h
-    \end{split}
-    \end{align}
-\end{frame}
+%\begin{frame}
+    %\frametitle{QBM Optimization}
+    %Log-likelihood lower bound
+    %\begin{align}
+        %\tilde{\ell}(\theta) = \sum_{\vec{v}} \pdata(\vec{v}) \log \tr(\rho_\vec{v})
+    %\end{align}
+    %Clamped Hamiltonian
+    %\begin{align}
+        %H_\vec{v}
+            %&= \braket{\vec{v}|H|\vec{v}}
+    %\end{align}
+    %and corresponding density operator
+    %\begin{align}
+        %\rho_\vec{v}
+            %&= \frac{1}{Z_\vec{v}} e^{-H_\vec{v}}
+    %\end{align}
+%\end{frame}
+
+%\begin{frame}
+    %\frametitle{QBM Optimization}
+    %Log-likelihood lower bound partial derivatives
+    %\begin{align}
+    %\begin{split}
+        %\partial_{w_{ij}} \tilde{\ell}(\theta)
+            %&= \langle \sigma_i^z \sigma_j^z \rangle_\text{data} - \langle \sigma_i^z \sigma_j^z \rangle_\text{model} \\
+        %\partial_{b_i} \tilde{\ell}(\theta)
+            %&= \langle \sigma_i^z \rangle_\text{data} - \langle \sigma_i^z \rangle_\text{model}
+    %\end{split}
+    %\end{align}
+    %where
+    %\begin{align}
+    %\begin{split}
+        %\langle \sigma_i^z \rangle_\text{data}
+            %&= \sum_\vec{v} \pdata(\vec{v}) v_i,
+            %\ i \in \mathcal{I}_v \\
+        %\langle \sigma_i^z \sigma_j^z \rangle_\text{data}
+            %&= \sum_\vec{v} \pdata(\vec{v}) v_i v_j,
+            %\ i, j \in \mathcal{I}_v \\
+        %\langle \sigma_i^z \rangle_\text{data}
+            %&= \sum_\vec{v} \pdata(\vec{v}) \frac{b_i'(\vec{v})}{D_i(\vec{v})} \tanh\big(D_i(\vec{v})\big),
+            %\ i \in \mathcal{I}_h \\
+        %\langle \sigma_i^z \sigma_j^z \rangle_\text{data}
+            %&= \sum_\vec{v} \pdata(\vec{v}) v_i \frac{b_j'(\vec{v})}{D_j(\vec{v})} \tanh\big(D_j(\vec{v})\big),
+            %\ i \in \mathcal{I}_v, \ j \in \mathcal{I}_h
+    %\end{split}
+    %\end{align}
+%\end{frame}
 
 \begin{frame}
     \frametitle{Connection to D-Wave Quantum Annealers}
@@ -367,7 +374,7 @@
     \begin{align}
         H(s) = A(s) \bigg( -\sum_i \sigma_i^x \bigg) + B(s) \bigg( \sum_i h_i \sigma_i^z + \sum_{i,j} J_{ij} \sigma_i^z \sigma_j^z \bigg)
     \end{align}
-    with density operator (\( \beta = 1 / k_B T \))
+    with density operator (\( \beta = 1 / k T \))
     \begin{align}
         \rho(s, T) = \frac{1}{Z} e^{-\beta H(s)}
     \end{align}
@@ -383,6 +390,13 @@
         \label{eq:qbm_scaling}
     \end{split}
     \end{align}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Default Anneal Schedule}
+    \begin{figure}
+        \includegraphics[width=1\linewidth]{qbm/anneal_schedules/Advantage_system4.1-s_pause=1.00-pause_duration=0.png}
+    \end{figure}
 \end{frame}
 
 \begin{frame}
@@ -420,7 +434,7 @@
     \frametitle{12-Qubit Autoencoder}
     Trained a quantum restricted Boltzmann machine via the log-likelihood lower bound maximization method (BQRBM) using both a simulation and the D-Wave Advantage 4.1.
     \begin{itemize}
-        \item Data set consisted of 1500 samples, 1000 from a \( \mathcal{N}(-2, 1) \) distribution and 500 from a \( \mathcal{N}(3, 1) \) distribution.
+        \item Data set consists of 1500 samples, 1000 from a \( \mathcal{N}(-2, 1) \) distribution and 500 from a \( \mathcal{N}(3, 1) \) distribution.
         \item 8 visible and 4 hidden units.
         \item Mini-batch size of 10.
         \item \( s^* = 1 \) (reduced the problem to a RBM trained with quantum assistance).
@@ -504,6 +518,13 @@
 \end{frame}
 
 \begin{frame}
+    \frametitle{QQ Plots}
+    \begin{figure}
+        \includegraphics[width=0.3\linewidth]{qbm/log_returns/qq.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
     \frametitle{KL Divergences}
     \begin{table}[!htb]
         \centering
@@ -517,45 +538,38 @@
     %\frametitle{Correlation Coefficients}
     %\begin{table}[!htb]
         %\centering
-        %\begin{adjustbox}{max height=35mm}
+        %\begin{adjustbox}{max height=32mm}
             %\input{../../tables/qbm/correlation_coefficients.tbl}
         %\end{adjustbox}
     %\end{table}
 %\end{frame}
 
-\begin{frame}
-    \frametitle{Correlation Coefficients}
-    \begin{figure}
-        \includegraphics[width=0.9\linewidth]{qbm/log_returns/correlation_coefficients.png}
-    \end{figure}
-\end{frame}
+%\begin{frame}
+    %\frametitle{Correlation Coefficients}
+    %\begin{figure}
+        %\includegraphics[width=0.9\linewidth]{qbm/log_returns/correlation_coefficients.png}
+    %\end{figure}
+%\end{frame}
 
-\begin{frame}
-    \frametitle{Volatilities}
-    \begin{table}[!htb]
-        \centering
-        \begin{adjustbox}{max width=\textwidth}
-            \input{../../tables/qbm/volatilities.tbl}
-        \end{adjustbox}
-    \end{table}
-\end{frame}
+%\begin{frame}
+    %\frametitle{Volatilities}
+    %\begin{table}[!htb]
+        %\centering
+        %\begin{adjustbox}{max width=\textwidth}
+            %\input{../../tables/qbm/volatilities.tbl}
+        %\end{adjustbox}
+    %\end{table}
+%\end{frame}
 
-\begin{frame}
-    \frametitle{Tails}
-    \begin{table}[!htb]
-        \centering
-        \begin{adjustbox}{max height=35mm}
-            \input{../../tables/qbm/tails.tbl}
-        \end{adjustbox}
-    \end{table}
-\end{frame}
-
-\begin{frame}
-    \frametitle{QQ Plots}
-    \begin{figure}
-        \includegraphics[width=0.3\linewidth]{qbm/log_returns/qq.png}
-    \end{figure}
-\end{frame}
+%\begin{frame}
+    %\frametitle{Tails}
+    %\begin{table}[!htb]
+        %\centering
+        %\begin{adjustbox}{max height=35mm}
+            %\input{../../tables/qbm/tails.tbl}
+        %\end{adjustbox}
+    %\end{table}
+%\end{frame}
 
 %----------------------------------------------------------------------------------------
 % References and Resources
