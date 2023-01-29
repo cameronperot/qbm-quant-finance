@@ -1,7 +1,7 @@
 # Quantum Boltzmann Machines: Applications in Quantitative Finance
 The latest version of the thesis can be found [here](https://jugit.fz-juelich.de/qip/quantum-boltzmann-machines/-/jobs/artifacts/main/raw/latex/report/main.pdf?job=report).
 
-The `qbm` Python package designed for training and analyzing QBMs has been moved to its own repository [here](https://jugit.fz-juelich.de/qip/qbm).
+The `qbm` Python package designed for training and analyzing QBMs has been moved to its own repository [here](https://github.com/cameronperot/qbm).
 
 ## Abstract
 In this thesis we explore using the D-Wave Advantage 4.1 quantum annealer to sample from quantum Boltzmann distributions and train quantum Boltzmann machines (QBMs).
@@ -29,7 +29,7 @@ pip install --no-build-isolation git+https://github.com/cameronperot/scikit-lear
 ```
 The thesis package can be installed by running
 ```
-git clone git@jugit.fz-juelich.de:qip/qbm-quant-finance.git
+git clone git@github.com:cameronperot/qbm-quant-finance.git
 cd qbm-quant-finance
 pip install .
 ```
