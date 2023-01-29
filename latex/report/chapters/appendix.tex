@@ -379,22 +379,22 @@ This is obtained by using Cayley-Hamilton theorem along with the series expansio
 
 \section{Effective \( \beta \) as a Learnable Parameter}\label{app:learning_beta}
 This derivation follows along the lines of that laid out in~\cite{xu_2021}.
-Suppose the D-Wave annealer samples according to a classical Boltzmann distribution \( p_\text{DW} \) of energies \( E_\text{DW} = E / \beta \), i.e.,
+Suppose the D-Wave annealer samples according to a classical Boltzmann distribution \( p_\text{DW} \) of energies \( E_\text{DW} = \beta E \), i.e.,
 \begin{align}
 \begin{split}
     p_\text{DW}
         &= \frac{1}{Z_\text{DW}} e^{-E_\text{DW}} \\
-        &= \frac{1}{Z_\text{DW}} e^{-E / \beta}.
+        &= \frac{1}{Z_\text{DW}} e^{-\beta E}.
 \end{split}
 \end{align}
 Then we can take the partial derivative of the corresponding log-likelihood
 \begin{align}
     \partial_{\beta} \log p_\text{DW}
-        &= \frac{1}{\beta^2} (E - \langle E \rangle),
+        &= E - \langle E \rangle,
 \end{align}
 and after averaging over all configurations and multiplying by the learning rate \( \eta \) we get
 \begin{align}
     \Delta\beta
-        &= \frac{\eta}{\beta^2}\big(\langle E \rangle_\text{data} - \langle E \rangle_\text{model}\big),
+        &= \langle E \rangle_\text{data} - \langle E \rangle_\text{model},
 \end{align}
 which we can use to treat the effective inverse temperature as a learnable parameter.
