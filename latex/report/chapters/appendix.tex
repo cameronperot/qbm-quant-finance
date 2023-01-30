@@ -387,12 +387,12 @@ Suppose the D-Wave annealer samples according to a classical Boltzmann distribut
         &= \frac{1}{Z_\text{DW}} e^{-\beta E}.
 \end{split}
 \end{align}
-Then we can take the partial derivative of the corresponding log-likelihood
+Then we can take the partial derivative of the corresponding negative log-likelihood
 \begin{align}
-    \partial_{\beta} \log p_\text{DW}
+    -\partial_{\beta} \log p_\text{DW}
         &= E - \langle E \rangle,
 \end{align}
-and after averaging over all configurations and multiplying by the learning rate \( \eta \) we get
+and after averaging over all configurations we get
 \begin{align}
     \Delta\beta
         &= \langle E \rangle_\text{data} - \langle E \rangle_\text{model},
