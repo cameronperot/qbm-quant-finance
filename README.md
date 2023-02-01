@@ -1,5 +1,5 @@
 # Quantum Boltzmann Machines: Applications in Quantitative Finance
-The latest version of the thesis can be found [here](https://jugit.fz-juelich.de/qip/quantum-boltzmann-machines/-/jobs/artifacts/main/raw/latex/report/main.pdf?job=report).
+The latest version of the thesis can be found [here on arXiv](https://arxiv.org/abs/2301.13295).
 
 The `qbm` Python package designed for training and analyzing QBMs has been moved to its own repository [here](https://github.com/cameronperot/qbm).
 
